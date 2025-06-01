@@ -1,0 +1,93 @@
+###############################################################################
+PHYSICAL STANDBY TO ACTIVE DATAGUARD
+-- check for open mode and datbase role
+SQL> set lines 300 pages 300;
+col DB_UNIQUE_NAME for a10;
+select name,db_unique_name,open_mode,DATABASE_ROLE,PROTECTION_MODE,SWITCHOVER#,SWITCHOVER_status,current_scn from v$database;SQL> SQL> 
+
+NAME	  DB_UNIQUE_ OPEN_MODE		  DATABASE_ROLE    PROTECTION_MODE	SWITCHOVER# SWITCHOVER_STATUS	 CURRENT_SCN
+--------- ---------- -------------------- ---------------- -------------------- ----------- -------------------- -----------
+PRODDB	  proddbs    MOUNTED		  PHYSICAL STANDBY MAXIMUM PERFORMANCE	  938130879 NOT ALLOWED 	     2891963
+
+
+--if MRP is on now make it off.
+SQL> alter database recover managed standby database cancel;
+
+--open the database
+SQL> alter database open read only;
+
+Database altered.
+
+
+-- check for open mode and datbase role
+SQL>  set lines 300 pages 300;
+col DB_UNIQUE_NAME for a10;
+select name,db_unique_name,open_mode,DATABASE_ROLE,PROTECTION_MODE,SWITCHOVER#,SWITCHOVER_status,current_scn from v$database;SQL> SQL> 
+
+NAME	  DB_UNIQUE_ OPEN_MODE		  DATABASE_ROLE    PROTECTION_MODE	SWITCHOVER# SWITCHOVER_STATUS	 CURRENT_SCN
+--------- ---------- -------------------- ---------------- -------------------- ----------- -------------------- -----------
+PRODDB	  proddbs    READ ONLY		  PHYSICAL STANDBY MAXIMUM PERFORMANCE	  938130879 NOT ALLOWED 	     2892400
+
+--start MRP
+SQL> alter database recover managed standby database disconnect from session;
+
+---- check for open mode and datbase role
+
+SQL>  set lines 300 pages 300;
+col DB_UNIQUE_NAME for a10;
+select name,db_unique_name,open_mode,DATABASE_ROLE,PROTECTION_MODE,SWITCHOVER#,SWITCHOVER_status,current_scn from v$database;SQL> SQL> 
+
+NAME	  DB_UNIQUE_ OPEN_MODE		  DATABASE_ROLE    PROTECTION_MODE	SWITCHOVER# SWITCHOVER_STATUS	 CURRENT_SCN
+--------- ---------- -------------------- ---------------- -------------------- ----------- -------------------- -----------
+PRODDB	  proddbs    READ ONLY WITH APPLY PHYSICAL STANDBY MAXIMUM PERFORMANCE	  938130879 NOT ALLOWED 	     2893120
+
+
+
+
+
+
++===============================================================================================
+
+
+ACTIVE DATAGUARD TO PHYSICAL STANDBY
+
+------- check for open mode and datbase role
+SQL>  set lines 300 pages 300;
+col DB_UNIQUE_NAME for a10;
+select name,db_unique_name,open_mode,DATABASE_ROLE,PROTECTION_MODE,SWITCHOVER#,SWITCHOVER_status,current_scn from v$database;SQL> SQL> 
+
+NAME	  DB_UNIQUE_ OPEN_MODE		  DATABASE_ROLE    PROTECTION_MODE	SWITCHOVER# SWITCHOVER_STATUS	 CURRENT_SCN
+--------- ---------- -------------------- ---------------- -------------------- ----------- -------------------- -----------
+PRODDB	  proddbs    READ ONLY WITH APPLY PHYSICAL STANDBY MAXIMUM PERFORMANCE	  938130879 NOT ALLOWED 	     2893120
+
+----STOP MRP
+SQL> alter database recover managed standby database cancel;
+
+------- check for open mode and datbase role
+SQL> set lines 300 pages 300;
+col DB_UNIQUE_NAME for a10;
+select name,db_unique_name,open_mode,DATABASE_ROLE,PROTECTION_MODE,SWITCHOVER#,SWITCHOVER_status,current_scn from v$database;SQL> SQL> 
+
+NAME	  DB_UNIQUE_ OPEN_MODE		  DATABASE_ROLE    PROTECTION_MODE	SWITCHOVER# SWITCHOVER_STATUS	 CURRENT_SCN
+--------- ---------- -------------------- ---------------- -------------------- ----------- -------------------- -----------
+PRODDB	  proddbs    READ ONLY		  PHYSICAL STANDBY MAXIMUM PERFORMANCE	  938130879 NOT ALLOWED 	     2894661
+
+
+SQL> shut immediate;
+SQL> startup mount;
+
+------- check for open mode and datbase role
+SQL> set lines 300 pages 300;
+col DB_UNIQUE_NAME for a10;
+select name,db_unique_name,open_mode,DATABASE_ROLE,PROTECTION_MODE,SWITCHOVER#,SWITCHOVER_status,current_scn from v$database;
+
+NAME	  DB_UNIQUE_ OPEN_MODE		  DATABASE_ROLE    PROTECTION_MODE	SWITCHOVER# SWITCHOVER_STATUS	 CURRENT_SCN
+--------- ---------- -------------------- ---------------- -------------------- ----------- -------------------- -----------
+PRODDB	  proddbs    MOUNTED		  PHYSICAL STANDBY MAXIMUM PERFORMANCE	  938130879 NOT ALLOWED 	     2894661
+
+---START MRP
+SQL> alter database recover managed standby database disconnect from session;
+
+
+
+

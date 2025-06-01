@@ -1,0 +1,224 @@
+Unnamed datafile
+
+Steps
+
+1. start the listener in both primary and standby
+2. start the instances in both primary and standby
+3. start mrp in standby
+4. switch some logfiles in primary and check the sync between primary and standby
+5. check for db_create_file_dest and make value null in both primary and standby
+6. create directory for /u02/datafile for datafiles
+7. create datafile using a tablespace like users
+8. now check for missing file in standby, from this we get file missing file number
+9. enter that file number in standby we will get datafile details (select file#,name from v$datafile where file#=14;)
+10. enter that file number in standby we will get datafile details (select FILE_NAME||','||TABLESPACE_NAME||','||FILE_ID||','||STATUS||','||bytes from dba_data_files where file_id = 14;)
+11. in standby make it manual standby file management and off the mrp
+12. create datafile as like standby database datafile using primary datafile
+13. make it auto of standby file management
+14. start mrp in standby
+15. make some log switches in primary
+16. check for the sync status in both primary and standby
+===================================================================================================================================
+
+PRIMARY DATABASE
+
+SQL> show parameter db_create
+
+NAME				     TYPE	 VALUE
+------------------------------------ ----------- ------------------------------
+db_create_file_dest		     string	 /u01/app/oracle/oradata
+db_create_online_log_dest_1	     string
+db_create_online_log_dest_2	     string
+db_create_online_log_dest_3	     string
+db_create_online_log_dest_4	     string
+db_create_online_log_dest_5	     string
+SQL> alter system set db_create_file_dest='' scope=both;
+
+System altered.
+
+SQL> show parameter db_create
+
+NAME				     TYPE	 VALUE
+------------------------------------ ----------- ------------------------------
+db_create_file_dest		     string
+db_create_online_log_dest_1	     string
+db_create_online_log_dest_2	     string
+db_create_online_log_dest_3	     string
+db_create_online_log_dest_4	     string
+db_create_online_log_dest_5	     string
+
+--------------------------------------------------------------------
+STANDBY DATABASE
+
+SQL> show parameter db_create
+
+NAME				     TYPE	 VALUE
+------------------------------------ ----------- ------------------------------
+db_create_file_dest		     string	 /u01/app/oracle/oradata
+db_create_online_log_dest_1	     string
+db_create_online_log_dest_2	     string
+db_create_online_log_dest_3	     string
+db_create_online_log_dest_4	     string
+db_create_online_log_dest_5	     string
+SQL> alter system set db_create_file_dest='' scope=both;
+
+System altered.
+
+SQL> show parameter db_create
+
+NAME				     TYPE	 VALUE
+------------------------------------ ----------- ------------------------------
+db_create_file_dest		     string
+db_create_online_log_dest_1	     string
+db_create_online_log_dest_2	     string
+db_create_online_log_dest_3	     string
+db_create_online_log_dest_4	     string
+db_create_online_log_dest_5	     string
+
+---------------------------------------------------------------------------------------------
+
+primary database
+SQL> alter tablespace users add datafile '/u02/datafile/user01.dbf' size 5M;
+
+
+
+standby database:
+SQL> select FILE#||','||ERROR||','||STATUS||','||RECOVER||','||FUZZY||','||NAME from v$datafile_header where ERROR='FILE MISSING';
+
+FILE#||','||ERROR||','||STATUS||','||RECOVER||','||FUZZY||','||NAME
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+19,FILE MISSING,ONLINE,,,
+
+SQL> select file#,name from v$datafile where file#=19;
+
+     FILE#
+----------
+NAME
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+	19
+/u01/app/oracle/product/19.0.0.0/dbhome_1/dbs/UNNAMED00019
+
+
+primary database:
+SQL> select FILE_NAME||','||TABLESPACE_NAME||','||FILE_ID||','||STATUS||','||bytes from dba_data_files where file_id = 19;
+
+FILE_NAME||','||TABLESPACE_NAME||','||FILE_ID||','||STATUS||','||BYTES
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+/u02/datafile/user01.dbf,USERS,19,AVAILABLE,5242880
+
+
+standby database:
+SQL> alter system set standby_file_management=MANUAL sid='*';
+SQL> alter database create datafile '/u01/app/oracle/product/19.0.0.0/dbhome_1/dbs/UNNAMED00019' as '/u01/app/oracle/oradata/RAMYA/datafile/user01.dbf' size 5M;
+
+Database altered.
+
+SQL> alter system set standby_file_management=AUTO sid='*';
+
+System altered.
+SQL> alter database recover managed standby database disconnect from session;
+
+
+
+
+primary database:
+SQL> alter system switch logfile;                                            
+
+System altered.
+SQL> set lines 300 pages 300;
+SELECT sequence#, first_time, next_time, applied FROM v$archived_log ORDER BY sequence#;SQL> 
+
+
+
+standby database:
+SQL> set lines 300 pages 300;
+SELECT sequence#, first_time, next_time, applied FROM v$archived_log ORDER BY sequence#;SQL> 
+
+
+
+
+primary Sdatabase:
+SQL> show parameter db_cre
+
+NAME				     TYPE	 VALUE
+------------------------------------ ----------- ------------------------------
+db_create_file_dest		     string
+db_create_online_log_dest_1	     string
+db_create_online_log_dest_2	     string
+db_create_online_log_dest_3	     string
+db_create_online_log_dest_4	     string
+db_create_online_log_dest_5	     string
+SQL> show parameter standby_f	
+
+NAME				     TYPE	 VALUE
+------------------------------------ ----------- ------------------------------
+standby_file_management 	     string	 AUTO
+SQL> alter system set db_create_file_dest='/u01/app/oracle/oradata' scope=both;
+
+System altered.
+
+
+
+primary
+SQL> show parameter db_cre	
+
+NAME				     TYPE	 VALUE
+------------------------------------ ----------- ------------------------------
+db_create_file_dest		     string	 /u01/app/oracle/oradata
+db_create_online_log_dest_1	     string
+db_create_online_log_dest_2	     string
+db_create_online_log_dest_3	     string
+db_create_online_log_dest_4	     string
+db_create_online_log_dest_5	     string
+SQL> 
+
+
+
+
+
+
+standby database:
+SQL> show parameter db_cre	 
+
+NAME				     TYPE	 VALUE
+------------------------------------ ----------- ------------------------------
+db_create_file_dest		     string
+db_create_online_log_dest_1	     string
+db_create_online_log_dest_2	     string
+db_create_online_log_dest_3	     string
+db_create_online_log_dest_4	     string
+db_create_online_log_dest_5	     string
+SQL> alter system set db_create_file_dest='/u01/app/oracle/oradata' scope=both;
+
+System altered.
+
+SQL> show parameter db_cre	
+
+NAME				     TYPE	 VALUE
+------------------------------------ ----------- ------------------------------
+db_create_file_dest		     string	 /u01/app/oracle/oradata
+db_create_online_log_dest_1	     string
+db_create_online_log_dest_2	     string
+db_create_online_log_dest_3	     string
+db_create_online_log_dest_4	     string
+db_create_online_log_dest_5	     string
+
+
+
+
+
+
+
+
+
+
+
+#################################################
+
+ALTER SYSTEM SET local_listener='(DESCRIPTION = (ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = 192.168.234.43)(PORT = 1521))) (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = proddb)))';
+
+
+ALTER SYSTEM SET local_listener='(DESCRIPTION = (ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST =192.168.234.122 )(PORT = 1521))) (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = proddbs)))';
+
+
+ORA-16000: database or pluggable database open for read-only access

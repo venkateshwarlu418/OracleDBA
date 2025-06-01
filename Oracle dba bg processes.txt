@@ -1,0 +1,657 @@
+
+
+
+
+
+													 Check All Background Processes
+
+
+
+SQL> SELECT NAME, DESCRIPTION
+FROM V$BGPROCESS
+WHERE NAME IS NOT NULL
+ORDER BY NAME;
+
+NAME |DESCRIPTION
+-----|----------------------------------------------------------------
+ABMR |Auto BMR Background Process
+ACFS |ACFS CSS
+ACMS |Atomic Controlfile to Memory Server
+AMB1 |ASM Background 1
+AMB2 |ASM Background 2
+AMB3 |ASM Background 3
+AQPC |AQ Process Coord
+ARB0 |ASM Rebalance 0
+ARB1 |ASM Rebalance 1
+ARB2 |ASM Rebalance 2
+ARB3 |ASM Rebalance 3
+ARB4 |ASM Rebalance 4
+ARB5 |ASM Rebalance 5
+ARB6 |ASM Rebalance 6
+ARB7 |ASM Rebalance 7
+ARB8 |ASM Rebalance 8
+ARB9 |ASM Rebalance 9
+ARBA |ASM Rebalance 10
+ARC0 |Archival Process 0
+ARC1 |Archival Process 1
+ARC2 |Archival Process 2
+ARC3 |Archival Process 3
+ARC4 |Archival Process 4
+ARC5 |Archival Process 5
+ARC6 |Archival Process 6
+ARC7 |Archival Process 7
+ARC8 |Archival Process 8
+ARC9 |Archival Process 9
+ARCa |Archival Process 10
+ARCb |Archival Process 11
+ARCc |Archival Process 12
+ARCd |Archival Process 13
+ARCe |Archival Process 14
+ARCf |Archival Process 15
+ARCg |Archival Process 16
+ARCh |Archival Process 17
+ARCi |Archival Process 18
+ARCj |Archival Process 19
+ARCk |Archival Process 20
+ARCl |Archival Process 21
+ARCm |Archival Process 22
+ARCn |Archival Process 23
+ARCo |Archival Process 24
+ARCp |Archival Process 25
+ARCq |Archival Process 26
+ARCr |Archival Process 27
+ARCs |Archival Process 28
+ARCt |Archival Process 29
+ASMB |ASM Background
+BW36 |db writer process 36
+BW37 |db writer process 37
+BW38 |db writer process 38
+BW39 |db writer process 39
+BW40 |db writer process 40
+BW41 |db writer process 41
+BW42 |db writer process 42
+BW43 |db writer process 43
+BW44 |db writer process 44
+BW45 |db writer process 45
+BW46 |db writer process 46
+BW47 |db writer process 47
+BW48 |db writer process 48
+BW49 |db writer process 49
+BW50 |db writer process 50
+BW51 |db writer process 51
+BW52 |db writer process 52
+BW53 |db writer process 53
+BW54 |db writer process 54
+BW55 |db writer process 55
+BW56 |db writer process 56
+BW57 |db writer process 57
+BW58 |db writer process 58
+BW59 |db writer process 59
+BW60 |db writer process 60
+BW61 |db writer process 61
+BW62 |db writer process 62
+BW63 |db writer process 63
+BW64 |db writer process 64
+BW65 |db writer process 65
+BW66 |db writer process 66
+BW67 |db writer process 67
+BW68 |db writer process 68
+BW69 |db writer process 69
+BW70 |db writer process 70
+BW71 |db writer process 71
+BW72 |db writer process 72
+BW73 |db writer process 73
+BW74 |db writer process 74
+BW75 |db writer process 75
+BW76 |db writer process 76
+BW77 |db writer process 77
+BW78 |db writer process 78
+BW79 |db writer process 79
+BW80 |db writer process 80
+BW81 |db writer process 81
+BW82 |db writer process 82
+BW83 |db writer process 83
+BW84 |db writer process 84
+BW85 |db writer process 85
+BW86 |db writer process 86
+BW87 |db writer process 87
+BW88 |db writer process 88
+BW89 |db writer process 89
+BW90 |db writer process 90
+BW91 |db writer process 91
+BW92 |db writer process 92
+BW93 |db writer process 93
+BW94 |db writer process 94
+BW95 |db writer process 95
+BW96 |db writer process 96
+BW97 |db writer process 97
+BW98 |db writer process 98
+BW99 |db writer process 99
+CJQ0 |Job Queue Coordinator
+CKPT |checkpoint
+CLMN |process cleanup
+CTWR |Change Tracking Writer
+D000 |Dispatchers
+DBRM |DataBase Resource Manager
+DBW0 |db writer process 0
+DBW1 |db writer process 1
+DBW2 |db writer process 2
+DBW3 |db writer process 3
+DBW4 |db writer process 4
+DBW5 |db writer process 5
+DBW6 |db writer process 6
+DBW7 |db writer process 7
+DBW8 |db writer process 8
+DBW9 |db writer process 9
+DBWa |db writer process 10 (a)
+DBWb |db writer process 11 (b)
+DBWc |db writer process 12 (c)
+DBWd |db writer process 13 (d)
+DBWe |db writer process 14 (e)
+DBWf |db writer process 15 (f)
+DBWg |db writer process 16 (g)
+DBWh |db writer process 17 (h)
+DBWi |db writer process 18 (i)
+DBWj |db writer process 19 (j)
+DBWk |db writer process 20 (k)
+DBWl |db writer process 21 (l)
+DBWm |db writer process 22 (m)
+DBWn |db writer process 23 (n)
+DBWo |db writer process 24 (o)
+DBWp |db writer process 25 (p)
+DBWq |db writer process 26 (q)
+DBWr |db writer process 27 (r)
+DBWs |db writer process 28 (s)
+DBWt |db writer process 29 (t)
+DBWu |db writer process 30 (u)
+DBWv |db writer process 31 (v)
+DBWw |db writer process 32 (w)
+DBWx |db writer process 33 (x)
+DBWy |db writer process 34 (y)
+DBWz |db writer process 35 (z)
+DIA0 |diagnosibility process 0
+DIA1 |diagnosibility process 1
+DIA2 |diagnosibility process 2
+DIA3 |diagnosibility process 3
+DIA4 |diagnosibility process 4
+DIA5 |diagnosibility process 5
+DIA6 |diagnosibility process 6
+DIA7 |diagnosibility process 7
+DIA8 |diagnosibility process 8
+DIA9 |diagnosibility process 9
+DIAG |diagnosibility process
+DMON |DG Broker Monitor Process
+DSKM |slave DiSKMon process
+FBDA |Flashback Data Archiver Process
+FENC |IOServer fence monitor
+FMON |File Mapping Monitor Process
+FSFP |Data Guard Broker FSFO Pinger
+GEN0 |generic0
+GEN1 |generic1
+GEN2 |generic2
+GMON |diskgroup monitor
+GTX0 |Global Txn process 0
+GTX1 |Global Txn process 1
+GTX2 |Global Txn process 2
+GTX3 |Global Txn process 3
+GTX4 |Global Txn process 4
+GTX5 |Global Txn process 5
+GTX6 |Global Txn process 6
+GTX7 |Global Txn process 7
+GTX8 |Global Txn process 8
+GTX9 |Global Txn process 9
+GTXa |Global Txn process 10
+GTXb |Global Txn process 11
+GTXc |Global Txn process 12
+GTXd |Global Txn process 13
+GTXe |Global Txn process 14
+GTXf |Global Txn process 15
+GTXg |Global Txn process 16
+GTXh |Global Txn process 17
+GTXi |Global Txn process 18
+GTXj |Global Txn process 19
+IMCO |In-memory coordinator process
+INSV |Data Guard Broker INstance SlaVe Process
+IPC0 |IPC Service 0
+LCK0 |Lock Process 0
+LCK1 |Lock Process 1
+LGWR |Redo etc.
+LMD0 |global enqueue service daemon 0
+LMD1 |global enqueue service daemon 1
+LMD2 |global enqueue service daemon 2
+LMD3 |global enqueue service daemon 3
+LMD4 |global enqueue service daemon 4
+LMD5 |global enqueue service daemon 5
+LMD6 |global enqueue service daemon 6
+LMD7 |global enqueue service daemon 7
+LMD8 |global enqueue service daemon 8
+LMD9 |global enqueue service daemon 9
+LMDa |global enqueue service daemon 10
+LMDb |global enqueue service daemon 11
+LMDc |global enqueue service daemon 12
+LMDd |global enqueue service daemon 13
+LMDe |global enqueue service daemon 14
+LMDf |global enqueue service daemon 15
+LMDg |global enqueue service daemon 16
+LMDh |global enqueue service daemon 17
+LMDi |global enqueue service daemon 19
+LMDj |global enqueue service daemon 19
+LMDk |global enqueue service daemon 20
+LMDl |global enqueue service daemon 21
+LMDm |global enqueue service daemon 22
+LMDn |global enqueue service daemon 23
+LMDo |global enqueue service daemon 24
+LMDp |global enqueue service daemon 25
+LMDq |global enqueue service daemon 26
+LMDr |global enqueue service daemon 27
+LMDs |global enqueue service daemon 28
+LMDt |global enqueue service daemon 29
+LMDu |global enqueue service daemon 30
+LMDv |global enqueue service daemon 31
+LMDw |global enqueue service daemon 32
+LMDx |global enqueue service daemon 33
+LMDy |global enqueue service daemon 34
+LMDz |global enqueue service daemon 35
+LMFC |GCS Lock Manager Flash Cache Process
+LMHB |lm heartbeat monitor
+LMON |global enqueue service monitor
+LREG |Listener Registration
+LSP0 |Logical Standby
+LSP1 |Dictionary build process for Logical Standby
+LSP2 |Set Guard Standby Information for Logical Standby
+M000 |MMON slave class 1
+M001 |MMON slave class 1
+M002 |MMON slave class 1
+M003 |MMON slave class 1
+MARK |mark AU for resync koordinator
+MMAN |Memory Manager
+MMNL |Manageability Monitor Process 2
+MMON |Manageability Monitor Process
+MRP0 |Managed Standby Recovery
+NSS1 |Network Server SYNC
+NSS2 |Network Server SYNC
+NSS3 |Network Server SYNC
+NSS4 |Network Server SYNC
+NSS5 |Network Server SYNC
+NSS6 |Network Server SYNC
+NSS7 |Network Server SYNC
+NSS8 |Network Server SYNC
+NSS9 |Network Server SYNC
+NSSA |Network Server SYNC
+NSSB |Network Server SYNC
+NSSC |Network Server SYNC
+NSSD |Network Server SYNC
+NSSE |Network Server SYNC
+NSSF |Network Server SYNC
+NSSG |Network Server SYNC
+NSSH |Network Server SYNC
+NSSI |Network Server SYNC
+NSSJ |Network Server SYNC
+NSSK |Network Server SYNC
+NSSL |Network Server SYNC
+NSSM |Network Server SYNC
+NSSN |Network Server SYNC
+NSSO |Network Server SYNC
+NSSP |Network Server SYNC
+NSSQ |Network Server SYNC
+NSV0 |Data Guard Broker NetSlave Process 0
+NSV1 |Data Guard Broker NetSlave Process 1
+NSV2 |Data Guard Broker NetSlave Process 2
+NSV3 |Data Guard Broker NetSlave Process 3
+NSV4 |Data Guard Broker NetSlave Process 4
+NSV5 |Data Guard Broker NetSlave Process 5
+NSV6 |Data Guard Broker NetSlave Process 6
+NSV7 |Data Guard Broker NetSlave Process 7
+NSV8 |Data Guard Broker NetSlave Process 8
+NSV9 |Data Guard Broker NetSlave Process 9
+NSVA |Data Guard Broker NetSlave Process A
+NSVB |Data Guard Broker NetSlave Process B
+NSVC |Data Guard Broker NetSlave Process C
+NSVD |Data Guard Broker NetSlave Process D
+NSVE |Data Guard Broker NetSlave Process E
+NSVF |Data Guard Broker NetSlave Process F
+NSVG |Data Guard Broker NetSlave Process G
+
+NAME |DESCRIPTION
+-----|----------------------------------------------------------------
+NSVH |Data Guard Broker NetSlave Process H
+NSVI |Data Guard Broker NetSlave Process I
+NSVJ |Data Guard Broker NetSlave Process J
+NSVK |Data Guard Broker NetSlave Process K
+NSVL |Data Guard Broker NetSlave Process L
+NSVM |Data Guard Broker NetSlave Process M
+NSVN |Data Guard Broker NetSlave Process N
+NSVO |Data Guard Broker NetSlave Process O
+NSVP |Data Guard Broker NetSlave Process P
+NSVQ |Data Guard Broker NetSlave Process Q
+NSVR |Data Guard Broker NetSlave Process R
+NSVS |Data Guard Broker NetSlave Process S
+NSVT |Data Guard Broker NetSlave Process T
+NSVU |Data Guard Broker NetSlave Process U
+OFSD |Oracle File Server BG
+P000 |Parallel query slave
+P001 |Parallel query slave
+PING |interconnect latency measurement
+PMAN |process manager
+PMON |process cleanup
+PSP0 |process spawner 0
+PXMN |PX Monitor
+Q001 |QMON MS
+Q003 |QMON MS
+Q004 |QMON MS
+Q005 |QMON MS
+Q006 |QMON MS
+Q007 |QMON MS
+Q008 |QMON MS
+Q009 |QMON MS
+Q00A |QMON MS
+Q00B |QMON MS
+Q00C |QMON MS
+Q00D |QMON MS
+Q00E |QMON MS
+Q00F |QMON MS
+Q00G |QMON MS
+Q00H |QMON MS
+Q00I |QMON MS
+Q00J |QMON MS
+Q00K |QMON MS
+Q00L |QMON MS
+Q00M |QMON MS
+QM02 |QMON MS
+QM03 |QMON MS
+RBAL |ASM Rebalance master
+RCBG |Result Cache: Background
+RECO |distributed recovery
+RMON |rolling migration monitor
+RMS0 |rac management server
+RPOP |instant restore repopulation daemon
+RSM0 |Data Guard Broker Resource Guard Process 0
+RSMN |Remote Slave Monitor
+RTTD |Redo Transport Test Driver
+RVWR |Recovery Writer
+S000 |Shared servers
+S001 |Shared servers
+SCMN |
+SCMN |
+SCRB |ASM Scrubbing Master
+SMCO |Space Manager Process
+SMON |System Monitor Process
+SVCB |services background monitor
+TMON |Transport Monitor
+TPZ1 |Test Process Z1
+TPZ2 |Test Process Z2
+TPZ3 |Test Process Z3
+TT00 |Redo Transport
+TT01 |Redo Transport
+TT02 |Redo Transport
+UTMU |multipdb
+VBG0 |Volume BG 0
+VBG1 |Volume BG 1
+VBG2 |Volume BG 2
+VBG3 |Volume BG 3
+VBG4 |Volume BG 4
+VBG5 |Volume BG 5
+VBG6 |Volume BG 6
+VBG7 |Volume BG 7
+VBG8 |Volume BG 8
+VBG9 |Volume BG 9
+VDBG |Volume Driver BG
+VKRM |Virtual sKeduler for Resource Manager
+VKTM |Virtual Keeper of TiMe process
+VMB0 |Volume Membership 0
+VUBG |Volume Driver Umbilical Background
+W000 |space management slave pool
+W001 |space management slave pool
+W002 |space management slave pool
+W003 |space management slave pool
+W004 |space management slave pool
+XDMG |cell automation manager
+XDWK |cell automation worker actions
+
+390 rows selected.
+
+
+
+
+										Check Currently Running Background Processes
+
+SQL> SELECT 
+    P.SPID AS "OS_PID", 
+    S.PROGRAM, 
+    S.PADDR, 
+    S.SID, 
+    S.SERIAL#
+FROM 
+    V$PROCESS P 
+JOIN 
+    V$SESSION S ON P.ADDR = S.PADDR
+WHERE 
+    S.TYPE = 'BACKGROUND'
+ORDER BY 
+    S.PROGRAM;  2    3    4    5    6    7    8    9   10   11   12   13   14  
+
+OS_PID			|PROGRAM					 |PADDR 	  |	  SID|	 SERIAL#
+------------------------|------------------------------------------------|----------------|----------|----------
+2738			|oracle@oraclept.com (AQPC)			 |000000007E3D1C68|	   43|	   52692
+2755			|oracle@oraclept.com (CJQ0)			 |000000007E3D8748|	   53|	   64146
+2485			|oracle@oraclept.com (CKPT)			 |000000007E3BB108|	   21|	   50928
+2424			|oracle@oraclept.com (CLMN)			 |000000007E3A3048|	    3|	   51832
+2449			|oracle@oraclept.com (DBRM)			 |000000007E3B1B68|	   14|	   41130
+2481			|oracle@oraclept.com (DBW0)			 |000000007E3B8648|	   19|	   28561
+2477			|oracle@oraclept.com (DIA0)			 |000000007E3B70E8|	   18|	   59292
+2442			|oracle@oraclept.com (DIAG)			 |000000007E3ADB48|	   11|	    1263
+2433			|oracle@oraclept.com (GEN0)			 |000000007E3A7068|	    6|	   59462
+2439			|oracle@oraclept.com (GEN1)			 |000000007E3AB088|	   10|	   38059
+2483			|oracle@oraclept.com (LGWR)			 |000000007E3B9BA8|	   20|	   22276
+2524			|oracle@oraclept.com (LREG)			 |000000007E3C1BE8|	   27|	   55974
+9036			|oracle@oraclept.com (M000)			 |000000007E3DF228|	   65|	    2057
+8760			|oracle@oraclept.com (M001)			 |000000007E3D5C88|	   55|	   27355
+6925			|oracle@oraclept.com (M002)			 |000000007E3D4728|	  101|	   61212
+11368			|oracle@oraclept.com (M003)			 |000000007E3DDCC8|	   59|	   38816
+7637			|oracle@oraclept.com (M004)			 |000000007E3CDC48|	   36|	   57852
+2435			|oracle@oraclept.com (MMAN)			 |000000007E3A85C8|	    7|	    2784
+2603			|oracle@oraclept.com (MMNL)			 |000000007E3C5C08|	   32|	   63192
+2581			|oracle@oraclept.com (MMON)			 |000000007E3C7168|	   31|	    4712
+2444			|oracle@oraclept.com (OFSD)			 |000000007E3AF0A8|	   13|	   32043
+2474			|oracle@oraclept.com (PMAN)			 |000000007E3B5B88|	   17|	   28728
+2422			|oracle@oraclept.com (PMON)			 |000000007E3A1AE8|	    2|	   16242
+2426			|oracle@oraclept.com (PSP0)			 |000000007E3A45A8|	    4|	   41177
+2549			|oracle@oraclept.com (PXMN)			 |000000007E3C46A8|	   30|	   65402
+2746			|oracle@oraclept.com (Q003)			 |000000007E3D71E8|	   50|	   57617
+3721			|oracle@oraclept.com (Q004)			 |000000007E3F1D68|	   78|	   52755
+2740			|oracle@oraclept.com (QM02)			 |000000007E3D31C8|	   45|	   15624
+2504			|oracle@oraclept.com (RECO)			 |000000007E3BF128|	   24|	   47565
+2444			|oracle@oraclept.com (SCMN)			 |000000007E3B0608|	   12|	   19157
+2439			|oracle@oraclept.com (SCMN)			 |000000007E3AC5E8|	    9|	    5983
+2498			|oracle@oraclept.com (SMCO)			 |000000007E3BDBC8|	   23|	   60013
+2493			|oracle@oraclept.com (SMON)			 |000000007E3BC668|	   22|	   51603
+2465			|oracle@oraclept.com (SVCB)			 |000000007E3B4628|	   16|	   12424
+2665			|oracle@oraclept.com (TMON)			 |000000007E3CB188|	   33|	   36555
+2727			|oracle@oraclept.com (TT00)			 |000000007E3CC6E8|	    8|	   56270
+2729			|oracle@oraclept.com (TT01)			 |000000007E3CF1A8|	   39|	   23834
+2731			|oracle@oraclept.com (TT02)			 |000000007E3D0708|	   40|	   31952
+2455			|oracle@oraclept.com (VKRM)			 |000000007E3B30C8|	   15|	   29561
+2429			|oracle@oraclept.com (VKTM)			 |000000007E3A5B08|	    5|	   22073
+2509			|oracle@oraclept.com (W000)			 |000000007E3C0688|	   25|	   21319
+2533			|oracle@oraclept.com (W001)			 |000000007E3C3148|	   28|	   28354
+2843			|oracle@oraclept.com (W002)			 |000000007E3A9B28|	   34|	   34368
+3237			|oracle@oraclept.com (W003)			 |000000007E3EF2A8|	   74|	   16002
+3517			|oracle@oraclept.com (W004)			 |000000007E3F0808|	   76|	   22254
+5952			|oracle@oraclept.com (W005)			 |000000007E3DC768|	   62|	     264
+5961			|oracle@oraclept.com (W006)			 |000000007E3E0788|	   63|	   49374
+5966			|oracle@oraclept.com (W007)			 |000000007E3E3248|	   66|	   53587
+
+
+
+										Check Wait Events for Background Processes
+
+SQL> set lines 200 pages 200
+col PROGRAM for a30
+col EVENT for a50 
+col WAIT_CLASS for a10
+col STATE for a10
+col SECONDS_IN_WAIT for 9999999999
+SELECT 
+    S.PROGRAM, 
+    W.EVENT, 
+    W.WAIT_CLASS, 
+    W.STATE, 
+    W.SECONDS_IN_WAIT
+FROM 
+    V$SESSION S
+JOIN 
+    V$SESSION_WAIT W ON S.SID = W.SID
+WHERE 
+    S.TYPE = 'BACKGROUND'
+ORDER BY 
+    W.SECONDS_IN_WAIT DESC;
+SQL> set lines 200 pages 200
+col PROGRAM for a30
+col EVENT for a50 
+col WAIT_CLASS for a10
+col STATE for a10
+col SECONDS_IN_WAIT for 9999999999
+SELECT 
+    S.PROGRAM, 
+    W.EVENT, 
+    W.WAIT_CLASS, 
+    W.STATE, 
+    W.SECONDS_IN_WAIT
+FROM 
+    V$SESSION S
+JOIN 
+    V$SESSION_WAIT W ON S.SID = W.SID
+WHERE 
+    S.TYPE = 'BACKGROUND'
+ORDER BY 
+    W.SECONDS_IN_WAIT DESC;
+
+PROGRAM 				      |EVENT											 |WAIT_CLASS|STATE     |SECONDS_IN_WAIT
+------------------------------|--------------------------------------------------|----------|----------|---------------
+oracle@oraclept.com (VKTM)    |VKTM Logical Idle Wait							 |Idle	    |WAITING   |	   4344
+oracle@oraclept.com (VKRM)    |VKRM Idle										 |Idle	    |WAITING   |	   4342
+oracle@oraclept.com (Q004)    |Streams AQ: waiting for time management or cleanup|Idle	    |WAITING   |	   4273
+							  | tasks											 |		    |	       |
+oracle@oraclept.com (RECO)    |rdbms ipc message								 |Idle	    |WAITING   |	    676
+oracle@oraclept.com (TT01)    |Data Guard: Timer								 |Idle	    |WAITING   |	    394
+oracle@oraclept.com (SMON)    |smon timer										 |Idle	    |WAITING   |	    296
+oracle@oraclept.com (M003)    |class slave wait 								 |Idle	    |WAITING   |	     49
+oracle@oraclept.com (TT00)    |Data Guard: Gap Manager							 |Idle	    |WAITING   |	     49
+oracle@oraclept.com (M001)    |class slave wait 								 |Idle	    |WAITING   |	     49
+oracle@oraclept.com (M000)    |class slave wait 								 |Idle	    |WAITING   |	     49
+oracle@oraclept.com (M002)    |class slave wait 								 |Idle	    |WAITING   |	     49
+oracle@oraclept.com (AQPC)    |AQPC idle										 |Idle	    |WAITING   |	     18
+oracle@oraclept.com (TMON)    |rdbms ipc message								 |Idle	    |WAITING   |	     18
+oracle@oraclept.com (QM02)    |Streams AQ: qmn coordinator idle wait			 |Idle	    |WAITING   |	      7
+oracle@oraclept.com (Q003)    |Streams AQ: qmn slave idle wait					 |Idle	    |WAITING   |	      7
+oracle@oraclept.com (W003)    |Space Manager: slave idle wait					 |Idle	    |WAITING   |	      4
+oracle@oraclept.com (CJQ0)    |rdbms ipc message								 |Idle	    |WAITING   |	      3
+oracle@oraclept.com (W004)    |Space Manager: slave idle wait					 |Idle	    |WAITING   |	      2
+oracle@oraclept.com (W006)    |Space Manager: slave idle wait					 |Idle	    |WAITING   |	      2
+oracle@oraclept.com (W002)    |Space Manager: slave idle wait					 |Idle	    |WAITING   |	      2
+oracle@oraclept.com (LREG)    |lreg timer										 |Idle	    |WAITING   |	      2
+oracle@oraclept.com (W005)    |Space Manager: slave idle wait					 |Idle	    |WAITING   |	      1
+oracle@oraclept.com (MMON)    |rdbms ipc message								 |Idle	    |WAITING   |	      1
+oracle@oraclept.com (PXMN)    |rdbms ipc message								 |Idle	    |WAITING   |	      1
+oracle@oraclept.com (W001)    |Space Manager: slave idle wait					 |Idle	    |WAITING   |	      1
+oracle@oraclept.com (W000)    |Space Manager: slave idle wait					 |Idle	    |WAITING   |	      1
+oracle@oraclept.com (SMCO)    |rdbms ipc message								 |Idle	    |WAITING   |	      1
+oracle@oraclept.com (CKPT)    |rdbms ipc message								 |Idle	    |WAITING   |	      1
+oracle@oraclept.com (DBW0)    |rdbms ipc message								 |Idle	    |WAITING   |	      1
+oracle@oraclept.com (DIA0)    |DIAG idle wait									 |Idle	    |WAITING   |	      1
+oracle@oraclept.com (PMAN)    |pman timer										 |Idle	    |WAITING   |	      1
+oracle@oraclept.com (SVCB)    |wait for unread message on broadcast channel		 |Idle	    |WAITING   |	      1
+oracle@oraclept.com (DBRM)    |rdbms ipc message								 |Idle	    |WAITING   |	      1
+oracle@oraclept.com (OFSD)    |OFS idle 										 |Idle	    |WAITING   |	      1
+oracle@oraclept.com (SCMN)    |watchdog main loop								 |Idle	    |WAITING   |	      1
+oracle@oraclept.com (GEN1)    |rdbms ipc message								 |Idle	    |WAITING   |	      1
+oracle@oraclept.com (SCMN)    |watchdog main loop								 |Idle	    |WAITING   |	      1
+oracle@oraclept.com (MMAN)    |rdbms ipc message								 |Idle	    |WAITING   |	      1
+oracle@oraclept.com (GEN0)    |rdbms ipc message								 |Idle	    |WAITING   |	      1
+oracle@oraclept.com (PSP0)    |rdbms ipc message								 |Idle	    |WAITING   |	      1
+oracle@oraclept.com (PMON)    |pmon timer										 |Idle	    |WAITING   |	      1
+oracle@oraclept.com (CLMN)    |pmon timer										 |Idle	    |WAITING   |	      1
+oracle@oraclept.com (W007)    |Space Manager: slave idle wait					 |Idle	    |WAITING   |	      1
+oracle@oraclept.com (MMNL)    |rdbms ipc message								 |Idle	    |WAITING   |	      0
+oracle@oraclept.com (LGWR)    |rdbms ipc message								 |Idle	    |WAITING   |	      0
+oracle@oraclept.com (DIAG)    |DIAG idle wait									 |Idle	    |WAITING   |	      0
+oracle@oraclept.com (TT02)    |heartbeat redo informer							 |Idle	    |WAITING   |	      0
+
+
+
+						Monitor All Background Processes Currently Running
+						
+SQL> set lines 300 pages 300
+set colsep |
+col SERIAL# for 9999999
+col SID for 999
+SELECT 
+    S.SID,
+    S.SERIAL#,
+    S.PROGRAM,
+    P.SPID AS OS_PID,
+    S.STATUS,
+    S.EVENT,
+    S.WAIT_CLASS,
+    S.SECONDS_IN_WAIT
+FROM 
+    V$SESSION S
+JOIN 
+    V$PROCESS P ON S.PADDR = P.ADDR
+WHERE 
+    S.TYPE = 'BACKGROUND'
+ORDER BY 
+    S.PROGRAM;
+	
+ SID| SERIAL#|PROGRAM			    |OS_PID		     |STATUS  |EVENT						 |WAIT_CLASS|SECONDS_IN_WAIT
+----|--------|------------------------------|------------------------|--------|--------------------------------------------------|----------|---------------
+  43|	52692|oracle@oraclept.com (AQPC)    |2738		     |ACTIVE  |AQPC idle					 |Idle	    |		  14
+  53|	64146|oracle@oraclept.com (CJQ0)    |2755		     |ACTIVE  |rdbms ipc message				 |Idle	    |		   2
+  21|	50928|oracle@oraclept.com (CKPT)    |2485		     |ACTIVE  |rdbms ipc message				 |Idle	    |		   2
+   3|	51832|oracle@oraclept.com (CLMN)    |2424		     |ACTIVE  |pmon timer					 |Idle	    |		   1
+  14|	41130|oracle@oraclept.com (DBRM)    |2449		     |ACTIVE  |rdbms ipc message				 |Idle	    |		   1
+  19|	28561|oracle@oraclept.com (DBW0)    |2481		     |ACTIVE  |rdbms ipc message				 |Idle	    |		   1
+  18|	59292|oracle@oraclept.com (DIA0)    |2477		     |ACTIVE  |DIAG idle wait					 |Idle	    |		   1
+  11|	 1263|oracle@oraclept.com (DIAG)    |2442		     |ACTIVE  |DIAG idle wait					 |Idle	    |		   1
+   6|	59462|oracle@oraclept.com (GEN0)    |2433		     |ACTIVE  |rdbms ipc message				 |Idle	    |		   1
+  10|	38059|oracle@oraclept.com (GEN1)    |2439		     |ACTIVE  |rdbms ipc message				 |Idle	    |		   0
+  20|	22276|oracle@oraclept.com (LGWR)    |2483		     |ACTIVE  |rdbms ipc message				 |Idle	    |		   1
+  27|	55974|oracle@oraclept.com (LREG)    |2524		     |ACTIVE  |lreg timer					 |Idle	    |		   0
+  65|	 2057|oracle@oraclept.com (M000)    |9036		     |ACTIVE  |class slave wait 				 |Idle	    |		  22
+  55|	27355|oracle@oraclept.com (M001)    |8760		     |ACTIVE  |class slave wait 				 |Idle	    |		  46
+ 101|	61212|oracle@oraclept.com (M002)    |6925		     |ACTIVE  |class slave wait 				 |Idle	    |		  19
+  59|	22673|oracle@oraclept.com (M003)    |11997		     |ACTIVE  |class slave wait 				 |Idle	    |		  22
+  36|	64720|oracle@oraclept.com (M004)    |11655		     |ACTIVE  |class slave wait 				 |Idle	    |		  19
+   7|	 2784|oracle@oraclept.com (MMAN)    |2435		     |ACTIVE  |rdbms ipc message				 |Idle	    |		   1
+  32|	63192|oracle@oraclept.com (MMNL)    |2603		     |ACTIVE  |rdbms ipc message				 |Idle	    |		   1
+  31|	 4712|oracle@oraclept.com (MMON)    |2581		     |ACTIVE  |rdbms ipc message				 |Idle	    |		   1
+  13|	32043|oracle@oraclept.com (OFSD)    |2444		     |ACTIVE  |OFS idle 					 |Idle	    |		   1
+  17|	28728|oracle@oraclept.com (PMAN)    |2474		     |ACTIVE  |pman timer					 |Idle	    |		   1
+   2|	16242|oracle@oraclept.com (PMON)    |2422		     |ACTIVE  |pmon timer					 |Idle	    |		   1
+   4|	41177|oracle@oraclept.com (PSP0)    |2426		     |ACTIVE  |rdbms ipc message				 |Idle	    |		   0
+  30|	65402|oracle@oraclept.com (PXMN)    |2549		     |ACTIVE  |rdbms ipc message				 |Idle	    |		   1
+  50|	57617|oracle@oraclept.com (Q003)    |2746		     |ACTIVE  |Streams AQ: qmn slave idle wait			 |Idle	    |		   5
+  78|	52755|oracle@oraclept.com (Q004)    |3721		     |ACTIVE  |Streams AQ: waiting for time management or cleanup|Idle	    |		4692
+    |	     |				    |			     |	      | tasks						 |	    |
+
+  45|	15624|oracle@oraclept.com (QM02)    |2740		     |ACTIVE  |Streams AQ: qmn coordinator idle wait		 |Idle	    |		   5
+  24|	47565|oracle@oraclept.com (RECO)    |2504		     |ACTIVE  |rdbms ipc message				 |Idle	    |		1095
+  12|	19157|oracle@oraclept.com (SCMN)    |2444		     |ACTIVE  |watchdog main loop				 |Idle	    |		   1
+   9|	 5983|oracle@oraclept.com (SCMN)    |2439		     |ACTIVE  |watchdog main loop				 |Idle	    |		   1
+  23|	60013|oracle@oraclept.com (SMCO)    |2498		     |ACTIVE  |rdbms ipc message				 |Idle	    |		   1
+  22|	51603|oracle@oraclept.com (SMON)    |2493		     |ACTIVE  |smon timer					 |Idle	    |		 115
+  16|	12424|oracle@oraclept.com (SVCB)    |2465		     |ACTIVE  |wait for unread message on broadcast channel	 |Idle	    |		   1
+  33|	36555|oracle@oraclept.com (TMON)    |2665		     |ACTIVE  |rdbms ipc message				 |Idle	    |		  14
+   8|	56270|oracle@oraclept.com (TT00)    |2727		     |ACTIVE  |Data Guard: Gap Manager				 |Idle	    |		  44
+  39|	23834|oracle@oraclept.com (TT01)    |2729		     |ACTIVE  |Data Guard: Timer				 |Idle	    |		 213
+  40|	31952|oracle@oraclept.com (TT02)    |2731		     |ACTIVE  |heartbeat redo informer				 |Idle	    |		   1
+  15|	29561|oracle@oraclept.com (VKRM)    |2455		     |ACTIVE  |VKRM Idle					 |Idle	    |		4761
+   5|	22073|oracle@oraclept.com (VKTM)    |2429		     |ACTIVE  |VKTM Logical Idle Wait				 |Idle	    |		4763
+  25|	21319|oracle@oraclept.com (W000)    |2509		     |ACTIVE  |Space Manager: slave idle wait			 |Idle	    |		   1
+  28|	28354|oracle@oraclept.com (W001)    |2533		     |ACTIVE  |Space Manager: slave idle wait			 |Idle	    |		   4
+  34|	34368|oracle@oraclept.com (W002)    |2843		     |ACTIVE  |Space Manager: slave idle wait			 |Idle	    |		   4
+  74|	16002|oracle@oraclept.com (W003)    |3237		     |ACTIVE  |Space Manager: slave idle wait			 |Idle	    |		   1
+  76|	22254|oracle@oraclept.com (W004)    |3517		     |ACTIVE  |Space Manager: slave idle wait			 |Idle	    |		   4
+  62|	  264|oracle@oraclept.com (W005)    |5952		     |ACTIVE  |Space Manager: slave idle wait			 |Idle	    |		   4
+  63|	49374|oracle@oraclept.com (W006)    |5961		     |ACTIVE  |Space Manager: slave idle wait			 |Idle	    |		   1
+  66|	53587|oracle@oraclept.com (W007)    |5966		     |ACTIVE  |Space Manager: slave idle wait			 |Idle	    |		   1

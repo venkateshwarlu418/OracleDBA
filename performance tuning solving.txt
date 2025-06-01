@@ -1,0 +1,102 @@
+
+If you have a long-running query in Oracle 19c and need to tune its performance, here’s a structured approach with practical steps and queries to guide you:
+
+Step-by-Step Guide for Query Performance Tuning in Oracle 19c
+1. Identify Problematic Queries
+2. Analyze the Execution Plan
+3. Check System and Session Resources
+4. Gather and Update Table Statistics
+5. Optimize the Query Structure
+6. Indexing
+7. Review and Pin Execution Plans
+8. Monitor and Iterate
+
+
+
+
+
+
+1. Identify Problematic Queries
+
+Use Oracle’s monitoring tools to find slow queries:
+
+SQL> SELECT sql_id, elapsed_time, executions, sql_text
+FROM v$sql
+WHERE elapsed_time/executions > <threshold>
+ORDER BY elapsed_time DESC;
+
+You can also use Oracle Enterprise Manager or AWR reports to identify top resource-consuming SQL statements.
+
+2. Analyze the Execution Plan
+
+Get the execution plan for the slow query:
+
+sql
+EXPLAIN PLAN FOR <your_query>;
+SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY);
+Look for full table scans, inefficient joins, or missing indexes.
+
+3. Check System and Session Resources
+
+Check for blocking sessions:
+
+sql
+SELECT blocking_session, sid, serial#, wait_class, seconds_in_wait
+FROM v$session
+WHERE blocking_session IS NOT NULL;
+Review CPU and memory usage at the database and host level.
+
+4. Gather and Update Table Statistics
+
+Outdated statistics can cause poor execution plans. Gather stats:
+
+sql
+EXEC DBMS_STATS.gather_table_stats('SCHEMA', 'TABLE_NAME');
+Ensure stats are regularly updated, especially after bulk operations.
+
+5. Optimize the Query Structure
+
+Avoid SELECT *; specify only needed columns.
+
+Rewrite complex queries to use efficient joins and filters.
+
+Use EXISTS instead of IN for subqueries if appropriate.
+
+Avoid unnecessary DISTINCT and ORDER BY clauses.
+
+6. Indexing
+
+Check if indexes exist on columns used in WHERE, JOIN, and ORDER BY clauses.
+
+Create indexes where missing, but avoid over-indexing:
+
+sql
+CREATE INDEX idx_column ON table_name(column_name);
+After creating indexes, gather table stats again.
+
+7. Review and Pin Execution Plans
+
+If a good plan is found, consider pinning it using SQL Plan Management.
+
+Use SQL Tuning Advisor for recommendations:
+
+sql
+EXEC DBMS_SQLTUNE.create_tuning_task(sql_id => '<SQL_ID>');
+Review and implement advisor recommendations if appropriate.
+
+8. Monitor and Iterate
+
+Performance tuning is iterative. After making changes, rerun the query and check improvements.
+
+Continue to monitor for new bottlenecks.
+
+Summary Table of Key Actions
+Step	Tool/Query Example	Purpose
+Identify slow queries	v$sql, AWR, Enterprise Manager	Find what needs tuning
+Analyze execution plan	EXPLAIN PLAN, DBMS_XPLAN	Understand how Oracle executes the query
+Check system/session resources	v$session, OS monitoring	Detect blocking or resource issues
+Gather/update statistics	DBMS_STATS.gather_table_stats	Ensure optimizer has up-to-date info
+Optimize query structure	Rewrite SQL, avoid SELECT *, DISTINCT, etc.	Reduce workload and improve efficiency
+Indexing	CREATE INDEX, review existing indexes	Speed up data access
+Use tuning advisors	DBMS_SQLTUNE	Get Oracle’s recommendations
+Iterate and monitor	Rerun tests, monitor with tools	Ensure sustained improvement

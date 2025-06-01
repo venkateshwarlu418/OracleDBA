@@ -1,0 +1,104 @@
+1. Preparation
+Take a Full Database Backup (RMAN):
+
+sql
+-- Run in RMAN prompt
+BACKUP DATABASE PLUS ARCHIVELOG;
+BACKUP CURRENT CONTROLFILE;
+BACKUP SPFILE;
+Or, for a more detailed script:
+
+text
+RUN {
+  ALLOCATE CHANNEL ch1 DEVICE TYPE DISK;
+  BACKUP AS COMPRESSED BACKUPSET DATABASE FORMAT '/backup/full_db_%T_%U';
+  BACKUP ARCHIVELOG ALL FORMAT '/backup/arch_%T_%U';
+  BACKUP CURRENT CONTROLFILE FORMAT '/backup/ctrl_%T_%U';
+  BACKUP SPFILE FORMAT '/backup/spfile_%T_%U';
+  RELEASE CHANNEL ch1;
+}
+Check Current Database Version:
+
+sql
+SELECT * FROM V$VERSION WHERE BANNER LIKE 'Oracle%';
+Check OPatch Version:
+
+bash
+$ORACLE_HOME/OPatch/opatch version
+2. Update OPatch Utility (if required)
+Backup Existing OPatch and Unzip New Version:
+
+bash
+cd $ORACLE_HOME
+mv OPatch OPatch_bkp
+unzip /path/to/p6880880_190000_Linux-x86-64.zip -d $ORACLE_HOME/
+$ORACLE_HOME/OPatch/opatch version
+3. Patch Conflict Check
+Unzip Patch and Check for Conflicts:
+
+bash
+cd /path/to/patch_folder
+unzip p<patch_number>_<version>_Linux-x86-64.zip
+$ORACLE_HOME/OPatch/opatch prereq CheckConflictAgainstOHWithDetail -ph .
+4. Shutdown Database and Listener
+Shutdown Database and Listener:
+
+bash
+export ORACLE_SID=<your_sid>
+sqlplus / as sysdba
+SHUTDOWN IMMEDIATE;
+exit
+
+lsnrctl stop
+5. Apply the Patch
+Apply Patch Using OPatch:
+
+bash
+cd /path/to/patch_folder
+$ORACLE_HOME/OPatch/opatch apply
+6. Start Database and Listener
+Start Listener and Database:
+
+bash
+lsnrctl start
+
+export ORACLE_SID=<your_sid>
+sqlplus / as sysdba
+STARTUP;
+exit
+7. Post-Patch Steps
+Run datapatch (if it’s a database patch):
+
+bash
+cd $ORACLE_HOME/OPatch
+./datapatch -verbose
+Verify Patch Application:
+
+bash
+$ORACLE_HOME/OPatch/opatch lsinventory
+Check Database Version:
+
+sql
+SELECT * FROM V$VERSION WHERE BANNER LIKE 'Oracle%';
+
+
+
+
+
+
+
+
+
+Summary Table of Steps and Commands
+
+Step								Command/Query Example
+Backup Database				RMAN: BACKUP DATABASE PLUS ARCHIVELOG;
+Check Version				SQL: SELECT * FROM V$VERSION WHERE BANNER LIKE 'Oracle%';
+Check OPatch Version		$ORACLE_HOME/OPatch/opatch version
+Update OPatch				unzip p6880880_190000_Linux-x86-64.zip -d $ORACLE_HOME/
+Conflict Check				$ORACLE_HOME/OPatch/opatch prereq CheckConflictAgainstOHWithDetail -ph .
+Shutdown DB/Listener		SHUTDOWN IMMEDIATE; and lsnrctl stop
+Apply Patch					$ORACLE_HOME/OPatch/opatch apply
+Start DB/Listener			STARTUP; and lsnrctl start
+Run datapatch				./datapatch -verbose
+Verify Patch				$ORACLE_HOME/OPatch/opatch lsinventory

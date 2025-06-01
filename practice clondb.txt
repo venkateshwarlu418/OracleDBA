@@ -1,0 +1,1402 @@
+[oracle@murali ~]$ . oraenv
+ORACLE_SID = [murdb] ? prodb
+The Oracle base has been set to /u01/app/oracle
+[oracle@murali ~]$ $ORACLE_HOME
+bash: /u01/app/oracle/product/19.0.0.0/dbhome_1: Is a directory
+[oracle@murali ~]$ cd /u01/app/oracle/product/19.0.0.0/dbhome_1
+[oracle@murali dbhome_1]$ cd network/admin
+[oracle@murali admin]$ sqlplus / as sysdba
+
+SQL*Plus: Release 19.0.0.0.0 - Production on Fri Nov 29 10:41:41 2024
+Version 19.3.0.0.0
+
+Copyright (c) 1982, 2019, Oracle.  All rights reserved.
+
+Connected to an idle instance.
+
+SQL> startup
+ORACLE instance started.
+
+Total System Global Area 1543500832 bytes
+Fixed Size		    9135136 bytes
+Variable Size		  922746880 bytes
+Database Buffers	  603979776 bytes
+Redo Buffers		    7639040 bytes
+Database mounted.
+Database opened.
+SQL> show pdbs
+
+    CON_ID CON_NAME			  OPEN MODE  RESTRICTED
+---------- ------------------------------ ---------- ----------
+	 2 PDB$SEED			  READ ONLY  NO
+	 3 ICIC 			  MOUNTED
+	 4 HRMS 			  MOUNTED
+	 5 SBI				  MOUNTED
+	 6 HDFC 			  MOUNTED
+SQL> alter pluggable database hdfc close;
+alter pluggable database hdfc close
+*
+ERROR at line 1:
+ORA-65020: pluggable database HDFC already closed
+
+
+SQL> alter pluggable database hdfc unplug int '/u01/app/oracle/oradata/hdfc_000o2.xml';
+alter pluggable database hdfc unplug int '/u01/app/oracle/oradata/hdfc_000o2.xml'
+                                     *
+ERROR at line 1:
+ORA-00925: missing INTO keyword
+
+
+SQL> exit
+Disconnected from Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.3.0.0.0
+[oracle@murali admin]$ pwd
+/u01/app/oracle/product/19.0.0.0/dbhome_1/network/admin
+[oracle@murali admin]$ cd
+[oracle@murali ~]$ pwd
+/home/oracle
+[oracle@murali ~]$ cd /u01
+[oracle@murali u01]$ cd app
+[oracle@murali app]$ cd oracle
+[oracle@murali oracle]$ cd oradata
+[oracle@murali oradata]$ ll
+total 4
+drwxr-x---. 5 oracle oinstall   58 Nov 27 10:52 MURDB
+drwxr-x---. 9 oracle oinstall 4096 Nov 28 13:22 PRODB
+[oracle@murali oradata]$ cd /..
+[oracle@murali /]$ sqlplus /  as sysdba
+
+SQL*Plus: Release 19.0.0.0.0 - Production on Fri Nov 29 11:04:25 2024
+Version 19.3.0.0.0
+
+Copyright (c) 1982, 2019, Oracle.  All rights reserved.
+
+
+Connected to:
+Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.3.0.0.0
+
+SQL> show pdbs
+
+    CON_ID CON_NAME			  OPEN MODE  RESTRICTED
+---------- ------------------------------ ---------- ----------
+	 2 PDB$SEED			  READ ONLY  NO
+	 3 ICIC 			  MOUNTED
+	 4 HRMS 			  MOUNTED
+	 5 SBI				  MOUNTED
+	 6 HDFC 			  MOUNTED
+SQL>  alter pluggable database hdfc unplug into '/u01/app/oracle/oradata/hdfc_000o2.xml';
+
+Pluggable database altered.
+
+SQL> 
+SQL> drop pluggable database hdfc;
+
+Pluggable database dropped.
+
+SQL> show pdbs
+
+    CON_ID CON_NAME			  OPEN MODE  RESTRICTED
+---------- ------------------------------ ---------- ----------
+	 2 PDB$SEED			  READ ONLY  NO
+	 3 ICIC 			  MOUNTED
+	 4 HRMS 			  MOUNTED
+	 5 SBI				  MOUNTED
+SQL> show user
+USER is "SYS"
+SQL> exit                         
+Disconnected from Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.3.0.0.0
+[oracle@murali /]$ cd admin/network
+bash: cd: admin/network: No such file or directory
+[oracle@murali /]$ 
+[oracle@murali /]$ cd $ORACLE_HOME
+[oracle@murali dbhome_1]$ cd admin/network
+bash: cd: admin/network: No such file or directory
+[oracle@murali dbhome_1]$ cat /etc/oratab
+#
+
+
+
+# This file is used by ORACLE utilities.  It is created by root.sh
+# and updated by either Database Configuration Assistant while creating
+# a database or ASM Configuration Assistant while creating ASM instance.
+
+# A colon, ':', is used as the field terminator.  A new line terminates
+# the entry.  Lines beginning with a pound sign, '#', are comments.
+#
+# Entries are of the form:
+#   $ORACLE_SID:$ORACLE_HOME:<N|Y>:
+#
+# The first and second fields are the system identifier and home
+# directory of the database respectively.  The third field indicates
+# to the dbstart utility that the database should , "Y", or should not,
+# "N", be brought up at system boot time.
+#
+# Multiple entries with the same $ORACLE_SID are not allowed.
+#
+#
+prodb:/u01/app/oracle/product/19.0.0.0/dbhome_1:N
+murdb:/u01/app/oracle/product/19.0.0.0/dbhome_1:N
+[oracle@murali dbhome_1]$ sqlplus / as sysdba
+
+SQL*Plus: Release 19.0.0.0.0 - Production on Fri Nov 29 11:35:30 2024
+Version 19.3.0.0.0
+
+Copyright (c) 1982, 2019, Oracle.  All rights reserved.
+
+
+Connected to:
+Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.3.0.0.0
+
+SQL> !   
+[oracle@murali dbhome_1]$ cat tsnnames.ora
+cat: tsnnames.ora: No such file or directory
+[oracle@murali dbhome_1]$ cd  network/admin
+[oracle@murali admin]$ cat tnsnames.ora
+# tnsnames.ora Network Configuration File: /u01/app/oracle/product/19.0.0.0/dbhome_1/network/admin/tnsnames.ora
+# Generated by Oracle configuration tools.
+
+TO_ICIC =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = 192.168.0.141)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = icic)
+    )
+  )
+
+TO_HRMS =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = 192.168.0.141)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = hrms)
+    )
+  )
+
+TO_PRODB =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = 192.168.0.141)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = prodb)
+    )
+  )
+
+[oracle@murali admin]$ ll
+total 12
+-rw-r--r--. 1 oracle oinstall 1175 Nov 28 14:23 listener.ora
+drwxr-xr-x. 2 oracle oinstall   64 Apr 17  2019 samples
+-rw-r--r--. 1 oracle oinstall 1536 Feb 14  2018 shrept.lst
+-rw-r--r--. 1 oracle oinstall  704 Nov 28 14:29 tnsnames.ora
+-rw-r--r--. 1 oracle oinstall    0 Nov 26 12:23 tsnames
+[oracle@murali admin]$ vi listener.ora
+[oracle@murali admin]$ sqlplus / as sysdba
+
+SQL*Plus: Release 19.0.0.0.0 - Production on Fri Nov 29 11:50:10 2024
+Version 19.3.0.0.0
+
+Copyright (c) 1982, 2019, Oracle.  All rights reserved.
+
+
+Connected to:
+Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.3.0.0.0
+
+SQL> show pdbs;
+
+    CON_ID CON_NAME			  OPEN MODE  RESTRICTED
+---------- ------------------------------ ---------- ----------
+	 2 PDB$SEED			  READ ONLY  NO
+	 3 ICIC 			  MOUNTED
+	 4 HRMS 			  MOUNTED
+	 5 SBI				  MOUNTED
+SQL> alter pluggable database sbi open readonly;
+alter pluggable database sbi open readonly
+                                  *
+ERROR at line 1:
+ORA-00933: SQL command not properly ended
+
+
+SQL> > alter pluggable database sbi open read only;
+SP2-0734: unknown command beginning "> alter pl..." - rest of line ignored.
+SQL> > alter pluggable database sbi open read only;
+SP2-0734: unknown command beginning "> alter pl..." - rest of line ignored.
+SQL> alter pluggable database sbi open read only;
+alter pluggable database sbi open read only
+*
+ERROR at line 1:
+ORA-65085: cannot open pluggable database in read-only mode
+
+
+SQL> alter pluggable database all close;
+
+Pluggable database altered.
+
+SQL> show pdbs;
+
+    CON_ID CON_NAME			  OPEN MODE  RESTRICTED
+---------- ------------------------------ ---------- ----------
+	 2 PDB$SEED			  READ ONLY  NO
+	 3 ICIC 			  MOUNTED
+	 4 HRMS 			  MOUNTED
+	 5 SBI				  MOUNTED
+SQL> alter pluggable database sbi open read only
+  2  ;
+alter pluggable database sbi open read only
+*
+ERROR at line 1:
+ORA-65085: cannot open pluggable database in read-only mode
+
+
+SQL> show con_name;
+
+CON_NAME
+------------------------------
+CDB$ROOT
+SQL> shut immediate;
+Database closed.
+Database dismounted.
+ORACLE instance shut down.
+SQL> startup
+ORACLE instance started.
+
+Total System Global Area 1543500832 bytes
+Fixed Size		    9135136 bytes
+Variable Size		  922746880 bytes
+Database Buffers	  603979776 bytes
+Redo Buffers		    7639040 bytes
+Database mounted.
+Database opened.
+SQL> show pdbs;
+
+    CON_ID CON_NAME			  OPEN MODE  RESTRICTED
+---------- ------------------------------ ---------- ----------
+	 2 PDB$SEED			  READ ONLY  NO
+	 3 ICIC 			  MOUNTED
+	 4 HRMS 			  MOUNTED
+	 5 SBI				  MOUNTED
+SQL>  alter pluggable database sbi open read only
+  2  ;
+  2    2
+  *
+ERROR at line 2:
+ORA-00933: SQL command not properly ended
+
+
+SQL> alter pluggable database sbi open read only
+  2  ;
+alter pluggable database sbi open read only
+*
+ERROR at line 1:
+ORA-65085: cannot open pluggable database in read-only mode
+
+
+SQL> alter pluggable database read only;
+alter pluggable database read only
+                              *
+ERROR at line 1:
+ORA-00922: missing or invalid option
+
+
+SQL> alter pluggable database sbi read only;
+alter pluggable database sbi read only
+                             *
+ERROR at line 1:
+ORA-00922: missing or invalid option
+
+
+SQL> SELECT name, open_mode FROM v$pdbs;
+
+NAME
+--------------------------------------------------------------------------------
+OPEN_MODE
+----------
+PDB$SEED
+READ ONLY
+
+ICIC
+MOUNTED
+
+HRMS
+MOUNTED
+
+
+NAME
+--------------------------------------------------------------------------------
+OPEN_MODE
+----------
+SBI
+MOUNTED
+
+
+SQL> !      
+[oracle@murali admin]$ vi tnsnames.ora 
+[oracle@murali admin]$ cat listener.ora 
+# listener.ora Network Configuration File: /u01/app/oracle/product/19.0.0.0/dbhome_1/network/admin/listener.ora
+# Generated by Oracle configuration tools.
+
+SID_LIST_LISTENER =
+  (SID_LIST =
+    (SID_DESC =
+      (GLOBAL_DBNAME = prodb)
+      (ORACLE_HOME = /u01/app/oracle/product/19.0.0.0/dbhome_1)
+      (SID_NAME = prodb)
+    )
+    (SID_DESC =
+      (GLOBAL_DBNAME = icic)
+      (ORACLE_HOME = /u01/app/oracle/product/19.0.0.0/dbhome_1)
+      (SID_NAME = prodb)
+    )
+    (SID_DESC =
+      (GLOBAL_DBNAME = hrms)
+      (ORACLE_HOME = /u01/app/oracle/product/19.0.0.0/dbhome_1)
+      (SID_NAME = prodb)
+    )
+    (SID_DESC =
+      (GLOBAL_DBNAME = sbi)
+      (ORACLE_HOME = /u01/app/oracle/product/19.0.0.0/dbhome_1)
+      (SID_NAME = prodb)
+    )
+    (SID_DESC =
+      (GLOBAL_DBNAME = hdfc)
+      (ORACLE_HOME = /u01/app/oracle/product/19.0.0.0/dbhome_1)
+      (SID_NAME = prodb)
+    )
+    (SID_DESC =
+      (GLOBAL_DBNAME = Oracle8)
+      (ORACLE_HOME = /u01/app/oracle/product/19.0.0.0/dbhome_1)
+      (SID_NAME = ORCL)
+    )
+  )
+
+LISTENER =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = 192.168.0.141)(PORT = 1521))
+  )
+
+ADR_BASE_LISTENER = /u01/app/oracle
+
+[oracle@murali admin]$ lsnrctl reload listener
+
+LSNRCTL for Linux: Version 19.0.0.0.0 - Production on 29-NOV-2024 12:03:12
+
+Copyright (c) 1991, 2019, Oracle.  All rights reserved.
+
+Connecting to (DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=192.168.0.141)(PORT=1521)))
+TNS-12541: TNS:no listener
+ TNS-12560: TNS:protocol adapter error
+  TNS-00511: No listener
+   Linux Error: 111: Connection refused
+[oracle@murali admin]$ ifconfig
+enp0s3: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 192.168.0.141  netmask 255.255.255.0  broadcast 192.168.0.255
+        inet6 fe80::20d5:e62:23c:cc97  prefixlen 64  scopeid 0x20<link>
+        ether 08:00:27:59:f7:a0  txqueuelen 1000  (Ethernet)
+        RX packets 103091  bytes 142677043 (136.0 MiB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 8357  bytes 614713 (600.3 KiB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+lo: flags=73<UP,LOOPBACK,RUNNING>  mtu 65536
+        inet 127.0.0.1  netmask 255.0.0.0
+        inet6 ::1  prefixlen 128  scopeid 0x10<host>
+        loop  txqueuelen 1000  (Local Loopback)
+        RX packets 110  bytes 7120 (6.9 KiB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 110  bytes 7120 (6.9 KiB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+virbr0: flags=4099<UP,BROADCAST,MULTICAST>  mtu 1500
+        inet 192.168.122.1  netmask 255.255.255.0  broadcast 192.168.122.255
+        ether 52:54:00:56:06:eb  txqueuelen 1000  (Ethernet)
+        RX packets 0  bytes 0 (0.0 B)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 0  bytes 0 (0.0 B)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+[oracle@murali admin]$ lsnrctl stop
+
+LSNRCTL for Linux: Version 19.0.0.0.0 - Production on 29-NOV-2024 12:03:40
+
+Copyright (c) 1991, 2019, Oracle.  All rights reserved.
+
+Connecting to (DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=192.168.0.141)(PORT=1521)))
+TNS-12541: TNS:no listener
+ TNS-12560: TNS:protocol adapter error
+  TNS-00511: No listener
+   Linux Error: 111: Connection refused
+[oracle@murali admin]$ lsnrctl stop listener
+
+LSNRCTL for Linux: Version 19.0.0.0.0 - Production on 29-NOV-2024 12:03:58
+
+Copyright (c) 1991, 2019, Oracle.  All rights reserved.
+
+Connecting to (DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=192.168.0.141)(PORT=1521)))
+TNS-12541: TNS:no listener
+ TNS-12560: TNS:protocol adapter error
+  TNS-00511: No listener
+   Linux Error: 111: Connection refused
+[oracle@murali admin]$ cat listener.ora 
+# listener.ora Network Configuration File: /u01/app/oracle/product/19.0.0.0/dbhome_1/network/admin/listener.ora
+# Generated by Oracle configuration tools.
+
+SID_LIST_LISTENER =
+  (SID_LIST =
+    (SID_DESC =
+      (GLOBAL_DBNAME = prodb)
+      (ORACLE_HOME = /u01/app/oracle/product/19.0.0.0/dbhome_1)
+      (SID_NAME = prodb)
+    )
+    (SID_DESC =
+      (GLOBAL_DBNAME = icic)
+      (ORACLE_HOME = /u01/app/oracle/product/19.0.0.0/dbhome_1)
+      (SID_NAME = prodb)
+    )
+    (SID_DESC =
+      (GLOBAL_DBNAME = hrms)
+      (ORACLE_HOME = /u01/app/oracle/product/19.0.0.0/dbhome_1)
+      (SID_NAME = prodb)
+    )
+    (SID_DESC =
+      (GLOBAL_DBNAME = sbi)
+      (ORACLE_HOME = /u01/app/oracle/product/19.0.0.0/dbhome_1)
+      (SID_NAME = prodb)
+    )
+    (SID_DESC =
+      (GLOBAL_DBNAME = hdfc)
+      (ORACLE_HOME = /u01/app/oracle/product/19.0.0.0/dbhome_1)
+      (SID_NAME = prodb)
+    )
+    (SID_DESC =
+      (GLOBAL_DBNAME = Oracle8)
+      (ORACLE_HOME = /u01/app/oracle/product/19.0.0.0/dbhome_1)
+      (SID_NAME = ORCL)
+    )
+  )
+
+LISTENER =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = 192.168.0.141)(PORT = 1521))
+  )
+
+ADR_BASE_LISTENER = /u01/app/oracle
+
+[oracle@murali admin]$ netmgr
+[oracle@murali admin]$ ps -ef|grep tns
+root        23     2  0 10:38 ?        00:00:00 [netns]
+oracle    5644  5461  0 12:05 pts/0    00:00:00 grep --color=auto tns
+[oracle@murali admin]$ kill -9 5644
+bash: kill: (5644) - No such process
+[oracle@murali admin]$ kill -9 5461
+
+SQL> 
+[1]+  Stopped                 sqlplus / as sysdba
+[oracle@murali admin]$ TO_AXIS_PRODDB =
+bash: TO_AXIS_PRODDB: command not found...
+[oracle@murali admin]$   (DESCRIPTION =
+>     (ADDRESS_LIST =
+>       (ADDRESS = (PROTOCOL = TCP)(HOST = 192.168.0.144)(PORT = 1521))
+bash: syntax error near unexpected token `('
+[oracle@murali admin]$     )
+bash: syntax error near unexpected token `)'
+[oracle@murali admin]$     (CONNECT_DATA =
+>       (SERVICE_NAME = AXIS_PRODDB)
+>     )
+bash: CONNECT_DATA: command not found...
+bash: SERVICE_NAME: command not found...
+[oracle@murali admin]$ lsnrctl start listener
+
+LSNRCTL for Linux: Version 19.0.0.0.0 - Production on 29-NOV-2024 12:06:27
+
+Copyright (c) 1991, 2019, Oracle.  All rights reserved.
+
+Starting /u01/app/oracle/product/19.0.0.0/dbhome_1/bin/tnslsnr: please wait...
+
+TNSLSNR for Linux: Version 19.0.0.0.0 - Production
+System parameter file is /u01/app/oracle/product/19.0.0.0/dbhome_1/network/admin/listener.ora
+Log messages written to /u01/app/oracle/diag/tnslsnr/murali/listener/alert/log.xml
+Listening on: (DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=192.168.0.141)(PORT=1521)))
+
+Connecting to (DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=192.168.0.141)(PORT=1521)))
+STATUS of the LISTENER
+------------------------
+Alias                     listener
+Version                   TNSLSNR for Linux: Version 19.0.0.0.0 - Production
+Start Date                29-NOV-2024 12:06:31
+Uptime                    0 days 0 hr. 0 min. 4 sec
+Trace Level               off
+Security                  ON: Local OS Authentication
+SNMP                      OFF
+Listener Parameter File   /u01/app/oracle/product/19.0.0.0/dbhome_1/network/admin/listener.ora
+Listener Log File         /u01/app/oracle/diag/tnslsnr/murali/listener/alert/log.xml
+Listening Endpoints Summary...
+  (DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=192.168.0.141)(PORT=1521)))
+Services Summary...
+Service "hdfc" has 1 instance(s).
+  Instance "prodb", status UNKNOWN, has 1 handler(s) for this service...
+Service "hrms" has 1 instance(s).
+  Instance "prodb", status UNKNOWN, has 1 handler(s) for this service...
+Service "icic" has 1 instance(s).
+  Instance "prodb", status UNKNOWN, has 1 handler(s) for this service...
+Service "prodb" has 1 instance(s).
+  Instance "prodb", status UNKNOWN, has 1 handler(s) for this service...
+Service "sbi" has 1 instance(s).
+  Instance "prodb", status UNKNOWN, has 1 handler(s) for this service...
+The command completed successfully
+[oracle@murali admin]$ cat tnsnames.ora 
+# tnsnames.ora Network Configuration File: /u01/app/oracle/product/19.0.0.0/dbhome_1/network/admin/tnsnames.ora
+# Generated by Oracle configuration tools.
+
+TO_ICIC =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = 192.168.0.141)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = icic)
+    )
+  )
+
+TO_HRMS =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = 192.168.0.141)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = hrms)
+    )
+  )
+
+TO_PRODB =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = 192.168.0.141)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = prodb)
+    )
+  )
+TO_AXIS_PRODDB =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = 192.168.0.144)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = AXIS_PRODDB)
+    )
+[oracle@murali admin]$ tnsping TO_AXIS_PRODDB
+
+TNS Ping Utility for Linux: Version 19.0.0.0.0 - Production on 29-NOV-2024 12:07:08
+
+Copyright (c) 1997, 2019, Oracle.  All rights reserved.
+
+Used parameter files:
+
+
+Used TNSNAMES adapter to resolve the alias
+Attempting to contact (DESCRIPTION = (ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = 192.168.0.144)(PORT = 1521))) (CONNECT_DATA = (SERVICE_NAME = AXIS_PRODDB))
+TNS-12533: TNS:illegal ADDRESS parameters
+[oracle@murali admin]$ tnsping TO_AXIS_PRODDB
+
+TNS Ping Utility for Linux: Version 19.0.0.0.0 - Production on 29-NOV-2024 12:07:41
+
+Copyright (c) 1997, 2019, Oracle.  All rights reserved.
+
+Used parameter files:
+
+
+Used TNSNAMES adapter to resolve the alias
+Attempting to contact (DESCRIPTION = (ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = 192.168.0.144)(PORT = 1521))) (CONNECT_DATA = (SERVICE_NAME = AXIS_PRODDB))
+TNS-12533: TNS:illegal ADDRESS parameters
+[oracle@murali admin]$ netmgr
+[oracle@murali admin]$ netmgr
+[oracle@murali admin]$ vi tnsnames.ora 
+[oracle@murali admin]$ netmgr
+[oracle@murali admin]$ vi tnsnames.ora 
+[oracle@murali admin]$ sqlplus / as sysdba
+
+SQL*Plus: Release 19.0.0.0.0 - Production on Fri Nov 29 12:12:26 2024
+Version 19.3.0.0.0
+
+Copyright (c) 1982, 2019, Oracle.  All rights reserved.
+
+
+Connected to:
+Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.3.0.0.0
+
+SQL> show pdbs
+
+    CON_ID CON_NAME			  OPEN MODE  RESTRICTED
+---------- ------------------------------ ---------- ----------
+	 2 PDB$SEED			  READ ONLY  NO
+	 3 ICIC 			  MOUNTED
+	 4 HRMS 			  MOUNTED
+	 5 SBI				  MOUNTED
+SQL> alter session set container=hrms;
+
+Session altered.
+
+SQL> show con_name from hrms;
+
+CON_NAME
+------------------------------
+HRMS
+SP2-0158: unknown SHOW option "from"
+SP2-0158: unknown SHOW option "hrms"
+SQL> show con_name;
+
+CON_NAME
+------------------------------
+HRMS
+SQL> create user mr identified by mr;
+create user mr identified by mr
+*
+ERROR at line 1:
+ORA-01109: database not open
+
+
+SQL> exit
+Disconnected from Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.3.0.0.0
+[oracle@murali admin]$ sqlplus / as sysdba
+
+SQL*Plus: Release 19.0.0.0.0 - Production on Fri Nov 29 12:15:02 2024
+Version 19.3.0.0.0
+
+Copyright (c) 1982, 2019, Oracle.  All rights reserved.
+
+
+Connected to:
+Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.3.0.0.0
+
+SQL> show pdbs;
+
+    CON_ID CON_NAME			  OPEN MODE  RESTRICTED
+---------- ------------------------------ ---------- ----------
+	 2 PDB$SEED			  READ ONLY  NO
+	 3 ICIC 			  MOUNTED
+	 4 HRMS 			  MOUNTED
+	 5 SBI				  MOUNTED
+SQL> alter pluggable database icic open;
+
+Pluggable database altered.
+
+SQL>  create user mr identified by mr;
+ create user mr identified by mr
+             *
+ERROR at line 1:
+ORA-65096: invalid common user or role name
+
+
+SQL> show con_name;
+
+CON_NAME
+------------------------------
+CDB$ROOT
+SQL> alter session set container=icic;
+
+Session altered.
+
+SQL> create user mr identified by mr;
+
+User created.
+
+SQL> grant connect,resource to mr;
+
+Grant succeeded.
+
+SQL> conn mr/mr@to_icic;
+Connected.
+SQL> !netmgr
+'
+
+
+^X
+
+
+
+
+SQL> SP2-0042: unknown command "'" - rest of line ignored.
+SQL> SQL> SQL> SP2-0042: unknown command "" - rest of line ignored.
+SQL> SQL> SQL> SQL> show pdbs;
+SP2-0382: The SHOW PDBS command is not available
+SQL> show pdbs;
+SP2-0382: The SHOW PDBS command is not available
+SQL> startup
+ORA-01031: insufficient privileges
+
+
+SQL> show con_name;
+
+CON_NAME
+------------------------------
+ICIC
+SQL> exit
+Disconnected from Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.3.0.0.0
+[oracle@murali admin]$ sqlplus / as sysdba
+
+SQL*Plus: Release 19.0.0.0.0 - Production on Fri Nov 29 12:25:32 2024
+Version 19.3.0.0.0
+
+Copyright (c) 1982, 2019, Oracle.  All rights reserved.
+
+
+Connected to:
+Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.3.0.0.0
+
+SQL> create database link db_link connect to venkat identified by venkat;
+
+Database link created.
+
+SQL> create database link db_link1 connect to venkat identified by venkat using 'to_axis_proddb';
+
+Database link created.
+
+SQL> create pluggable database axispro from axis_proddb@db_link1;
+create pluggable database axispro from axis_proddb@db_link1
+*
+ERROR at line 1:
+ORA-17628: Oracle error 1031 returned by remote Oracle server
+ORA-01031: insufficient privileges
+
+
+SQL> show user;
+USER is "SYS"
+SQL> select * from tab@db_link1;
+
+TNAME
+--------------------------------------------------------------------------------
+TABTYPE        CLUSTERID
+------------- ----------
+VENKATTABLE
+TABLE
+
+
+SQL> create pluggable database axispro from axis_proddb@db_link1;
+create pluggable database axispro from axis_proddb@db_link1
+*
+ERROR at line 1:
+ORA-17628: Oracle error 1031 returned by remote Oracle server
+ORA-01031: insufficient privileges
+
+
+SQL> create pluggable database axispro from axis_proddb@db_link1;
+
+Pluggable database created.
+
+SQL> show pdbs;
+
+    CON_ID CON_NAME			  OPEN MODE  RESTRICTED
+---------- ------------------------------ ---------- ----------
+	 2 PDB$SEED			  READ ONLY  NO
+	 3 ICIC 			  READ WRITE NO
+	 4 HRMS 			  MOUNTED
+	 5 SBI				  MOUNTED
+	 6 AXISPRO			  MOUNTED
+SQL> alter plugagble databse axispro open;
+alter plugagble databse axispro open
+      *
+ERROR at line 1:
+ORA-00940: invalid ALTER command
+
+
+SQL> alter pluggable database axispro open;
+
+Pluggable database altered.
+
+SQL> conn venkat/venkat@to_axis_proddb;
+Connected.
+SQL> select * from tab;
+
+TNAME
+--------------------------------------------------------------------------------
+TABTYPE        CLUSTERID
+------------- ----------
+VENKATTABLE
+TABLE
+
+
+SQL> select * from venkattable;
+
+      SLNO NAME
+---------- --------------------
+	10 a
+	10 a
+	10 a
+	10 a
+	10 a
+
+SQL>  
+SQL> 
+SQL> 
+SQL> show con_name
+
+CON_NAME
+------------------------------
+AXIS_PRODDB
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> alter session set container=cdb$root;
+ERROR:
+ORA-01031: insufficient privileges
+
+
+SQL> 
+SQL> 
+SQL> 
+SQL> conn / as sysdba
+Connected.
+SQL> show user
+USER is "SYS"
+SQL> sho con_name 
+
+CON_NAME
+------------------------------
+CDB$ROOT
+SQL> 
+SQL> 
+SQL> 
+SQL> show pdbs                
+
+    CON_ID CON_NAME			  OPEN MODE  RESTRICTED
+---------- ------------------------------ ---------- ----------
+	 2 PDB$SEED			  READ ONLY  NO
+	 3 ICIC 			  READ WRITE NO
+	 4 HRMS 			  MOUNTED
+	 5 SBI				  MOUNTED
+	 6 AXISPRO			  READ WRITE NO
+SQL> alter session set container=icici;
+ERROR:
+ORA-65011: Pluggable database ICICI does not exist.
+
+
+SQL> alter session set container=icic;
+
+Session altered.
+
+SQL> select username from dba_users;
+
+USERNAME
+--------------------------------------------------------------------------------
+SYS
+SYSTEM
+XS$NULL
+LBACSYS
+OUTLN
+DBSNMP
+APPQOSSYS
+DBSFWUSER
+GGSYS
+ANONYMOUS
+CTXSYS
+
+USERNAME
+--------------------------------------------------------------------------------
+DVSYS
+DVF
+GSMADMIN_INTERNAL
+MDSYS
+OLAPSYS
+XDB
+WMSYS
+GSMCATUSER
+MDDATA
+SYSBACKUP
+REMOTE_SCHEDULER_AGENT
+
+USERNAME
+--------------------------------------------------------------------------------
+PDBADMIN
+GSMUSER
+SYSRAC
+OJVMSYS
+SI_INFORMTN_SCHEMA
+AUDSYS
+DIP
+ORDPLUGINS
+SYSKM
+ORDDATA
+ORACLE_OCM
+
+USERNAME
+--------------------------------------------------------------------------------
+SYS$UMF
+MR
+SYSDG
+ORDSYS
+
+37 rows selected.
+
+SQL> conn mr/mr@to_icic;                          
+Connected.
+SQL> 
+SQL> 
+SQL> 
+SQL> create table mrtable (sl number, name varchar2(11));
+
+Table created.
+
+SQL> insert into mrtable values (11, 'l');
+insert into mrtable values (11, 'l')
+            *
+ERROR at line 1:
+ORA-01950: no privileges on tablespace 'USERS'
+
+
+SQL> grant connect, resource to mr;
+grant connect, resource to mr
+*
+ERROR at line 1:
+ORA-01932: ADMIN option not granted for role 'CONNECT'
+
+
+SQL> show con_name
+
+CON_NAME
+------------------------------
+ICIC
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> show user
+USER is "MR"
+SQL> conn / as sysdba
+Connected.
+SQL> show con_name
+
+CON_NAME
+------------------------------
+CDB$ROOT
+SQL> alter session set container=icic;
+
+Session altered.
+
+SQL> create tablespace mrts to mr;
+create tablespace mrts to mr
+                       *
+ERROR at line 1:
+ORA-02180: invalid option for CREATE TABLESPACE
+
+
+SQL> show user
+USER is "SYS"
+SQL> alter user mr quota unlimited on users;
+
+User altered.
+
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> conn mr/mr@to_icic;
+Connected.
+SQL> insert into mrtable values (11, 'l');
+
+1 row created.
+
+SQL> 
+SQL> 
+SQL> 
+SQL> /
+
+1 row created.
+
+SQL> /
+
+1 row created.
+
+SQL> /
+
+1 row created.
+
+SQL> /
+
+1 row created.
+
+SQL> /
+
+1 row created.
+
+SQL> /
+
+1 row created.
+
+SQL> commit;
+
+Commit complete.
+
+SQL> select * from mrtable;
+
+	SL NAME
+---------- -----------
+	11 l
+	11 l
+	11 l
+	11 l
+	11 l
+	11 l
+	11 l
+
+7 rows selected.
+
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> conn / as sysdba
+Connected.
+SQL> 
+SQL> 
+SQL> show con_name
+
+CON_NAME
+------------------------------
+CDB$ROOT
+SQL> show pdbs
+
+    CON_ID CON_NAME			  OPEN MODE  RESTRICTED
+---------- ------------------------------ ---------- ----------
+	 2 PDB$SEED			  READ ONLY  NO
+	 3 ICIC 			  READ WRITE NO
+	 4 HRMS 			  MOUNTED
+	 5 SBI				  MOUNTED
+	 6 AXISPRO			  READ WRITE NO
+SQL> alter session set container=icic;
+
+Session altered.
+
+SQL> grant create pluggable database to mr;
+
+Grant succeeded.
+
+SQL> 
+SQL> 
+SQL> exit
+Disconnected from Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.3.0.0.0
+[oracle@murali admin]$ !sq
+sqlplus / as sysdba
+
+SQL*Plus: Release 19.0.0.0.0 - Production on Fri Nov 29 13:05:15 2024
+Version 19.3.0.0.0
+
+Copyright (c) 1982, 2019, Oracle.  All rights reserved.
+
+
+Connected to:
+Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.3.0.0.0
+
+SQL> 
+SQL> 
+SQL> 
+SQL> show pdbs
+
+    CON_ID CON_NAME			  OPEN MODE  RESTRICTED
+---------- ------------------------------ ---------- ----------
+	 2 PDB$SEED			  READ ONLY  NO
+	 3 ICIC 			  READ WRITE NO
+	 4 HRMS 			  MOUNTED
+	 5 SBI				  MOUNTED
+	 6 AXISPRO			  READ WRITE NO
+SQL> alter pluggable database icic close;
+
+Pluggable database altered.
+
+SQL> alter pluggable database icic open read only;
+
+Pluggable database altered.
+
+SQL> show pdbs
+
+    CON_ID CON_NAME			  OPEN MODE  RESTRICTED
+---------- ------------------------------ ---------- ----------
+	 2 PDB$SEED			  READ ONLY  NO
+	 3 ICIC 			  READ ONLY  NO
+	 4 HRMS 			  MOUNTED
+	 5 SBI				  MOUNTED
+	 6 AXISPRO			  READ WRITE NO
+SQL> 
+
+
+
+
+
+
+target
+
+
+
+
+
+
+
+
+                                 **************************************************************
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+[oracle@murali admin]$ 
+[oracle@murali admin]$ 
+[oracle@murali admin]$ 
+[oracle@murali admin]$ cd
+[oracle@murali ~]$ ssh oracle@192
+168
+0
+^Z
+[1]+  Stopped                 ssh oracle@192
+[oracle@murali ~]$ 
+[oracle@murali ~]$ 
+[oracle@murali ~]$ 
+[oracle@murali ~]$ ssh oracle@192.168.0.144
+ 
+The authenticity of host '192.168.0.144 (192.168.0.144)' can't be established.
+ECDSA key fingerprint is SHA256:w9QwXpI4eMLDovcFx61NVn1xFDBiAn7uHgGlJR0XEJI.
+ECDSA key fingerprint is MD5:3f:18:71:fb:82:c2:3c:db:7f:1f:96:63:f5:3b:46:97.
+Are you sure you want to continue connecting (yes/no)? yes
+Warning: Permanently added '192.168.0.144' (ECDSA) to the list of known hosts.
+oracle@192.168.0.144's password: 
+Last login: Fri Nov 29 12:00:47 2024 from 192.168.0.247
+[oracle@venky ~]$ 
+[oracle@venky ~]$ 
+[oracle@venky ~]$ 
+[oracle@venky ~]$ 
+[oracle@venky ~]$ 
+[oracle@venky ~]$ cd $ORACLE_HOME
+[oracle@venky dbhome_1]$ cd network/admin/
+[oracle@venky admin]$ ll
+total 16
+-rw-r--r--. 1 oracle oinstall 1181 Nov 29 11:17 listener.ora
+drwxr-xr-x. 2 oracle oinstall   64 Apr 17  2019 samples
+-rw-r--r--. 1 oracle oinstall 1536 Feb 14  2018 shrept.lst
+-rw-r--r--. 1 oracle oinstall  533 Nov 29 11:41 tnsnames.ora
+-rw-r--r--. 1 oracle oinstall  884 Nov 29 09:07 tnsnames.ora_bkp
+[oracle@venky admin]$ vi tnsnames.ora
+[oracle@venky admin]$ 
+[oracle@venky admin]$ 
+[oracle@venky admin]$ 
+[oracle@venky admin]$ 
+[oracle@venky admin]$ 
+[oracle@venky admin]$ 
+[oracle@venky admin]$ 
+[oracle@venky admin]$ tnsping to_icic
+
+TNS Ping Utility for Linux: Version 19.0.0.0.0 - Production on 29-NOV-2024 13:08:23
+
+Copyright (c) 1997, 2019, Oracle.  All rights reserved.
+
+Used parameter files:
+
+
+Used TNSNAMES adapter to resolve the alias
+Attempting to contact (DESCRIPTION = (ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = 192.168.0.141)(PORT = 1521))) (CONNECT_DATA = (SERVICE_NAME = icic)))
+OK (310 msec)
+[oracle@venky admin]$ 
+[oracle@venky admin]$ 
+[oracle@venky admin]$ 
+[oracle@venky admin]$ !sq
+sqlplus / as sysdba
+
+SQL*Plus: Release 19.0.0.0.0 - Production on Fri Nov 29 13:08:45 2024
+Version 19.3.0.0.0
+
+Copyright (c) 1982, 2019, Oracle.  All rights reserved.
+
+Connected to an idle instance.
+
+SQL> exit
+ 
+[oracle@venky admin]$ . oraenv
+ORACLE_SID = [vendb] ? prodb
+The Oracle base remains unchanged with value /u01/app/oracle
+[oracle@venky admin]$ sqlplus / as sysdba
+
+
+Doing thing is 
+selecting the pdb of source user
+making selected pdb close
+making selected pdb read only mode
+
+now it is possible to make cloning of pdb
+
+
+
+giving dblink name source user name password and tnsname of pdb of source user
+
+SQL> create database link dblink connect to mr identified by mr using 'to_icic';
+
+Database link created.
+getting the table list deatils of source using dblink name
+SQL> select * from tab@dblink;
+
+TNAME
+--------------------------------------------------------------------------------
+TABTYPE        CLUSTERID
+------------- ----------
+MRTABLE
+TABLE
+
+
+SQL> create pluggable database mricici from icic@dblink;
+
+Pluggable database created.
+
+SQL> show pdbs
+
+    CON_ID CON_NAME			  OPEN MODE  RESTRICTED
+---------- ------------------------------ ---------- ----------
+	 2 PDB$SEED			  READ ONLY  NO
+	 3 SBI				  MOUNTED
+	 4 MRICICI			  MOUNTED
+	 5 AXIS 			  MOUNTED
+	 6 ICICI_DUP			  MOUNTED
+	 7 ICICI			  MOUNTED
+	 8 AXIS_PRODDB			  READ ONLY  NO
+	 9 HDFC 			  MOUNTED
+SQL> alter session set container=mricici;
+
+Session altered.
+
+SQL> conn mr/mr@to_icic;
+Connected.
+
+SQL> select * from tab;
+
+TNAME
+--------------------------------------------------------------------------------
+TABTYPE        CLUSTERID
+------------- ----------
+MRTABLE
+TABLE
+
+
+SQL> select * from mrtable;
+
+	SL NAME
+---------- -----------
+	11 l
+	11 l
+	11 l
+	11 l
+	11 l
+	11 l
+	11 l
+
+7 rows selected.
+
+SQL> 
+
+
+
+
+SQL> select username from dba_users where oracle_maintained='N';
+
+USERNAME
+--------------------------------------------------------------------------------
+VENKAT
+VV
+
+SQL> select OWNER, TABLE_NAME, TABLESPACE_NAME from all_tables where owner='VENKAT';
+
+OWNER	  |TABLE_NAME	       |TABLESPACE_NAME     
+----------|--------------------|----------------
+VENKAT	  |HDFCTABLE	       |SYSTEM		    
+
+desc dba_users
+
+SQL> set lines 200 pages 200
+set colsep |
+col username for a20
+col account_status for a20
+col default_tablespace for a20
+col temporary_tablespace for a20
+select username, account_status,DEFAULT_TABLESPACE, TEMPORARY_TABLESPACE from dba_users where username='VENKAT';SQL> SQL> SQL> SQL> SQL> SQL> 
+
+USERNAME	    |ACCOUNT_STATUS	 |DEFAULT_TABLESPACE  |TEMPORARY_TABLESPACE
+--------------------|--------------------|--------------------|--------------------
+VENKAT		    |OPEN		 |USERS 	      |TEMP
+
+
+
+getting the columns details of table of user
+
+desc all_tab_columns
+
+
+SQL> set lines 180
+set colsep |
+col owner for a10
+col table_name fro a15
+col column_name for a15
+select owner, table_name, COLUMN_NAME from all_tab_columns where owner='VENKAT';SQL> SQL> SQL> SP2-0158: unknown COLUMN option "fro"
+SQL> SQL> 
+
+OWNER	  |TABLE_NAME												   |COLUMN_NAME
+----------|--------------------------------------------------------------------------------------------------------------------------------|---------------
+VENKAT	  |TABLEVENKAT												   |AC
+VENKAT	  |TABLEVENKAT												   |NAME
+
+
+SQL> set lines 200 pages 200
+set colsep |
+col owner for a10
+col table_name for a20
+col tablespace_name for a20
+col user_stats for a20
+select OWNER, TABLE_NAME, TABLESPACE_NAME,USER_STATS from all_tables where owner='VENKAT';SQL> SQL> SQL> SQL> SQL> SQL> 
+
+OWNER	  |TABLE_NAME	       |TABLESPACE_NAME     |USER_STATS
+----------|--------------------|--------------------|--------------------
+VENKAT	  |TABLEVENKAT	       |USERS		    |NO
+
+
+
+SQL> SELECT * 
+FROM DBA_TS_QUOTAS
+WHERE USERNAME = 'VENKAT';  2    3  
+
+TABLESPACE_NAME     |USERNAME			   |	 BYTES| MAX_BYTES|    BLOCKS|MAX_BLOCKS|DRO
+--------------------|------------------------------|----------|----------|----------|----------|---
+USERS		    |VENKAT			   |	 65536|        -1|	   8|	     -1|NO
+
+
+checking the details in pdb mode
+SQL> SELECT * 
+FROM DBA_TS_QUOTAS
+WHERE USERNAME = 'VENKAT';  2    3  
+
+TABLESPACE_NAME 	      |USERNAME 	   |	 BYTES| MAX_BYTES|    BLOCKS|MAX_BLOCKS|DRO
+------------------------------|--------------------|----------|----------|----------|----------|---
+TSVENKAT		      |VENKAT		   |	     0|        -1|	   0|	     -1|NO
+HDFC_TS 		      |VENKAT		   |	     0|        -1|	   0|	     -1|NO
+HDFCTS			      |VENKAT		   |	 65536|        -1|	   8|	     -1|NO
+
+
+
+
+SQL> set lines 200 pages 200;
+col username for a25;
+col profile for a20;
+col DEFAULT_TABLESPACE for a20;
+col TEMPORARY_TABLESPACE for a20;
+col ACCOUNT_STATUS for a20;
+select username,DEFAULT_TABLESPACE,TEMPORARY_TABLESPACE,PROFILE,ACCOUNT_STATUS from dba_users where username='VENKAT';SQL> SQL> SQL> SQL> SQL> SQL> 
+
+USERNAME		 |DEFAULT_TABLESPACE  |TEMPORARY_TABLESPACE|PROFILE		|ACCOUNT_STATUS
+-------------------------|--------------------|--------------------|--------------------|--------------------
+VENKAT			 |HDFCTS	      |TEMP		   |DEFAULT		|OPEN
+

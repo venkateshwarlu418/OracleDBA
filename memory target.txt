@@ -1,0 +1,987 @@
+[oracle@venky ~]$ sqlplus / as sysdba
+
+SQL*Plus: Release 19.0.0.0.0 - Production on Tue Nov 26 14:25:20 2024
+Version 19.3.0.0.0
+
+Copyright (c) 1982, 2019, Oracle.  All rights reserved.
+
+Connected to an idle instance.
+
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> startup;
+ORA-00845: MEMORY_TARGET not supported on this system
+ 
+SQL> exit
+Disconnected
+ 
+[oracle@venky ~]$ su root
+Password: 
+
+[root@venky oracle]# df -h
+Filesystem           Size  Used Avail Use% Mounted on
+devtmpfs             1.8G     0  1.8G   0% /dev
+tmpfs                1.8G  880M  944M  49% /dev/shm
+tmpfs                1.8G  9.5M  1.8G   1% /run
+tmpfs                1.8G     0  1.8G   0% /sys/fs/cgroup
+/dev/mapper/ol-root   20G   11G  9.3G  53% /
+/dev/mapper/ol-u01    91G   14G   77G  16% /u01
+/dev/sda2            2.0G  233M  1.8G  12% /boot
+tmpfs                365M   36K  365M   1% /run/user/1001
+/dev/sr0              57M   57M     0 100% /run/media/oracle/VBox_GAs_7.1.4
+tmpfs                365M     0  365M   0% /run/user/0
+
+[root@venky oracle]# mount -t tmpfs shmfs -o size=4096M /dev/shm
+
+[root@venky oracle]# su oracle
+[oracle@venky ~]$ 
+[oracle@venky ~]$ 
+[oracle@venky ~]$ 
+[oracle@venky ~]$ 
+[oracle@venky ~]$ 
+[oracle@venky ~]$ sqlplus / as sysdba
+
+SQL*Plus: Release 19.0.0.0.0 - Production on Tue Nov 26 14:28:39 2024
+Version 19.3.0.0.0
+
+Copyright (c) 1982, 2019, Oracle.  All rights reserved.
+
+Connected to an idle instance.
+
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> startup;
+ORACLE instance started.
+
+Total System Global Area 1543500144 bytes
+Fixed Size		    8896880 bytes
+Variable Size		  889192448 bytes
+Database Buffers	  637534208 bytes
+Redo Buffers		    7876608 bytes
+ORA-00205: error in identifying control file, check alert log for more info
+
+
+SQL> !
+[oracle@venky ~]$ cat /etc/oratab
+#
+
+
+
+# This file is used by ORACLE utilities.  It is created by root.sh
+# and updated by either Database Configuration Assistant while creating
+# a database or ASM Configuration Assistant while creating ASM instance.
+
+# A colon, ':', is used as the field terminator.  A new line terminates
+# the entry.  Lines beginning with a pound sign, '#', are comments.
+#
+# Entries are of the form:
+#   $ORACLE_SID:$ORACLE_HOME:<N|Y>:
+#
+# The first and second fields are the system identifier and home
+# directory of the database respectively.  The third field indicates
+# to the dbstart utility that the database should , "Y", or should not,
+# "N", be brought up at system boot time.
+#
+# Multiple entries with the same $ORACLE_SID are not allowed.
+#
+#
+vendb:/u01/app/oracle/product/19.0.0.0/dbhome_1:N
+prodb:/u01/app/oracle/product/19.0.0.0/dbhome_1:N
+[oracle@venky ~]$ . oraenv
+ORACLE_SID = [vendb] ? prodb
+The Oracle base remains unchanged with value /u01/app/oracle
+[oracle@venky ~]$ sqlplus / as sysdba
+
+SQL*Plus: Release 19.0.0.0.0 - Production on Tue Nov 26 14:29:44 2024
+Version 19.3.0.0.0
+
+Copyright (c) 1982, 2019, Oracle.  All rights reserved.
+
+Connected to an idle instance.
+
+SQL> startup;
+ORA-27100: shared memory realm already exists
+Linux-x86_64 Error: 17: File exists
+Additional information: 4549
+Additional information: 12288
+SQL> exit
+Disconnected
+[oracle@venky ~]$ sqlplus / as sysdba
+
+SQL*Plus: Release 19.0.0.0.0 - Production on Tue Nov 26 14:30:00 2024
+Version 19.3.0.0.0
+
+Copyright (c) 1982, 2019, Oracle.  All rights reserved.
+
+Connected to an idle instance.
+
+SQL> startup;
+ORACLE instance started.
+
+Total System Global Area 1543500832 bytes
+Fixed Size		    9135136 bytes
+Variable Size		  889192448 bytes
+Database Buffers	  637534208 bytes
+Redo Buffers		    7639040 bytes
+ORA-01102: cannot mount database in EXCLUSIVE mode
+
+
+SQL> shut abort;
+ORACLE instance shut down.
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> startup;
+ORACLE instance started.
+
+Total System Global Area 1543500832 bytes
+Fixed Size		    9135136 bytes
+Variable Size		  889192448 bytes
+Database Buffers	  637534208 bytes
+Redo Buffers		    7639040 bytes
+Database mounted.
+Database opened.
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> show pdbs
+
+    CON_ID CON_NAME			  OPEN MODE  RESTRICTED
+---------- ------------------------------ ---------- ----------
+	 2 PDB$SEED			  READ ONLY  NO
+	 3 SBI				  MOUNTED
+SQL> alter pluggable database sbi open;
+
+Pluggable database altered.
+
+SQL> show pdbs
+
+    CON_ID CON_NAME			  OPEN MODE  RESTRICTED
+---------- ------------------------------ ---------- ----------
+	 2 PDB$SEED			  READ ONLY  NO
+	 3 SBI				  READ WRITE NO
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> alter session set container=sbi;
+
+Session altered.
+
+SQL> show con_name
+
+CON_NAME
+------------------------------
+SBI
+SQL> 
+SQL> 
+SQL> create user venk identified by venk;
+
+User created.
+
+SQL> 
+SQL> 
+SQL> conn venk/venk
+ERROR:
+ORA-01017: invalid username/password; logon denied
+
+
+Warning: You are no longer connected to ORACLE.
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> show user
+USER is ""
+SQL> 
+SQL> !
+[oracle@venky ~]$ 
+[oracle@venky ~]$ 
+[oracle@venky ~]$ 
+[oracle@venky ~]$ 
+[oracle@venky ~]$ sqlplus / as sysdba
+
+SQL*Plus: Release 19.0.0.0.0 - Production on Tue Nov 26 14:32:39 2024
+Version 19.3.0.0.0
+
+Copyright (c) 1982, 2019, Oracle.  All rights reserved.
+
+
+Connected to:
+Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.3.0.0.0
+
+SQL> conn venk/venk
+ERROR:
+ORA-01017: invalid username/password; logon denied
+
+
+Warning: You are no longer connected to ORACLE.
+SQL> show pdbs
+SP2-0640: Not connected
+SP2-0641: "SHOW PDBS" requires connection to server
+SQL> 
+SQL> 
+SQL> 
+SQL> conn / as sysdba
+Connected.
+SQL> 
+SQL> 
+SQL> show pdbs
+
+    CON_ID CON_NAME			  OPEN MODE  RESTRICTED
+---------- ------------------------------ ---------- ----------
+	 2 PDB$SEED			  READ ONLY  NO
+	 3 SBI				  READ WRITE NO
+SQL> show con_name
+
+CON_NAME
+------------------------------
+CDB$ROOT
+SQL> alter session set container=sbi;
+
+Session altered.
+
+SQL> 
+SQL> 
+SQL> 
+SQL> show con_name
+
+CON_NAME
+------------------------------
+SBI
+SQL> grant connect, resource to venk;
+
+Grant succeeded.
+
+SQL> conn venk/venk
+ERROR:
+ORA-01017: invalid username/password; logon denied
+
+
+Warning: You are no longer connected to ORACLE.
+SQL> show user
+USER is ""
+SQL> conn / as sysdba
+Connected.
+SQL> 
+SQL> 
+SQL> 
+SQL> !
+[oracle@venky ~]$ 
+[oracle@venky ~]$ 
+[oracle@venky ~]$ 
+[oracle@venky ~]$ cd $ORACLE_HOME
+[oracle@venky dbhome_1]$ cd network/admin
+[oracle@venky admin]$ ll
+total 12
+-rw-r--r--. 1 oracle oinstall    0 Nov 24 09:28 file1
+-rw-r--r--. 1 oracle oinstall  474 Nov 25 15:47 listener.ora
+-rw-r--r--. 1 oracle oinstall    0 Nov 24 09:29 sampath
+drwxr-xr-x. 2 oracle oinstall   64 Apr 17  2019 samples
+-rw-r--r--. 1 oracle oinstall 1536 Feb 14  2018 shrept.lst
+-rw-r--r--. 1 oracle oinstall  529 Nov 25 14:22 tnsnames.ora
+[oracle@venky admin]$ netmgr
+[oracle@venky admin]$ 
+[oracle@venky admin]$ 
+[oracle@venky admin]$ cat listeners.ora
+cat: listeners.ora: No such file or directory
+[oracle@venky admin]$ cat listener.ora 
+# listener.ora Network Configuration File: /u01/app/oracle/product/19.0.0.0/dbhome_1/network/admin/listener.ora
+# Generated by Oracle configuration tools.
+
+SID_LIST_LISTENER =
+  (SID_LIST =
+    (SID_DESC =
+      (GLOBAL_DBNAME = laxmi)
+      (ORACLE_HOME = /u01/app/oracle/product/19.0.0.0/dbhome_1)
+      (SID_NAME = laxmi)
+    )
+    (SID_DESC =
+      (GLOBAL_DBNAME = hdfc)
+      (ORACLE_HOME = /u01/app/oracle/product/19.0.0.0/dbhome_1)
+      (SID_NAME = prodb)
+    )
+  )
+
+LISTENER =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = 192.168.0.166)(PORT = 1521))
+  )
+
+ADR_BASE_LISTENER = /u01/app/oracle
+
+[oracle@venky admin]$ netmgr
+[oracle@venky admin]$ cat tnsnames.ora 
+# tnsnames.ora Network Configuration File: /u01/app/oracle/product/19.0.0.0/dbhome_1/network/admin/tnsnames.ora
+# Generated by Oracle configuration tools.
+
+TO_VENDB =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = 192.168.0.143)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = vendb)
+    )
+  )
+
+TO_PRODB =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = 192.168.0.144)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = hdfc)
+    )
+  )
+
+[oracle@venky admin]$ vi tnsnames.ora 
+[oracle@venky admin]$ 
+[oracle@venky admin]$ 
+[oracle@venky admin]$ 
+[oracle@venky admin]$ 
+[oracle@venky admin]$ lsnrctl reload 
+
+LSNRCTL for Linux: Version 19.0.0.0.0 - Production on 26-NOV-2024 14:39:54
+
+Copyright (c) 1991, 2019, Oracle.  All rights reserved.
+
+Connecting to (DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=192.168.0.144)(PORT=1521)))
+TNS-12541: TNS:no listener
+ TNS-12560: TNS:protocol adapter error
+  TNS-00511: No listener
+   Linux Error: 111: Connection refused
+[oracle@venky admin]$ lsnrctl start
+
+LSNRCTL for Linux: Version 19.0.0.0.0 - Production on 26-NOV-2024 14:40:04
+
+Copyright (c) 1991, 2019, Oracle.  All rights reserved.
+
+Starting /u01/app/oracle/product/19.0.0.0/dbhome_1/bin/tnslsnr: please wait...
+
+TNSLSNR for Linux: Version 19.0.0.0.0 - Production
+System parameter file is /u01/app/oracle/product/19.0.0.0/dbhome_1/network/admin/listener.ora
+Log messages written to /u01/app/oracle/diag/tnslsnr/venky/listener/alert/log.xml
+Listening on: (DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=192.168.0.144)(PORT=1521)))
+
+Connecting to (DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=192.168.0.144)(PORT=1521)))
+STATUS of the LISTENER
+------------------------
+Alias                     LISTENER
+Version                   TNSLSNR for Linux: Version 19.0.0.0.0 - Production
+Start Date                26-NOV-2024 14:40:04
+Uptime                    0 days 0 hr. 0 min. 0 sec
+Trace Level               off
+Security                  ON: Local OS Authentication
+SNMP                      OFF
+Listener Parameter File   /u01/app/oracle/product/19.0.0.0/dbhome_1/network/admin/listener.ora
+Listener Log File         /u01/app/oracle/diag/tnslsnr/venky/listener/alert/log.xml
+Listening Endpoints Summary...
+  (DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=192.168.0.144)(PORT=1521)))
+Services Summary...
+Service "hdfc" has 1 instance(s).
+  Instance "prodb", status UNKNOWN, has 1 handler(s) for this service...
+Service "prodb" has 1 instance(s).
+  Instance "prodb", status UNKNOWN, has 1 handler(s) for this service...
+The command completed successfully
+[oracle@venky admin]$ tnsping hdfc
+
+TNS Ping Utility for Linux: Version 19.0.0.0.0 - Production on 26-NOV-2024 14:40:17
+
+Copyright (c) 1997, 2019, Oracle.  All rights reserved.
+
+Used parameter files:
+
+Used HOSTNAME adapter to resolve the alias
+Attempting to contact (DESCRIPTION=(CONNECT_DATA=(SERVICE_NAME=))(ADDRESS=(PROTOCOL=tcp)(HOST=104.16.122.45)(PORT=1521))(ADDRESS=(PROTOCOL=tcp)(HOST=104.16.121.45)(PORT=1521))(ADDRESS=(PROTOCOL=tcp)(HOST=2606:4700::6810:7a2d)(PORT=1521))(ADDRESS=(PROTOCOL=tcp)(HOST=2606:4700::6810:792d)(PORT=1521)))
+^Z
+[1]+  Stopped                 tnsping hdfc
+[oracle@venky admin]$ 
+[oracle@venky admin]$ 
+[oracle@venky admin]$ 
+[oracle@venky admin]$ tnsping to_hdfc
+
+TNS Ping Utility for Linux: Version 19.0.0.0.0 - Production on 26-NOV-2024 14:40:33
+
+Copyright (c) 1997, 2019, Oracle.  All rights reserved.
+
+Used parameter files:
+
+
+Used TNSNAMES adapter to resolve the alias
+Attempting to contact (DESCRIPTION = (ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = 192.168.0.144)(PORT = 1521))) (CONNECT_DATA = (SERVICE_NAME = hdfc)))
+OK (0 msec)
+[oracle@venky admin]$ 
+[oracle@venky admin]$ 
+[oracle@venky admin]$ 
+[oracle@venky admin]$ !sq
+sqlplus / as sysdba
+
+SQL*Plus: Release 19.0.0.0.0 - Production on Tue Nov 26 15:04:05 2024
+Version 19.3.0.0.0
+
+Copyright (c) 1982, 2019, Oracle.  All rights reserved.
+
+
+Connected to:
+Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.3.0.0.0
+
+SQL> 
+SQL> 
+SQL> 
+SQL> show pdbs
+
+    CON_ID CON_NAME			  OPEN MODE  RESTRICTED
+---------- ------------------------------ ---------- ----------
+	 2 PDB$SEED			  READ ONLY  NO
+	 3 SBI				  READ WRITE NO
+SQL> sho con_id
+
+CON_ID
+------------------------------
+1
+SQL> show con_nme
+concat "." (hex 2e)
+SP2-0158: unknown SHOW option "_nme"
+SQL> show con_name
+
+CON_NAME
+------------------------------
+CDB$ROOT
+SQL> 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+new[oracle@venky admin]$ 
+[oracle@venky admin]$ 
+[oracle@venky admin]$ 
+[oracle@venky admin]$ ifconfig
+enp0s3: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 192.168.0.144  netmask 255.255.255.0  broadcast 192.168.0.255
+        inet6 fe80::aa94:25ae:f2f0:ab67  prefixlen 64  scopeid 0x20<link>
+        ether 08:00:27:ff:28:75  txqueuelen 1000  (Ethernet)
+        RX packets 4045  bytes 346137 (338.0 KiB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 333  bytes 26786 (26.1 KiB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+lo: flags=73<UP,LOOPBACK,RUNNING>  mtu 65536
+        inet 127.0.0.1  netmask 255.0.0.0
+        inet6 ::1  prefixlen 128  scopeid 0x10<host>
+        loop  txqueuelen 1000  (Local Loopback)
+        RX packets 380  bytes 24566 (23.9 KiB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 380  bytes 24566 (23.9 KiB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+virbr0: flags=4099<UP,BROADCAST,MULTICAST>  mtu 1500
+        inet 192.168.122.1  netmask 255.255.255.0  broadcast 192.168.122.255
+        ether 52:54:00:1d:f9:29  txqueuelen 1000  (Ethernet)
+        RX packets 0  bytes 0 (0.0 B)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 0  bytes 0 (0.0 B)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+[oracle@venky admin]$ 
+[oracle@venky admin]$ 
+[oracle@venky admin]$ 
+[oracle@venky admin]$ 
+[oracle@venky admin]$ !
+[oracle@venky admin]$ !sq
+sqlplus / as sysdba
+
+SQL*Plus: Release 19.0.0.0.0 - Production on Tue Nov 26 14:41:00 2024
+Version 19.3.0.0.0
+
+Copyright (c) 1982, 2019, Oracle.  All rights reserved.
+
+
+Connected to:
+Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.3.0.0.0
+
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> show pdbs
+SQL> select instance_name from v$instance;
+
+INSTANCE_NAME
+----------------
+vendb
+
+SQL> !
+[oracle@venky admin]$ . oraenv
+ORACLE_SID = [vendb] ? prodb
+The Oracle base remains unchanged with value /u01/app/oracle
+[oracle@venky admin]$ sqlplus / as sysdba
+
+SQL*Plus: Release 19.0.0.0.0 - Production on Tue Nov 26 14:41:53 2024
+Version 19.3.0.0.0
+
+Copyright (c) 1982, 2019, Oracle.  All rights reserved.
+
+
+Connected to:
+Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.3.0.0.0
+
+SQL> 
+SQL> 
+SQL> show pdbs
+
+    CON_ID CON_NAME			  OPEN MODE  RESTRICTED
+---------- ------------------------------ ---------- ----------
+	 2 PDB$SEED			  READ ONLY  NO
+	 3 SBI				  READ WRITE NO
+SQL> alter session set container=sbi;
+
+Session altered.
+
+SQL> conn venk/venk
+ERROR:
+ORA-01017: invalid username/password; logon denied
+
+
+Warning: You are no longer connected to ORACLE.
+SQL> exit
+[oracle@venky admin]$ !sq
+sqlplus / as sysdba
+
+SQL*Plus: Release 19.0.0.0.0 - Production on Tue Nov 26 14:42:27 2024
+Version 19.3.0.0.0
+
+Copyright (c) 1982, 2019, Oracle.  All rights reserved.
+
+
+Connected to:
+Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.3.0.0.0
+
+SQL> 
+SQL> 
+SQL> show pdbs
+
+    CON_ID CON_NAME			  OPEN MODE  RESTRICTED
+---------- ------------------------------ ---------- ----------
+	 2 PDB$SEED			  READ ONLY  NO
+	 3 SBI				  READ WRITE NO
+SQL> alter session set container=sbi;
+
+Session altered.
+
+SQL> conn venk/venk@to_hdfc;
+ERROR:
+ORA-01017: invalid username/password; logon denied
+
+
+Warning: You are no longer connected to ORACLE.
+SQL> !
+[oracle@venky admin]$ ll
+total 12
+-rw-r--r--. 1 oracle oinstall    0 Nov 24 09:28 file1
+-rw-r--r--. 1 oracle oinstall  614 Nov 26 14:38 listener.ora
+-rw-r--r--. 1 oracle oinstall    0 Nov 24 09:29 sampath
+drwxr-xr-x. 2 oracle oinstall   64 Apr 17  2019 samples
+-rw-r--r--. 1 oracle oinstall 1536 Feb 14  2018 shrept.lst
+-rw-r--r--. 1 oracle oinstall  522 Nov 26 14:39 tnsnames.ora
+[oracle@venky admin]$ cat listener.ora 
+# listener.ora Network Configuration File: /u01/app/oracle/product/19.0.0.0/dbhome_1/network/admin/listener.ora
+# Generated by Oracle configuration tools.
+
+SID_LIST_LISTENER =
+  (SID_LIST =
+    (SID_DESC =
+      (GLOBAL_DBNAME = prodb)
+      (ORACLE_HOME = /u01/app/oracle/product/19.0.0.0/dbhome_1)
+      (SID_NAME = prodb)
+    )
+    (SID_DESC =
+      (GLOBAL_DBNAME = hdfc)
+      (ORACLE_HOME = /u01/app/oracle/product/19.0.0.0/dbhome_1)
+      (SID_NAME = prodb)
+    )
+  )
+
+LISTENER =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = 192.168.0.144)(PORT = 1521))
+  )
+
+ADR_BASE_LISTENER = /u01/app/oracle
+
+[oracle@venky admin]$ vi tnsnames.ora 
+[oracle@venky admin]$ cat listener.ora 
+# listener.ora Network Configuration File: /u01/app/oracle/product/19.0.0.0/dbhome_1/network/admin/listener.ora
+# Generated by Oracle configuration tools.
+
+SID_LIST_LISTENER =
+  (SID_LIST =
+    (SID_DESC =
+      (GLOBAL_DBNAME = prodb)
+      (ORACLE_HOME = /u01/app/oracle/product/19.0.0.0/dbhome_1)
+      (SID_NAME = prodb)
+    )
+    (SID_DESC =
+      (GLOBAL_DBNAME = hdfc)
+      (ORACLE_HOME = /u01/app/oracle/product/19.0.0.0/dbhome_1)
+      (SID_NAME = prodb)
+    )
+  )
+
+LISTENER =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = 192.168.0.144)(PORT = 1521))
+  )
+
+ADR_BASE_LISTENER = /u01/app/oracle
+
+[oracle@venky admin]$ ifconfig
+enp0s3: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 192.168.0.144  netmask 255.255.255.0  broadcast 192.168.0.255
+        inet6 fe80::aa94:25ae:f2f0:ab67  prefixlen 64  scopeid 0x20<link>
+        ether 08:00:27:ff:28:75  txqueuelen 1000  (Ethernet)
+        RX packets 4228  bytes 368572 (359.9 KiB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 386  bytes 30362 (29.6 KiB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+lo: flags=73<UP,LOOPBACK,RUNNING>  mtu 65536
+        inet 127.0.0.1  netmask 255.0.0.0
+        inet6 ::1  prefixlen 128  scopeid 0x10<host>
+        loop  txqueuelen 1000  (Local Loopback)
+        RX packets 684  bytes 62364 (60.9 KiB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 684  bytes 62364 (60.9 KiB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+virbr0: flags=4099<UP,BROADCAST,MULTICAST>  mtu 1500
+        inet 192.168.122.1  netmask 255.255.255.0  broadcast 192.168.122.255
+        ether 52:54:00:1d:f9:29  txqueuelen 1000  (Ethernet)
+        RX packets 0  bytes 0 (0.0 B)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 0  bytes 0 (0.0 B)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+[oracle@venky admin]$ netmgr
+[oracle@venky admin]$ cat listener.ora 
+# listener.ora Network Configuration File: /u01/app/oracle/product/19.0.0.0/dbhome_1/network/admin/listener.ora
+# Generated by Oracle configuration tools.
+
+SID_LIST_LISTENER =
+  (SID_LIST =
+    (SID_DESC =
+      (GLOBAL_DBNAME = prodb)
+      (ORACLE_HOME = /u01/app/oracle/product/19.0.0.0/dbhome_1)
+      (SID_NAME = prodb)
+    )
+    (SID_DESC =
+      (GLOBAL_DBNAME = hdfc)
+      (ORACLE_HOME = /u01/app/oracle/product/19.0.0.0/dbhome_1)
+      (SID_NAME = prodb)
+    )
+  )
+
+LISTENER =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = 192.168.0.144)(PORT = 1521))
+  )
+
+ADR_BASE_LISTENER = /u01/app/oracle
+
+[oracle@venky admin]$ 
+[oracle@venky admin]$ lsnrctl reload listener
+
+LSNRCTL for Linux: Version 19.0.0.0.0 - Production on 26-NOV-2024 14:46:30
+
+Copyright (c) 1991, 2019, Oracle.  All rights reserved.
+
+Connecting to (DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=192.168.0.144)(PORT=1521)))
+The command completed successfully
+[oracle@venky admin]$ tnsping to_hdfc
+
+TNS Ping Utility for Linux: Version 19.0.0.0.0 - Production on 26-NOV-2024 14:46:41
+
+Copyright (c) 1997, 2019, Oracle.  All rights reserved.
+
+Used parameter files:
+
+
+Used TNSNAMES adapter to resolve the alias
+Attempting to contact (DESCRIPTION = (ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = 192.168.0.144)(PORT = 1521))) (CONNECT_DATA = (SERVICE_NAME = hdfc)))
+OK (0 msec)
+[oracle@venky admin]$ sqlplus / as sysdba
+
+SQL*Plus: Release 19.0.0.0.0 - Production on Tue Nov 26 14:46:52 2024
+Version 19.3.0.0.0
+
+Copyright (c) 1982, 2019, Oracle.  All rights reserved.
+
+
+Connected to:
+Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.3.0.0.0
+
+SQL> show pdbs;
+
+    CON_ID CON_NAME			  OPEN MODE  RESTRICTED
+---------- ------------------------------ ---------- ----------
+	 2 PDB$SEED			  READ ONLY  NO
+	 3 SBI				  READ WRITE NO
+SQL> alter session set container=sbi;
+
+Session altered.
+
+SQL> show con_name;
+
+CON_NAME
+------------------------------
+SBI
+SQL> select username from dba_users;
+
+USERNAME
+--------------------------------------------------------------------------------
+SYS
+SYSTEM
+XS$NULL
+DBSNMP
+APPQOSSYS
+GSMCATUSER
+MDDATA
+DBSFWUSER
+PDBADMIN
+SYSBACKUP
+REMOTE_SCHEDULER_AGENT
+
+USERNAME
+--------------------------------------------------------------------------------
+GGSYS
+ANONYMOUS
+GSMUSER
+SYSRAC
+CTXSYS
+DVSYS
+DVF
+OJVMSYS
+SI_INFORMTN_SCHEMA
+AUDSYS
+GSMADMIN_INTERNAL
+
+USERNAME
+--------------------------------------------------------------------------------
+DIP
+ORDPLUGINS
+LBACSYS
+MDSYS
+OLAPSYS
+VENK
+SYSKM
+ORDDATA
+OUTLN
+ORACLE_OCM
+SYS$UMF
+
+USERNAME
+--------------------------------------------------------------------------------
+XDB
+WMSYS
+SYSDG
+ORDSYS
+
+37 rows selected.
+
+SQL> grant connect,resource,create session to venk;
+
+Grant succeeded.
+
+SQL> conn venk/venk@to_hdfc;
+ERROR:
+ORA-01017: invalid username/password; logon denied
+
+
+Warning: You are no longer connected to ORACLE.
+SQL> conn / as sysdba
+Connected.
+SQL> show pdbs;
+
+    CON_ID CON_NAME			  OPEN MODE  RESTRICTED
+---------- ------------------------------ ---------- ----------
+	 2 PDB$SEED			  READ ONLY  NO
+	 3 SBI				  READ WRITE NO
+SQL> alter session set container = sbi;p
+  2  ^X
+  3  
+SQL> 
+SQL> 
+SQL> alter session set container = sbi;
+
+Session altered.
+
+SQL> show con_name;
+
+CON_NAME
+------------------------------
+SBI
+SQL> create user ven idenfied by ven;
+create user ven idenfied by ven
+                *
+ERROR at line 1:
+ORA-00922: missing or invalid option
+
+
+SQL> create user ven identified by ven;
+
+User created.
+
+SQL> grant connect,resource to ven;
+
+Grant succeeded.
+
+SQL> alter user ven quota 5M on users;
+
+User altered.
+
+SQL> conn ven/ven@to_hdfc;
+ERROR:
+ORA-01017: invalid username/password; logon denied
+
+
+Warning: You are no longer connected to ORACLE.
+SQL> !
+[oracle@venky admin]$ ll
+total 12
+-rw-r--r--. 1 oracle oinstall    0 Nov 24 09:28 file1
+-rw-r--r--. 1 oracle oinstall  614 Nov 26 14:38 listener.ora
+-rw-r--r--. 1 oracle oinstall    0 Nov 24 09:29 sampath
+drwxr-xr-x. 2 oracle oinstall   64 Apr 17  2019 samples
+-rw-r--r--. 1 oracle oinstall 1536 Feb 14  2018 shrept.lst
+-rw-r--r--. 1 oracle oinstall  522 Nov 26 14:45 tnsnames.ora
+[oracle@venky admin]$ cat tnsnames.ora 
+# tnsnames.ora Network Configuration File: /u01/app/oracle/product/19.0.0.0/dbhome_1/network/admin/tnsnames.ora
+# Generated by Oracle configuration tools.
+
+TO_HDFC =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = 192.168.0.144)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = hdfc)
+    )
+  )
+
+TO_VENDB =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = 192.168.0.144)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = prodb)
+    )
+  )
+
+[oracle@venky admin]$ vi tnsnames.ora 
+[oracle@venky admin]$ vi listener.ora 
+[oracle@venky admin]$ lsnrctl reload listener
+
+LSNRCTL for Linux: Version 19.0.0.0.0 - Production on 26-NOV-2024 14:53:37
+
+Copyright (c) 1991, 2019, Oracle.  All rights reserved.
+
+Connecting to (DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=192.168.0.144)(PORT=1521)))
+The command completed successfully
+[oracle@venky admin]$ tnsping to_sbi
+
+TNS Ping Utility for Linux: Version 19.0.0.0.0 - Production on 26-NOV-2024 14:53:46
+
+Copyright (c) 1997, 2019, Oracle.  All rights reserved.
+
+Used parameter files:
+
+
+Used TNSNAMES adapter to resolve the alias
+Attempting to contact (DESCRIPTION = (ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = 192.168.0.144)(PORT = 1521))) (CONNECT_DATA = (SERVICE_NAME = sbi)))
+OK (0 msec)
+[oracle@venky admin]$ sqlplus / as sysdba
+
+SQL*Plus: Release 19.0.0.0.0 - Production on Tue Nov 26 14:53:59 2024
+Version 19.3.0.0.0
+
+Copyright (c) 1982, 2019, Oracle.  All rights reserved.
+
+
+Connected to:
+Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.3.0.0.0
+
+SQL> show pdbs
+
+    CON_ID CON_NAME			  OPEN MODE  RESTRICTED
+---------- ------------------------------ ---------- ----------
+	 2 PDB$SEED			  READ ONLY  NO
+	 3 SBI				  READ WRITE NO
+SQL> alter session set container=sbi;
+
+Session altered.
+
+SQL> conn ven/ven@to_sbi;
+Connected.
+SQL> conn venk/venk@to_sbi; 
+Connected.
+SQL> show user;
+USER is "VENK"
+SQL> conn / as sysdba
+Connected.
+SQL> show user;
+USER is "SYS"
+SQL> !
+[oracle@venky admin]$ cat tnsnames.ora 
+# tnsnames.ora Network Configuration File: /u01/app/oracle/product/19.0.0.0/dbhome_1/network/admin/tnsnames.ora
+# Generated by Oracle configuration tools.
+
+TO_SBI =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = 192.168.0.144)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = sbi)
+    )
+  )
+
+TO_VENDB =
+  (DESCRIPTION =
+    (ADDRESS_LIST =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = 192.168.0.144)(PORT = 1521))
+    )
+    (CONNECT_DATA =
+      (SERVICE_NAME = prodb)
+    )
+  )
+
+[oracle@venky admin]$ netmgr
+[oracle@venky admin]$ 

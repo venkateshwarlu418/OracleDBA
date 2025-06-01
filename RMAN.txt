@@ -1,0 +1,422 @@
+
+(configuring database in archivelog mode)
+
+shut immediate; 
+
+startup mount;
+alter database archivelog;
+alter database open;
+
+archive log list;
+
+
+
+
+
+(configuring database in noarchivelog mode)
+shut immediate;
+startup mount;
+alter database noarchivelog;
+alter database open;
+
+(know your archive log destination)
+
+archive log list;
+
+
+
+RMAN CONFIGURATION on primary DB.
+
+mkdir /u01/rman_bkp/
+rman target / 
+spool log to rman.log
+show all;
+spool off;
+exit;
+
+vi rman.log
+
+
+****************** configuration parameters *******************
+
+
+CONFIGURE RETENTION POLICY TO REDUNDANCY 2 # default
+CONFIGURE BACKUP OPTIMIZATION OFF; # default
+CONFIGURE DEFAULT DEVICE TYPE TO DISK; # default
+CONFIGURE CONTROLFILE AUTOBACKUP ON; # default
+CONFIGURE CONTROLFILE AUTOBACKUP FORMAT FOR DEVICE TYPE DISK TO '/u01/rman_bkp/%F'; # default
+CONFIGURE DEVICE TYPE DISK PARALLELISM 2 BACKUP TYPE TO BACKUPSET; # default
+CONFIGURE DATAFILE BACKUP COPIES FOR DEVICE TYPE DISK TO 1; # default
+CONFIGURE ARCHIVELOG BACKUP COPIES FOR DEVICE TYPE DISK TO 1; # default
+CONFIGURE MAXSETSIZE TO UNLIMITED; # default
+CONFIGURE ENCRYPTION FOR DATABASE OFF; # default
+CONFIGURE ENCRYPTION ALGORITHM 'AES128'; # default
+CONFIGURE COMPRESSION ALGORITHM 'BASIC' AS OF RELEASE 'DEFAULT' OPTIMIZE FOR LOAD TRUE ; # default
+CONFIGURE RMAN OUTPUT TO KEEP FOR 7 DAYS; # default
+CONFIGURE ARCHIVELOG DELETION POLICY TO NONE; # default
+CONFIGURE SNAPSHOT CONTROLFILE NAME TO '/u01/rman_bkp/snapcf_DB.f'; # default
+CONFIGURE CHANNEL 1 DEVICE TYPE DISK FORMAT '/u01/rman_bkp/%U';
+CONFIGURE CHANNEL 2 DEVICE TYPE DISK FORMAT '/u01/rman_bkp/%U';
+
+
+						********
+-
+
+
+
+
+if you want to connect directly from oracle to rman target do the following below
+
+
+
+
+orapwd file=$ORACLE_HOME/dbs/orapwproddb password=Dba_2024 entries=10 force=y
+
+
+
+
+[oracle@oraclept ~]$ rman target /
+
+connected to target database: PRODDB (DBID=896617639)
+
+						********
+
+If you are already in rman and you just connect to connect target
+[oracle@oraclept ~]$ rman
+rman> connect target /
+
+connected to target database: PRODDB (DBID=896617639)
+
+
+@rman.log
+
+
+********To do bakup
+
+backup database;
+
+
+****** To list all RMAN backups (including full and incremental backups) taken for the database, you can
+
+list backup;
+
+
+************* To delete backups there are various types
+DELETE EXPIRED BACKUP;
+DELETE BACKUP OF DATAFILE <file_number>;
+DELETE BACKUP OF ARCHIVELOG ALL;
+
+DELETE BACKUPSET <backup_set_key>;
+RMAN> delete backupset 4;
+
+using channel ORA_DISK_1
+using channel ORA_DISK_2
+
+List of Backup Pieces
+BP Key  BS Key  Pc# Cp# Status      Device Type Piece Name
+------- ------- --- --- ----------- ----------- ----------
+4       4       1   1   AVAILABLE   DISK        /u01/rman/PRODDB_042fh3ip_1_1
+
+Do you really want to delete the above objects (enter YES or NO)? yes
+deleted backup piece
+backup piece handle=/u01/rman/PRODDB_042fh3ip_1_1 RECID=4 STAMP=1157140057
+Deleted 1 objects
+
+
+
+RMAN> DELETE ARCHIVELOG ALL COMPLETED BEFORE 'SYSDATE-7';  -- Deletes logs older than 7 days
+
+
+
+(DELETE BACKUP;   -- Deletes backups according to the retention policy.
+DELETE BACKUP ALL;) all the backups deleted from the list
+RMAN> delete backup;
+
+using channel ORA_DISK_1
+using channel ORA_DISK_2
+
+List of Backup Pieces
+BP Key  BS Key  Pc# Cp# Status      Device Type Piece Name
+------- ------- --- --- ----------- ----------- ----------
+3       3       1   1   AVAILABLE   DISK        /u01/rman/PRODDB_032fh3hk_1_1
+5       5       1   1   AVAILABLE   DISK        /u01/rman/PRODDB_052fh3iq_1_1
+6       6       1   1   AVAILABLE   DISK        /u01/rman_bkp/073bu7f3_1_1
+7       7       1   1   AVAILABLE   DISK        /u01/rman_bkp/063bu7f3_1_1
+8       8       1   1   AVAILABLE   DISK        /u01/rman_bkp/c-896617639-20241205-00
+9       9       1   1   AVAILABLE   DISK        /u01/rman_bkp/0a3bu8t5_1_1
+10      10      1   1   AVAILABLE   DISK        /u01/rman_bkp/093bu8t5_1_1
+11      11      1   1   AVAILABLE   DISK        /u01/rman_bkp/c-896617639-20241205-01
+12      12      1   1   AVAILABLE   DISK        /u01/rman_bkp/0d3bu92k_1_1
+13      13      1   1   AVAILABLE   DISK        /u01/rman_bkp/0c3bu92k_1_1
+14      14      1   1   AVAILABLE   DISK        /u01/rman_bkp/c-896617639-20241205-02
+
+Do you really want to delete the above objects (enter YES or NO)? yes
+deleted backup piece
+backup piece handle=/u01/rman/PRODDB_032fh3hk_1_1 RECID=3 STAMP=1157140020
+deleted backup piece
+backup piece handle=/u01/rman/PRODDB_052fh3iq_1_1 RECID=5 STAMP=1157140059
+deleted backup piece
+backup piece handle=/u01/rman_bkp/073bu7f3_1_1 RECID=6 STAMP=1186930147
+deleted backup piece
+backup piece handle=/u01/rman_bkp/063bu7f3_1_1 RECID=7 STAMP=1186930149
+deleted backup piece
+backup piece handle=/u01/rman_bkp/c-896617639-20241205-00 RECID=8 STAMP=1186930162
+deleted backup piece
+backup piece handle=/u01/rman_bkp/0a3bu8t5_1_1 RECID=9 STAMP=1186931621
+deleted backup piece
+backup piece handle=/u01/rman_bkp/093bu8t5_1_1 RECID=10 STAMP=1186931621
+deleted backup piece
+backup piece handle=/u01/rman_bkp/c-896617639-20241205-01 RECID=11 STAMP=1186931637
+deleted backup piece
+backup piece handle=/u01/rman_bkp/0d3bu92k_1_1 RECID=12 STAMP=1186931796
+deleted backup piece
+backup piece handle=/u01/rman_bkp/0c3bu92k_1_1 RECID=13 STAMP=1186931796
+Deleted 5 objects
+
+deleted backup piece
+backup piece handle=/u01/rman_bkp/c-896617639-20241205-02 RECID=14 STAMP=1186931811
+Deleted 6 objects
+
+RMAN> list backup;
+******** If there are no available backups in list then the messege shows as below
+
+specification does not match any backup in the repository
+
+
+RMAN> list backup;
+
+
+List of Backup Sets
+===================
+
+
+BS Key  Type LV Size       Device Type Elapsed Time Completion Time     
+------- ---- -- ---------- ----------- ------------ --------------------
+15      Full    979.20M    DISK        00:00:05     05-DEC-2024 16:08:48
+        BP Key: 15   Status: AVAILABLE  Compressed: NO  Tag: TAG20241205T160842
+        Piece Name: /u01/rman_bkp/0g3buc4b_1_1
+  List of Datafiles in backup set 15
+  File LV Type Ckp SCN    Ckp Time             Abs Fuz SCN Sparse Name
+  ---- -- ---- ---------- -------------------- ----------- ------ ----
+  2       Full 6269190    05-DEC-2024 16:08:43              NO    /u01/app/oracle/oradata/PRODDB/datafile/o1_mf_venkyts_mo0kb7do_.dbf
+  5       Full 6269190    05-DEC-2024 16:08:43              NO    /u01/app/oracle/oradata/PRODDB/datafile/o1_mf_soetbs_lrn6blkm_.dbf
+  7       Full 6269190    05-DEC-2024 16:08:43              NO    /u01/app/oracle/oradata/PRODDB/datafile/o1_mf_users_lrn5k5bw_.dbf
+
+BS Key  Type LV Size       Device Type Elapsed Time Completion Time     
+------- ---- -- ---------- ----------- ------------ --------------------
+16      Full    1.61G      DISK        00:00:07     05-DEC-2024 16:08:50
+        BP Key: 16   Status: AVAILABLE  Compressed: NO  Tag: TAG20241205T160842
+        Piece Name: /u01/rman_bkp/0f3buc4b_1_1
+  List of Datafiles in backup set 16
+  File LV Type Ckp SCN    Ckp Time             Abs Fuz SCN Sparse Name
+  ---- -- ---- ---------- -------------------- ----------- ------ ----
+  1       Full 6269189    05-DEC-2024 16:08:43              NO    /u01/app/oracle/oradata/PRODDB/datafile/o1_mf_system_lrn5hvv7_.dbf
+  3       Full 6269189    05-DEC-2024 16:08:43              NO    /u01/app/oracle/oradata/PRODDB/datafile/o1_mf_sysaux_lrn5jnxt_.dbf
+  4       Full 6269189    05-DEC-2024 16:08:43              NO    /u01/app/oracle/oradata/PRODDB/datafile/o1_mf_undotbs1_lrn5k49l_.dbf
+
+BS Key  Type LV Size       Device Type Elapsed Time Completion Time     
+------- ---- -- ---------- ----------- ------------ --------------------
+17      Full    10.20M     DISK        00:00:00     05-DEC-2024 16:08:58
+        BP Key: 17   Status: AVAILABLE  Compressed: NO  Tag: TAG20241205T160858
+        Piece Name: /u01/rman_bkp/c-896617639-20241205-03
+  SPFILE Included: Modification time: 05-DEC-2024 14:33:55
+  SPFILE db_unique_name: PRODDB
+  Control File Included: Ckp SCN: 6269203      Ckp time: 05-DEC-2024 16:08:58
+
+
+
+
+
+
+RMAN> DELETE BACKUPPIECE <backup_piece_key>;
+RMAN> delete backuppiece 2;
+using channel ORA_DISK_1
+using channel ORA_DISK_2
+
+List of Backup Pieces
+BP Key  BS Key  Pc# Cp# Status      Device Type Piece Name
+------- ------- --- --- ----------- ----------- ----------
+2       2       1   1   AVAILABLE   DISK        /u01/app/oracle/fast_recovery_area/PRODDB/autobackup/2024_01_01/o1_mf_s_1157139587_ls5kxcjp_.bkp
+
+Do you really want to delete the above objects (enter YES or NO)? yes
+deleted backup piece
+backup piece handle=/u01/app/oracle/fast_recovery_area/PRODDB/autobackup/2024_01_01/o1_mf_s_1157139587_ls5kxcjp_.bkp RECID=2 STAMP=1157139587
+Deleted 1 objects
+
+
+
+Checking for the backups are in valid or obsolete state,
+If the backups are in obsolete state, then check for ***** CONFIGURE RETENTION POLICY TO REDUNDANCY 4 # default ****
+and increase the retention policy more than previous, those backups in obsolete state
+are get back into valid state.
+
+
+
+RMAN> report obsolete;
+
+RMAN retention policy will be applied to the command
+RMAN retention policy is set to redundancy 1
+Report of obsolete backups and copies
+Type                 Key    Completion Time    Filename/Handle
+-------------------- ------ ------------------ --------------------
+Backup Set           2      01-JAN-2024 19:39:47
+  Backup Piece       2      01-JAN-2024 19:39:47 /u01/app/oracle/fast_recovery_area/PRODDB/autobackup/2024_01_01/o1_mf_s_1157139587_ls5kxcjp_.bkp
+Backup Set           3      01-JAN-2024 19:47:29
+  Backup Piece       3      01-JAN-2024 19:47:29 /u01/rman/PRODDB_032fh3hk_1_1
+Backup Set           4      01-JAN-2024 19:47:37
+  Backup Piece       4      01-JAN-2024 19:47:37 /u01/rman/PRODDB_042fh3ip_1_1
+Backup Set           5      01-JAN-2024 19:47:39
+  Backup Piece       5      01-JAN-2024 19:47:39 /u01/rman/PRODDB_052fh3iq_1_1
+Backup Set           6      06-DEC-2024 19:34:01
+  Backup Piece       6      06-DEC-2024 19:34:01 /u01/app/oracle/fast_recovery_area/PRODDB/backupset/2024_12_06/o1_mf_nnndf_TAG20241206T193348_mo6125n3_.bkp
+Backup Set           7      06-DEC-2024 19:34:04
+  Backup Piece       7      06-DEC-2024 19:34:04 /u01/app/oracle/fast_recovery_area/PRODDB/autobackup/2024_12_06/o1_mf_s_1187033644_mo612njh_.bkp
+Backup Set           8      06-DEC-2024 19:41:38
+  Backup Piece       8      06-DEC-2024 19:41:38 /u01/app/oracle/fast_recovery_area/PRODDB/backupset/2024_12_06/o1_mf_nnndf_TAG20241206T194124_mo61jdpd_.bkp
+Backup Set           9      06-DEC-2024 19:41:40
+  Backup Piece       9      06-DEC-2024 19:41:40 /u01/app/oracle/fast_recovery_area/PRODDB/autobackup/2024_12_06/o1_mf_s_1187034100_mo61jws3_.bkp
+Backup Set           11     06-DEC-2024 19:47:06
+  Backup Piece       11     06-DEC-2024 19:47:06 /u01/rman_bkp/0e3c1d9i_1_1
+Archive Log          1      06-DEC-2024 20:02:21 /u01/app/oracle/fast_recovery_area/PRODDB/archivelog/2024_12_06/o1_mf_1_23_mo61w7mb_.arc
+Backup Set           10     06-DEC-2024 19:47:04
+  Backup Piece       10     06-DEC-2024 19:47:04 /u01/rman_bkp/0f3c1d9i_1_1
+Archive Log          2      06-DEC-2024 21:20:54 /u01/app/oracle/fast_recovery_area/PRODDB/archivelog/2024_12_06/o1_mf_1_1_mo67byrd_.arc
+Backup Set           12     06-DEC-2024 20:12:58
+  Backup Piece       12     06-DEC-2024 20:12:58 /u01/rman_bkp/c-896617639-20241206-04
+
+RMAN> CONFIGURE RETENTION POLICY TO REDUNDANCY 4 # default
+2> ;
+
+new RMAN configuration parameters:
+CONFIGURE RETENTION POLICY TO REDUNDANCY 4;
+new RMAN configuration parameters are successfully stored
+
+RMAN> report obsolete;
+
+RMAN retention policy will be applied to the command
+RMAN retention policy is set to redundancy 4
+Report of obsolete backups and copies
+Type                 Key    Completion Time    Filename/Handle
+-------------------- ------ ------------------ --------------------
+Backup Set           2      01-JAN-2024 19:39:47
+  Backup Piece       2      01-JAN-2024 19:39:47 /u01/app/oracle/fast_recovery_area/PRODDB/autobackup/2024_01_01/o1_mf_s_1157139587_ls5kxcjp_.bkp
+Backup Set           3      01-JAN-2024 19:47:29
+  Backup Piece       3      01-JAN-2024 19:47:29 /u01/rman/PRODDB_032fh3hk_1_1
+Backup Set           4      01-JAN-2024 19:47:37
+  Backup Piece       4      01-JAN-2024 19:47:37 /u01/rman/PRODDB_042fh3ip_1_1
+Backup Set           5      01-JAN-2024 19:47:39
+  Backup Piece       5      01-JAN-2024 19:47:39 /u01/rman/PRODDB_052fh3iq_1_1
+
+RMAN> list backup;
+
+
+list of the archivelogs below
+
+RMAN> list archivelog all;
+
+List of Archived Log Copies for database with db_unique_name PRODDB
+=====================================================================
+
+Key     Thrd Seq     S Low Time            
+------- ---- ------- - --------------------
+1       1    23      A 06-DEC-2024 19:17:13
+        Name: /u01/app/oracle/fast_recovery_area/PRODDB/archivelog/2024_12_06/o1_mf_1_23_mo61w7mb_.arc
+
+2       1    1       A 06-DEC-2024 20:12:50
+        Name: /u01/app/oracle/fast_recovery_area/PRODDB/archivelog/2024_12_06/o1_mf_1_1_mo67byrd_.arc
+
+
+
+
+
+backup database tag "12_05_2024_16_47_00";
+
+if we dont want our backup to fall in obsolete status then we have to use keep until clause.
+backup database  tag 'retain' keep until time 'sysdate+2';
+
+backup incremental level 0 database;
+
+backup incremental level 1 database;
+backup incremental level 1 cumulative database;
+
+
+
+
+
+
+report obsolete;
+RMAN retention policy will be applied to the command
+RMAN retention policy is set to redundancy 2
+no obsolete backups found
+
+
+RMAN> report obsolete;
+
+RMAN retention policy will be applied to the command
+RMAN retention policy is set to redundancy 2
+Report of obsolete backups and copies
+Type                 Key    Completion Time    Filename/Handle
+-------------------- ------ ------------------ --------------------
+Backup Set           16     05-DEC-2024 16:08:50
+  Backup Piece       16     05-DEC-2024 16:08:50 /u01/rman_bkp/0f3buc4b_1_1
+Backup Set           15     05-DEC-2024 16:08:48
+  Backup Piece       15     05-DEC-2024 16:08:48 /u01/rman_bkp/0g3buc4b_1_1
+Backup Set           17     05-DEC-2024 16:08:58
+  Backup Piece       17     05-DEC-2024 16:08:58 /u01/rman_bkp/c-896617639-20241205-03
+
+
+
+
+RMAN> list backup summary;
+
+
+List of Backups
+===============
+Key     TY LV S Device Type Completion Time      #Pieces #Copies Compressed Tag
+------- -- -- - ----------- -------------------- ------- ------- ---------- ---
+39      B  F  A DISK        06-DEC-2024 14:18:46 1       1       NO         TAG20241206T141841
+40      B  F  A DISK        06-DEC-2024 14:18:47 1       1       NO         TAG20241206T141841
+41      B  F  A DISK        06-DEC-2024 14:18:48 1       1       NO         TAG20241206T141848
+
+
+
+
+
+
+
+
+
+
+
+
+list archivelog all;
+backup archivelog all;
+delete archivelog all backed up 1 times to disk;
+
+delete archivelog all completed before 'sysdate-1';
+
+delete archivelog until time 'sysdate -1';
+
+delete archivelog until sequence 25;
+
+delete archivelog from sequence 25 until sequence 35;
+
+
+
+REPORT OBSOLETE: Identifies backups that are no longer needed based on the retention policy (time-based or redundancy-based).
+VALIDATE BACKUP: Checks the validity of all backups to ensure they can be restored.
+CROSSCHECK BACKUP: Verifies whether the physical backup files are available and marks missing ones as expired.
+LIST BACKUP: Lists all backups and their statuses.
+LIST EXPIRED BACKUP: Lists backups that are marked as expired (i.e., missing or manually deleted).
+DELETE EXPIRED BACKUP: Deletes expired backups from the RMAN catalog.
+DELETE OBSOLETE: Removes backups that are no longer needed based on your retention policy.
+
+
+SELECT THREAD#, SEQUENCE#, FIRST_TIME, NEXT_TIME, ARCHIVED
+FROM V$ARCHIVED_LOG
+ORDER BY THREAD#, SEQUENCE#;
+  THREAD#| SEQUENCE#|FIRST_TIM|NEXT_TIME|ARC
+----------|----------|---------|---------|---
+	 1|	   24|08-DEC-24|08-DEC-24|YES
+	 
+	 RECOVER DATABASE UNTIL SEQUENCE 101 THREAD 1;

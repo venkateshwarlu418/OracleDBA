@@ -1,0 +1,36 @@
+user_users (checking in user)
+
+
+SQL> desc user_users
+ Name					   Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ USERNAME				   NOT NULL VARCHAR2(128)
+ USER_ID				   NOT NULL NUMBER
+ ACCOUNT_STATUS 			   NOT NULL VARCHAR2(32)
+ LOCK_DATE					    DATE
+ EXPIRY_DATE					    DATE
+ DEFAULT_TABLESPACE			   NOT NULL VARCHAR2(30)
+ TEMPORARY_TABLESPACE			   NOT NULL VARCHAR2(30)
+ LOCAL_TEMP_TABLESPACE				    VARCHAR2(30)
+ CREATED				   NOT NULL DATE
+ INITIAL_RSRC_CONSUMER_GROUP			    VARCHAR2(128)
+ EXTERNAL_NAME					    VARCHAR2(4000)
+ PROXY_ONLY_CONNECT				    VARCHAR2(1)
+ COMMON 					    VARCHAR2(3)
+ ORACLE_MAINTAINED				    VARCHAR2(1)
+ INHERITED					    VARCHAR2(3)
+ DEFAULT_COLLATION				    VARCHAR2(100)
+ IMPLICIT					    VARCHAR2(3)
+ ALL_SHARD					    VARCHAR2(3)
+ PASSWORD_CHANGE_DATE				    DATE
+
+
+set lines 300 pages 300
+set colsep |
+col username for a10
+col user_id for a10
+col account_status for a20
+col default_tablespace for a30
+col temporary_tablespace for a30
+col local_temp_tablespace for a30
+select username, user_id, account_status, default_tablespace, temporary_tablespace, local_temp_tablespace from user_users where username='VENKAT';

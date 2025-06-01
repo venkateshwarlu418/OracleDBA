@@ -1,0 +1,365 @@
+
+TEMP
+
+CHECK:
+
+SET LINESIZE 255
+
+COLUMN tablespace_name FORMAT A20
+COLUMN file_name FORMAT A40
+
+SELECT tf.tablespace_name,
+       tf.file_name,
+       tf.size_mb,
+       f.free_mb,
+       tf.max_size_mb,
+       f.free_mb + (tf.max_size_mb - tf.size_mb) AS max_free_mb,
+       RPAD(' '|| RPAD('X',ROUND((tf.max_size_mb-(f.free_mb + (tf.max_size_mb - tf.size_mb)))/max_size_mb*10,0), 'X'),11,'-') AS used_pct
+FROM   (SELECT file_id,
+               file_name,
+               tablespace_name,
+               TRUNC(bytes/1024/1024) AS size_mb,
+               TRUNC(GREATEST(bytes,maxbytes)/1024/1024) AS max_size_mb
+        FROM   dba_temp_files) tf,
+       (SELECT TRUNC(SUM(bytes)/1024/1024) AS free_mb,
+               file_id
+        FROM dba_free_space
+        GROUP BY file_id) f
+WHERE  tf.file_id = f.file_id (+)
+ORDER BY tf.tablespace_name,
+         tf.file_name;
+
+CHECK TEMPFILE DETAILS:
+	 
+SET LINESIZE 200
+COLUMN file_name FORMAT A70
+
+SELECT TABLESPACE_NAME,
+		file_id,
+       file_name,
+       ROUND(bytes/1024/1024/1024) AS size_gb,
+       ROUND(maxbytes/1024/1024/1024) AS max_size_gb,
+       autoextensible,
+       increment_by,
+       status
+FROM   dba_temp_files
+ORDER BY file_name;
+
+CREATE TEMP TABLESPACE
+
+CREATE TEMPORARY TABLESPACE TEMP_NEW TEMPFILE '/database/PRODDB/datafile/temp__new_01.dbf' SIZE 10m autoextend on maxsize unlimited;
+
+To set the default temporary tablespace in Oracle, you can run the following
+ALTER DATABASE DEFAULT TEMPORARY TABLESPACE TEMP_NEW;
+
+select property_name,property_value from database_properties where property_name like '%DEFAULT%';
+
+ALTER TABLESPACE TEMP ADD TEMPFILE '+DATAC1' SIZE 10G AUTOEXTEND ON NEXT 1G MAXSIZE 32767M;
+
+who are using old temporary tablespace ( i.e. TEMP ) and kill them.
+
+SELECT b.tablespace,b.segfile#,b.segblk#,b.blocks,a.sid,a.serial#,
+a.username,a.osuser, a.status
+FROM v$session a,v$sort_usage b
+WHERE a.saddr = b.session_addr;
+
+
+
+TEMP % Utilization
+
+Query to check percentage (%) utilization of temp tablespace
+
+select (s.tot_used_blocks/f.total_blocks)*100 as "percent used"
+from (select sum(used_blocks) tot_used_blocks
+from v$sort_segment where tablespace_name='TEMP') s,
+(select sum(blocks) total_blocks
+from dba_temp_files where tablespace_name='TEMP') f;
+
+
+Top 10 queries using temp tablespace.
+
+select * from (
+select s.sid,
+s.status,
+s.sql_hash_value sesshash,
+u.SQLHASH sorthash,
+s.username,
+u.tablespace,
+sum(u.blocks*p.value/1024/1024) mbused ,
+sum(u.extents) noexts,
+nvl(s.module,s.program) proginfo,
+floor(last_call_et/3600)||':'||
+floor(mod(last_call_et,3600)/60)||':'||
+mod(mod(last_call_et,3600),60) lastcallet
+from v$sort_usage u,
+v$session s,
+v$parameter p
+where u.session_addr = s.saddr
+and p.name = 'db_block_size'
+group by s.sid,s.status,s.sql_hash_value,u.sqlhash,s.username,u.tablespace,
+nvl(s.module,s.program),
+floor(last_call_et/3600)||':'||
+floor(mod(last_call_et,3600)/60)||':'||
+mod(mod(last_call_et,3600),60)
+order by 7 desc,3)
+where rownum < 11;
+
+current sessions using temp.
+
+SELECT sysdate,a.username, a.sid, a.serial#, a.osuser, 
+(b.blocks*d.block_size)/1048576 MB_used, c.sql_text
+FROM v$session a, v$tempseg_usage b, v$sqlarea c,
+     (select block_size from dba_tablespaces where tablespace_name='TEMP') d
+    WHERE b.tablespace = 'TEMP'
+    and a.saddr = b.session_addr
+    AND c.address= a.sql_address
+    AND c.hash_value = a.sql_hash_value
+    AND (b.blocks*d.block_size)/1048576 > 1024
+    ORDER BY b.tablespace, 6 desc;
+
+
+get DDL of tablespace
+
+set heading off;
+set echo off;
+Set pages 999;
+set long 90000;
+spool ddl_tablespace.sql
+select dbms_metadata.get_ddl('TABLE','EMPLOYEE','SCOTT') from DUAL; 
+spool off
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+TEMP
+
+CHECK:
+
+SET LINESIZE 255
+
+COLUMN tablespace_name FORMAT A20
+COLUMN file_name FORMAT A40
+
+SELECT tf.tablespace_name,
+       tf.file_name,
+       tf.size_mb,
+       f.free_mb,
+       tf.max_size_mb,
+       f.free_mb + (tf.max_size_mb - tf.size_mb) AS max_free_mb,
+       RPAD(' '|| RPAD('X',ROUND((tf.max_size_mb-(f.free_mb + (tf.max_size_mb - tf.size_mb)))/max_size_mb*10,0), 'X'),11,'-') AS used_pct
+FROM   (SELECT file_id,
+               file_name,
+               tablespace_name,
+               TRUNC(bytes/1024/1024) AS size_mb,
+               TRUNC(GREATEST(bytes,maxbytes)/1024/1024) AS max_size_mb
+        FROM   dba_temp_files) tf,
+       (SELECT TRUNC(SUM(bytes)/1024/1024) AS free_mb,
+               file_id
+        FROM dba_free_space
+        GROUP BY file_id) f
+WHERE  tf.file_id = f.file_id (+)
+ORDER BY tf.tablespace_name,
+         tf.file_name;
+
+TABLESPACE_NAME      	FILE_NAME					 								SIZE_MB    	FREE_MB 	MAX_SIZE_MB 	MAX_FREE_MB 	USED_PCT
+-------------------- ---------------------------------------- 						---------- 	---------- ----------- 		----------- 	----------
+TEMP		     /u01/app/oracle/oradata/VENDB/datafile/o1_mf_temp_mlmhgnrz_.tmp	    32	  		4	  		32767    	   32739  		----------	  
+
+
+		CHECK TEMPFILE DETAILS:
+	 
+SET LINESIZE 200
+COLUMN file_name FORMAT A70
+
+SELECT TABLESPACE_NAME,
+		file_id,
+       file_name,
+       ROUND(bytes/1024/1024/1024) AS size_gb,
+       ROUND(maxbytes/1024/1024/1024) AS max_size_gb,
+       autoextensible,
+       increment_by,
+       status
+FROM   dba_temp_files
+ORDER BY file_name;
+
+TABLESPACE_NAME 	FILE_ID FILE_NAME																	  SIZE_GB MAX_SIZE_GB AUT INCREMENT_BY STATUS
+-------------------- ---------- ---------------------------------------------------------------------- ---------- ----------- --- ------------ -------
+TEMP			      1 /u01/app/oracle/oradata/VENDB/datafile/o1_mf_temp_mlmhgnrz_.tmp 				0	   32 YES	    80 ONLINE
+TEMP_NEW		      2 /u01/app/oracle/oradata/VENDB/datafile/temp_new_01.dbf							0	   32 YES	     1 ONLINE
+TEMP_NEW_01		      3 /u01/app/oracle/oradata/VENDB/datafile/temp_new_02.tmp							0	   32 YES	     1 ONLINE
+
+
+
+
+
+
+CREATE TEMP TABLESPACE
+
+sql> CREATE TEMPORARY TABLESPACE TEMP_NEW TEMPFILE '/database/VENDB/datafile/temp_new_01.dbf' SIZE 10m autoextend on maxsize unlimited;
+sql> CREATE TEMPORARY TABLESPACE TEMP_NEW TEMPFILE '/u01/app/oracle/oradata/VENDB/datafile/temp_new_01.dbf' SIZE 10m autoextend on maxsize unlimited;
+Tablespace created.
+
+
+sql> CREATE TEMPORARY TABLESPACE TEMP_new_01 TEMPFILE '/u01/app/oracle/oradata/VENDB/datafile/temp_new_02.tmp' SIZE 10m autoextend on maxsize unlimited;
+
+
+
+Resize a tempfile
+sql> alter database TEMP_new_01 '/u01/app/oracle/oradata/VENDB/datafile/temp_new_02.tmp' resize 200M;
+
+
+
+To set the default temporary tablespace in Oracle, you can run the following
+sql> ALTER DATABASE DEFAULT TEMPORARY TABLESPACE TEMP_NEW;
+Database altered.
+
+Check for default temp tablespace
+
+sql> col property_name for a40;
+col property_value for A40;
+select property_name,property_value from database_properties where property_name like '%DEFAULT%';
+
+
+PROPERTY_NAME					|PROPERTY_VALUE
+----------------------------------------|----------------------------------------
+DEFAULT_TBS_TYPE				|SMALLFILE
+DEFAULT_EDITION 				|ORA$BASE
+DEFAULT_PERMANENT_TABLESPACE	|USERS
+DEFAULT_TEMP_TABLESPACE 		|TEMP_NEW
+
+
+sql> ALTER DATABASE DEFAULT TEMPORARY TABLESPACE TEMP;
+Database altered.
+
+sql> col property_name for a40;
+col property_value for A40;
+select property_name,property_value from database_properties where property_name like '%DEFAULT%';
+PROPERTY_NAME					|PROPERTY_VALUE
+----------------------------------------|----------------------------------------
+DEFAULT_TBS_TYPE				|SMALLFILE
+DEFAULT_EDITION 				|ORA$BASE
+DEFAULT_PERMANENT_TABLESPACE	|USERS
+DEFAULT_TEMP_TABLESPACE 		|TEMP
+
+
+
+sql> ALTER TABLESPACE TEMP ADD TEMPFILE '+DATAC1' SIZE 10G AUTOEXTEND ON NEXT 1G MAXSIZE 32767M;
+
+
+
+who are using old temporary tablespace ( i.e. TEMP ) and kill them.
+
+sql> SELECT b.tablespace,b.segfile#,b.segblk#,b.blocks,a.sid,a.serial#,
+a.username,a.osuser, a.status
+FROM v$session a,v$sort_usage b
+WHERE a.saddr = b.session_addr;
+
+
+
+TEMP % Utilization
+
+Query to check percentage (%) utilization of temp tablespace
+
+select (s.tot_used_blocks/f.total_blocks)*100 as "percent used"
+from (select sum(used_blocks) tot_used_blocks
+from v$sort_segment where tablespace_name='TEMP') s,
+(select sum(blocks) total_blocks
+from dba_temp_files where tablespace_name='TEMP') f;
+
+select (s.tot_used_blocks/f.total_blocks)*100 as "percent used"
+from (select sum(used_blocks) tot_used_blocks
+from v$sort_segment where tablespace_name='TEMP_NEW') s,
+(select sum(blocks) total_blocks
+from dba_temp_files where tablespace_name='TEMP_NEW') f;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Top 10 queries using temp tablespace.
+
+select * from (
+select s.sid,
+s.status,
+s.sql_hash_value sesshash,
+u.SQLHASH sorthash,
+s.username,
+u.tablespace,
+sum(u.blocks*p.value/1024/1024) mbused ,
+sum(u.extents) noexts,
+nvl(s.module,s.program) proginfo,
+floor(last_call_et/3600)||':'||
+floor(mod(last_call_et,3600)/60)||':'||
+mod(mod(last_call_et,3600),60) lastcallet
+from v$sort_usage u,
+v$session s,
+v$parameter p
+where u.session_addr = s.saddr
+and p.name = 'db_block_size'
+group by s.sid,s.status,s.sql_hash_value,u.sqlhash,s.username,u.tablespace,
+nvl(s.module,s.program),
+floor(last_call_et/3600)||':'||
+floor(mod(last_call_et,3600)/60)||':'||
+mod(mod(last_call_et,3600),60)
+order by 7 desc,3)
+where rownum < 11;
+
+current sessions using temp.
+
+SELECT sysdate,a.username, a.sid, a.serial#, a.osuser, 
+(b.blocks*d.block_size)/1048576 MB_used, c.sql_text
+FROM v$session a, v$tempseg_usage b, v$sqlarea c,
+     (select block_size from dba_tablespaces where tablespace_name='TEMP') d
+    WHERE b.tablespace = 'TEMP'
+    and a.saddr = b.session_addr
+    AND c.address= a.sql_address
+    AND c.hash_value = a.sql_hash_value
+    AND (b.blocks*d.block_size)/1048576 > 1024
+    ORDER BY b.tablespace, 6 desc;
+
+
+get DDL of tablespace
+
+set heading off;
+set echo off;
+Set pages 999;
+set long 90000;
+spool ddl_tablespace.sql
+select dbms_metadata.get_ddl('TABLE','EMPLOYEE','SCOTT') from DUAL; 
+spool off

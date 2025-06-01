@@ -1,0 +1,499 @@
+DOWNLOAD GRID+DBHOME+OJVM PATCH
+
+
+
+
+-- makesure new opatch is replaced 
+in all nodes and in oracle and grid home (check version in both grid and oracle home)
+
+[grid@rac1 ~]$ $ORACLE_HOME/OPatch/opatch version
+OPatch Version: 12.2.0.1.17
+
+OPatch succeeded.
+
+[oracle@rac1 ~]$ cd $ORACLE_HOME/OPatch
+[oracle@rac1 OPatch]$ opatch version
+OPatch Version: 12.2.0.1.17
+
+OPatch succeeded.
+
+Taking OPatch bakup in Grid Home through root user
+[root@rac1 ~]# cd /u01/app/19.0.0/grid/
+[root@rac1 grid]# mv OPatch OPatch_bkp
+
+
+Creating a directory for patch installation
+[root@rac1 grid]# mkdir -p  /u01/rac_patch
+
+make copy opatch file to this location using winscp
+[root@rac1 ]# cd /tmp/rac_patch/
+[root@rac1 rac_patch]# ll
+total 131320
+-rwxr-xr-x 1 root root 134471443 May 12 12:19 p6880880_190000_Linux-x86-64.zip
+
+[root@rac1 rac_patch]# unzip p6880880_190000_Linux-x86-64.zip -d /u01/app/19.0.0/grid/
+
+(if any errors appear then do the following below in root user)
+[root@rac1 patch]# chown -R oracle:oinstall /u01/app/19.0.0/grid
+[root@rac1 patch]# chmod -R 775 /u01/app/19.0.0/grid
+
+
+[grid@rac1 ~]$ cd $ORACLE_HOME/OPatch
+-bash: cd: /u01/app/19.0.0/grid/OPatch: Permission denied
+[grid@rac1 ~]$ exit
+logout
+[root@rac1 ~]# chown -R oracle:oinstall /u01/app/19.0.0/grid
+[root@rac1 ~]# su - grid
+Last login: Sun May 25 19:05:46 IST 2025 on pts/0
+[grid@rac1 ~]$ cd $ORACLE_HOME/OPatch
+[grid@rac1 OPatch]$ opatch version
+OPatch Version: 12.2.0.1.43		(before it is OPatch Version: 12.2.0.1.17)
+
+OPatch succeeded.
+
+
+
+Now do the same in ORACLE_HOME
+
+[grid@rac1 ~]$ exit
+logout
+[root@rac1 ~]# su - oracle
+[oracle@rac1 ~]$ cd $ORACLE_HOME
+[oracle@rac1 db_1]$ mv OPatch OPatch_bkp
+[oracle@rac1 db_1]$ exit
+logout
+[root@rac1 ~]# cd /tmp/rac_patch/
+[root@rac1 rac_patch]# ll
+-rw-r--r-- 1 root root 134471443 Sep 10  2024 p6880880_190000_Linux-x86-64.zip
+[root@rac1 rac_patch]# unzip p6880880_190000_Linux-x86-64.zip -d /u02/app/oracle/product/19.0.0/db_1
+[root@rac1 rac_patch]# cd
+[root@rac1 ~]# su - oracle
+[oracle@rac1 ~]$ cd $ORACLE_HOME
+[oracle@rac1 db_1]$ cd OPatch
+-bash: cd: OPatch: Permission denied
+[oracle@rac1 db_1]$ exit
+logout
+[root@rac1 ~]# chown -R oracle:oinstall /u02/app/oracle/product/19.0.0/db_1
+[root@rac1 ~]# su - oracle
+[oracle@rac1 ~]$ cd $ORACLE_HOME/OPatch
+[oracle@rac1 OPatch]$ opatch version
+OPatch Version: 12.2.0.1.43			(before it is OPatch Version: 12.2.0.1.17)
+
+OPatch succeeded.
+
+
+Now ORACLE & GRID homes opatch versions are upto dated.
+
+go through the readme 
+
+recommendations:
+
+-- take a backup of the Oracle home binaries, 
+-- before that we should stop the database and instance 
+[oracle@rac1 OPatch]$ exit
+logout
+[root@rac1 ~]# ps -ef|grep smon
+
+root      3632     1  5 18:53 ?        00:01:20 /u01/app/19.0.0/grid/bin/osysmond.bin
+grid      4902     1  0 18:55 ?        00:00:00 asm_smon_+ASM1
+oracle    7460     1  0 18:58 ?        00:00:00 ora_smon_oradb1
+root     24388  4938  0 19:20 pts/0    00:00:00 grep --color=auto smon
+
+[root@rac1 ~]# /u01/app/19.0.0/grid/bin/crsctl disable crs
+CRS-4621: Oracle High Availability Services autostart is disabled.
+[root@rac1 ~]# /u01/app/19.0.0/grid/bin/crsctl stop crs
+
+[root@rac1 ~]# ps -ef|grep smon
+root     25786  4938  0 19:22 pts/0    00:00:00 grep --color=auto smon
+
+[root@rac1 ~]# su - oracle
+[oracle@rac1 ~]$ 
+[oracle@rac1 ~]$ echo $ORACLE_HOME
+/u02/app/oracle/product/19.0.0/db_1
+[oracle@rac1 ~]$ tar -czvf /backup/oracle_home_backup.tar.gz $ORACLE_HOME
+--if any appears then creating backup directory from root user
+[root@rac1 ~]# mkdir -p /backup
+[root@rac1 ~]# chown -R oracle:oinstall /backup
+[root@rac1 ~]# su - oracle
+[oracle@rac1 ~]$ tar -czvf /backup/oracle_home_backup.tar.gz $ORACLE_HOME
+
+		tar: This is the tape archive command, used to create or extract archive files in Unix-like systems 
+			(like Linux or macOS). It bundles files into a single archive file. In this case, it's used to create an archive of the $ORACLE_HOME directory.
+		
+		-c: This flag tells tar to create a new archive.
+		
+		-z: This flag enables gzip compression, meaning that the resulting .tar archive will be compressed to save space.
+		
+		-v: This flag stands for verbose. It means that tar will list all the files being archived. 
+			It helps you track the progress as it adds files to the archive.
+		
+		-f: This flag is used to specify the file name of the archive. It indicates that the next argument will 
+			be the name of the archive file to be created.
+		
+		
+Avoid below and continue from grid bineries backup
+*************************************************************************************************
+🔄 To Restore Oracle Home from Backup
+
+# As oracle user
+			cd /u01/app/oracle/product
+			tar -xvzf /backup/oracle_home_backup.tar.gz
+
+✅ Then reconfigure it using:
+
+			cd $ORACLE_HOME/oui/bin
+			./runInstaller -silent -attachHome ORACLE_HOME="$ORACLE_HOME" ORACLE_HOME_NAME="DB19_HOME"
+*************************************************************************************************
+
+
+-- the Grid home binaries backup  
+[grid@rac1 ~]$ echo $ORACLE_HOME
+/u01/app/19.0.0/grid
+[grid@rac1 ~]$ exit
+logout
+[root@rac1 ]# chown -R oracle:oinstall /backup
+[root@rac1 rac_patch]# tar -czvf /backup/grid_home_backup.tar.gz /u01/app/19.0.0/grid/
+
+
+			
+-- Central Inventory bineries backup
+[root@rac1 ~]# cat /etc/oraInst.loc
+		inventory_loc=/u01/app/oraInventory
+		inst_group=oinstall
+		
+[root@rac1 ~]# tar -czvf /backup/oraInventory_backup.tar.gz /u01/app/oraInventory/backup
+
+--if any errors occured while starting the cluster after stopping
+
+[root@rac1 ~]# /u01/app/19.0.0/grid/bin/crsctl stop crs -f
+
+[root@rac1 ~]# /u01/app/19.0.0/grid/bin/crsctl enable crs		
+[root@rac1 ~]# /u01/app/19.0.0/grid/bin/crsctl start crs
+
+
+
+
+
+
+
+
+
+=================================
+RUN BELOW STEPS from 2.1.1.2 to 2.1.1.6 on all nodes(one after other)
+=================================
+applying the patch on node1:
+=================================
+Prerequisites
+2.1.1.2 Validation of Oracle Inventory
+=================================
+
+from grid user:
+[grid@rac1 ~]$ $ORACLE_HOME/OPatch/opatch lsinventory -detail -oh $ORACLE_HOME
+		Oracle Interim Patch Installer version 12.2.0.1.43
+		Copyright (c) 2025, Oracle Corporation.  All rights reserved.
+		
+		
+		Oracle Home       : /u01/app/19.0.0/grid
+		Central Inventory : /u01/app/oraInventory
+		from           : /u01/app/19.0.0/grid/oraInst.loc
+		OPatch version    : 12.2.0.1.43
+		OUI version       : 12.2.0.7.0
+		Log file location : /u01/app/19.0.0/grid/cfgtoollogs/opatch/opatch2025-05-12_13-04-12PM_1.log
+		
+		Lsinventory Output file location : /u01/app/19.0.0/grid/cfgtoollogs/opatch/lsinv/lsinventory2025-05-12_13-04-12PM.txt
+		
+		OPatch succeeded.
+
+
+
+from oracle user
+[oracle@rac1 ~]$ $ORACLE_HOME/OPatch/opatch lsinventory -detail -oh $ORACLE_HOME
+			Oracle Interim Patch Installer version 12.2.0.1.43
+			Copyright (c) 2025, Oracle Corporation.  All rights reserved.
+			
+			
+			Oracle Home       : /u02/app/oracle/product/19.0.0/db_1
+			Central Inventory : /u01/app/oraInventory
+			from           : /u02/app/oracle/product/19.0.0/db_1/oraInst.loc
+			OPatch version    : 12.2.0.1.43
+			OUI version       : 12.2.0.7.0
+			Log file location : /u02/app/oracle/product/19.0.0/db_1/cfgtoollogs/opatch/opatch2025-05-12_13-04-54PM_1.log
+			
+			Lsinventory Output file location : /u02/app/oracle/product/19.0.0/db_1/cfgtoollogs/opatch/lsinv/lsinventory2025-05-12_13-04-54PM.txt
+			
+			OPatch succeeded.
+
+
+=================================
+2.1.1.3 Download and Unzip the Patch
+=================================
+make win scp of rac patch(p36582629_190000_Linux-x86-64) to the location of /tmp/rac_patch
+-- Oracle® Database Patch 36582629 - GI Release Update 19.24.0.0.240716
+[root@rac1 ~]# cd /tmp/rac_patch/
+
+[root@rac1 rac_patch]# unzip p36582629_190000_Linux-x86-64.zip
+[root@rac1 rac_patch]# ll
+total 3498744
+drwxr-x---  8 root root       4096 Jul 13  2024 36582629
+drwxr-x--- 15 root root       4096 Jun 28  2024 OPatch
+-rw-r--r--  1 root root 3445758071 Sep 12  2024 p36582629_190000_Linux-x86-64.zip
+-rw-r--r--  1 root root  134471443 Sep 10  2024 p6880880_190000_Linux-x86-64.zip
+-rw-rw-r--  1 root root    2470333 Jul 16  2024 PatchSearch.xml
+
+
+[root@rac1 rac_patch]# cd 36582629
+[root@rac1 36582629]# ll
+total 144
+drwxr-x--- 5 root root     81 Jul 13  2024 36582781
+drwxr-x--- 5 root root     62 Jul 13  2024 36587798
+drwxr-x--- 5 root root     62 Jul 13  2024 36590554
+drwxr-x--- 4 root root     48 Jul 13  2024 36648174
+drwxr-x--- 4 root root     48 Jul 13  2024 36758186
+drwxr-x--- 2 root root   4096 Jul 13  2024 automation
+-rw-rw-r-- 1 root root   5824 Jul 14  2024 bundle.xml
+-rw-r--r-- 1 root root 134032 Jul 15  2024 README.html
+-rw-r--r-- 1 root root      0 Jul 13  2024 README.txt
+
+
+=================================
+2.1.1.4 Run OPatch Conflict Check
+=================================
+Determine whether any currently installed one-off patches conflict with this patch 36582629 as follows:
+=================================
+
+=================================
+As the Grid user:
+=================================
+
+while performing below if you get any error, then make changes in root user to /tmp/rac_patch/36582629
+[grid@rac1 ~]$ cd /tmp/rac_patch/
+[grid@rac1 rac_patch]$ cd 36582629/
+-bash: cd: 36582629/: Permission denied
+[root@rac1 36582781]# chmod -R 777 /tmp/rac_patch/36582629
+
+try starting cluster enable and start
+[root@rac1 36582629]# /u01/app/19.0.0/grid/bin/crsctl enable crs
+[root@rac1 36582629]# /u01/app/19.0.0/grid/bin/crsctl start crs
+
+---if not starts then do the following below
+--- if there is any error and not restarting the cluster then do the following below
+[root@rac1 36582629]# chown -R grid:oinstall /u01/app/19.0.0/grid
+[root@rac1 36582629]# chmod -R 755 /u01/app/19.0.0/grid
+
+[root@rac1 36582629]# /u01/app/19.0.0/grid/bin/crsctl stop crs -f
+
+[root@rac1 36582629]# rm -rf /var/opt/oracle/
+[root@rac1 36582629]# rm -rf /u01/app/19.0.0/grid/cdata/
+[root@rac1 36582629]# rm -rf /u01/app/grid/crf/
+[root@rac1 36582629]# /u01/app/19.0.0/grid/bin/crsctl start crs
+
+
+now perform the BELOW from gri user
+
+[grid@rac1 ~]$ $ORACLE_HOME/OPatch/opatch prereq CheckConflictAgainstOHWithDetail -phBaseDir /tmp/rac_patch/36582629/36582781
+			Oracle Interim Patch Installer version 12.2.0.1.43
+			Copyright (c) 2025, Oracle Corporation.  All rights reserved.
+			PREREQ session
+			Oracle Home       : /u01/app/19.0.0/grid
+			Central Inventory : /u01/app/oraInventory
+			from          	  : /u01/app/19.0.0/grid/oraInst.loc
+			OPatch version    : 12.2.0.1.43
+			OUI version       : 12.2.0.7.0
+			Log file location : /u01/app/19.0.0/grid/cfgtoollogs/opatch/opatch2025-05-12_13-11-35PM_1.log
+			Invoking prereq "checkconflictagainstohwithdetail"
+			Prereq "checkConflictAgainstOHWithDetail" passed.
+			OPatch succeeded.
+
+[grid@rac1 ~]$ $ORACLE_HOME/OPatch/opatch prereq CheckConflictAgainstOHWithDetail -phBaseDir /tmp/rac_patch/36582629/36587798
+OPatch succeeded.
+
+[grid@rac1 ~]$ $ORACLE_HOME/OPatch/opatch prereq CheckConflictAgainstOHWithDetail -phBaseDir /tmp/rac_patch/36582629/36590554
+OPatch succeeded.
+
+[grid@rac1 ~]$ $ORACLE_HOME/OPatch/opatch prereq CheckConflictAgainstOHWithDetail -phBaseDir /tmp/rac_patch/36582629/36648174
+OPatch succeeded.
+
+[grid@rac1 ~]$ $ORACLE_HOME/OPatch/opatch prereq CheckConflictAgainstOHWithDetail -phBaseDir /tmp/rac_patch/36582629/36758186
+OPatch succeeded.
+
+	
+	
+	
+=================================
+For Oracle home, as home user:
+=================================
+
+
+[oracle@rac1 ~]$ $ORACLE_HOME/OPatch/opatch prereq CheckConflictAgainstOHWithDetail -phBaseDir /tmp/rac_patch/36582629/36582781
+			Oracle Interim Patch Installer version 12.2.0.1.43
+			Copyright (c) 2025, Oracle Corporation.  All rights reserved.
+			
+			PREREQ session
+			
+			Oracle Home       : /u02/app/oracle/product/19.0.0/db_1
+			Central Inventory : /u01/app/oraInventory
+			from           : /u02/app/oracle/product/19.0.0/db_1/oraInst.loc
+			OPatch version    : 12.2.0.1.43
+			OUI version       : 12.2.0.7.0
+			Log file location : /u02/app/oracle/product/19.0.0/db_1/cfgtoollogs/opatch/opatch2025-05-12_13-13-55PM_1.log
+			
+			Invoking prereq "checkconflictagainstohwithdetail"
+			
+			Prereq "checkConflictAgainstOHWithDetail" passed.
+			
+			OPatch succeeded.
+
+[oracle@rac1 ~]$ $ORACLE_HOME/OPatch/opatch prereq CheckConflictAgainstOHWithDetail -phBaseDir /tmp/rac_patch/36582629/36587798
+OPatch succeeded.
+
+=================================
+2.1.1.5 Run OPatch System Space Check
+=================================
+
+Check if enough free space is available on the ORACLE_HOME filesystem for the patches to be applied as given below:
+For Grid Infrastructure home, as home user:
+Create file /tmp/patch_list_gihome.txt with the following content:
+
+[root@rac1 ~]$ cat > /tmp/rac_patch/patch_list_gihome.txt
+/tmp/rac_patch/36582629/36582781
+/tmp/rac_patch/36582629/36587798
+/tmp/rac_patch/36582629/36590554
+/tmp/rac_patch/36582629/36648174
+/tmp/rac_patch/36582629/36758186			(ctrl+d) for save and exit
+
+check for job running 
+[grid@rac1 ~]$ % cat /tmp/rac_patch/patch_list_gihome.txt
+
+
+
+Run the OPatch command to check if enough free space is available in the Grid Infrastructure home:
+
+[grid@rac1 ~]$ $ORACLE_HOME/OPatch/opatch prereq CheckSystemSpace -phBaseFile /tmp/rac_patch/patch_list_gihome.txt
+OPatch succeeded.
+
+
+For Oracle home, as home user:
+
+Create file /tmp/rac_patch/patch_list_dbhome.txt with the following content:
+[oracle@rac1 ~]$ cat > /tmp/rac_patch/patch_list_dbhome.txt
+
+/tmp/rac_patch/36582629/36582781
+/tmp/rac_patch/36582629/36587798				(ctrl+d) for save and exit
+
+% cat /tmp/rac_patch/patch_list_dbhome.txt
+
+
+Run OPatch command to check if enough free space is available in the Oracle home:
+
+[oracle@rac1 ~]$ $ORACLE_HOME/OPatch/opatch prereq CheckSystemSpace -phBaseFile /tmp/rac_patch/patch_list_dbhome.txt
+Invoking prereq "checksystemspace"
+
+Prereq "checkSystemSpace" passed.
+
+OPatch succeeded.
+
+
+=================================
+2.1.1.6 APPLY PATCH:
+=================================
+
+Add the directory containing the OPatchAuto to the $PATH environment variable. For example:
+
+[root@rac1 ~]# cd /tmp/rac_patch/36582629/
+[root@rac1 36582629]# chown -R root:root /u01/app/19.0.0/grid/bin/   (if required)
+[root@rac1 36582629]# export PATH=$PATH:/u01/app/19.0.0/grid/OPatch
+[root@rac1 36582629]# opatchauto apply /tmp/rac_patch/36582629 -oh /u01/app/19.0.0/grid/
+
+		--------------------------------------------------------------------------------------------------|
+		|To patch one or more Oracle RAC database homes:                                                  |
+		|                                                                                                 |
+		|# opatchauto apply <UNZIPPED_PATCH_LOCATION>/36233126 -oh <oracle_home1_path>,<oracle_home2_path>|
+		--------------------------------------------------------------------------------------------------|
+		
+													GRID_HOME PATCH COMPLETED
+=================================
+ORACLE_HOME PATCH COMPLETED
+=================================
+
+=================================
+DATABASE PATCH STARTS
+=================================
+
+Run below step from any one of the node from oracle user
+
+sqlplus /nolog
+Connect / as sysdba
+startup;
+alter pluggable database all open;
+quit;
+cd $ORACLE_HOME/OPatch
+./datapatch -sanity_checks
+
+./datapatch -verbose
+
+
+
+
+
+can you ask me some multiple choice question on the topic of rac in oracle 19c
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+												Oracle® Database Patch 36582629 - GI Release Update 19.24.0.0.240716
+												
+2.1 Patch Installation and Deinstallation
+
+	This topic includes the following sections:
+
+	2.1.1 Patch Installation Prerequisites
+	2.1.2 One-off Patch Conflict Detection and Resolution
+	2.1.3 Patch Installation Checks
+	2.1.4 OPatchAuto Out-of-Place Patching
+	2.1.5 OPatchAuto
+	2.1.6 Patch Installation
+	2.1.7 Installing Patch in Oracle Data Guard Standby-First Mode
+	2.1.8 Patch Post Installation Instructions
+	2.1.9 Patch Post Installation Instructions for Databases 
+		  Created or Upgraded After Installation of Patch in the Oracle Home
+
+2.1.1 Patch Installation Prerequisites
+	It is highly recommended to take a backup of the Oracle home binaries, 
+												 the Grid home binaries, 
+												 and Central Inventory prior to applying patches.
+
+You must apply below the following before applying the patch:
+
+	2.1.1.1 OPatch Utility Information
+	2.1.1.2 Validation of Oracle Inventory
+	2.1.1.3 Download and Unzip the Patch
+	2.1.1.4 Run OPatch Conflict Check
+	2.1.1.5 Run OPatch System Space Check
+	
+2.1.1.1 OPatch Utility Information:
+--You must use the OPatch utility version 12.2.0.1.42 or later to apply this patch. 
+-- It is recommended that you download the OPatch utility and the patch to a 
+   shared location in order to access them from any node in the cluster for the 
+   patch application on each node.
+[grid@rac1 ~]$ $ORACLE_HOME/OPatch/opatch version
+[oracle@rac1 ~]$ cd $ORACLE_HOME/OPatch/opatch version

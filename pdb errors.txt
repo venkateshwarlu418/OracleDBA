@@ -1,0 +1,6 @@
+col message for a40
+select name,cause,type,message,status from pdb_plug_in_violations order by nameSQL> 
+  2  ;
+  
+select username from cdb_users;   -- In CDB
+select username from all_users;   -- In PDB

@@ -1,0 +1,59 @@
+[oracle@venky admin]$ lsnrctl status
+
+LSNRCTL for Linux: Version 19.0.0.0.0 - Production on 23-NOV-2024 19:39:46
+
+Copyright (c) 1991, 2019, Oracle.  All rights reserved.
+
+Connecting to (DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=192.168.51.203)(PORT=1521)))
+STATUS of the LISTENER
+------------------------
+Alias                     LISTENER
+Version                   TNSLSNR for Linux: Version 19.0.0.0.0 - Production
+Start Date                23-NOV-2024 19:29:00
+Uptime                    0 days 0 hr. 10 min. 46 sec
+Trace Level               off
+Security                  ON: Local OS Authentication
+SNMP                      OFF
+Listener Parameter File   /u01/app/oracle/product/19.0.0.0/dbhome_1/network/admin/listener.ora
+Listener Log File         /u01/app/oracle/diag/tnslsnr/venky/listener/alert/log.xml
+Listening Endpoints Summary...
+  (DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=192.168.51.203)(PORT=1521)))
+Services Summary...
+Service "vendb" has 1 instance(s).
+  Instance "vendb", status UNKNOWN, has 1 handler(s) for this service...
+The command completed successfully
+
+
+
+
+[oracle@venky admin]$ lsnrctl start listener
+
+LSNRCTL for Linux: Version 19.0.0.0.0 - Production on 23-NOV-2024 19:46:09
+
+Copyright (c) 1991, 2019, Oracle.  All rights reserved.
+
+Starting /u01/app/oracle/product/19.0.0.0/dbhome_1/bin/tnslsnr: please wait...
+
+TNSLSNR for Linux: Version 19.0.0.0.0 - Production
+System parameter file is /u01/app/oracle/product/19.0.0.0/dbhome_1/network/admin/listener.ora
+Log messages written to /u01/app/oracle/diag/tnslsnr/venky/listener/alert/log.xml
+Listening on: (DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=192.168.51.203)(PORT=1521)))
+
+Connecting to (DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=192.168.51.203)(PORT=1521)))
+STATUS of the LISTENER
+------------------------
+Alias                     listener
+Version                   TNSLSNR for Linux: Version 19.0.0.0.0 - Production
+Start Date                23-NOV-2024 19:46:09
+Uptime                    0 days 0 hr. 0 min. 0 sec
+Trace Level               off
+Security                  ON: Local OS Authentication
+SNMP                      OFF
+Listener Parameter File   /u01/app/oracle/product/19.0.0.0/dbhome_1/network/admin/listener.ora
+Listener Log File         /u01/app/oracle/diag/tnslsnr/venky/listener/alert/log.xml
+Listening Endpoints Summary...
+  (DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=192.168.51.203)(PORT=1521)))
+Services Summary...
+Service "vendb" has 1 instance(s).
+  Instance "vendb", status UNKNOWN, has 1 handler(s) for this service...
+The command completed successfully

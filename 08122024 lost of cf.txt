@@ -1,0 +1,313 @@
+[oracle@oraclept ~]$ . oraenv
+ORACLE_SID = [proddb] ? vendb
+ORACLE_HOME = [/home/oracle] ? sqlplus / as
+bash: [: too many arguments
+ORACLE_BASE environment variable is not being set since this
+information is not available for the current user ID oracle.
+You can set ORACLE_BASE manually if it is required.
+Resetting ORACLE_BASE to its previous value or ORACLE_HOME
+The Oracle base remains unchanged with value /u01/app/oracle
+
+[oracle@oraclept ~]$ 
+[oracle@oraclept ~]$ 
+[oracle@oraclept ~]$ sqlplus / as sysdba
+bash: sqlplus: command not found...
+[oracle@oraclept ~]$ . oraenv
+bash: [: too many arguments
+ORACLE_SID = [vendb] ? proddb
+sThe Oracle base remains unchanged with value /u01/app/oracle
+[oracle@oraclept ~]$ sqlplus / as sysdba
+
+SQL*Plus: Release 19.0.0.0.0 - Production on Sun Dec 8 09:03:11 2024
+Version 19.3.0.0.0
+
+Copyright (c) 1982, 2019, Oracle.  All rights reserved.
+
+
+Connected to:
+Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.3.0.0.0
+
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> select name from v$control_file;
+select name from v$control_file
+                 *
+ERROR at line 1:
+ORA-00942: table or view does not exist
+
+
+SQL> select name frome v$controlfile;
+select name frome v$controlfile
+                  *
+ERROR at line 1:
+ORA-00923: FROM keyword not found where expected
+
+
+SQL> select name from v$controlfile;
+
+NAME
+--------------------------------------------------------------------------------
+/u01/app/oracle/oradata/PRODDB/controlfile/o1_mf_lrn5lhl8_.ctl
+/u01/app/oracle/fast_recovery_area/PRODDB/controlfile/o1_mf_lrn5lhlr_.ctl
+
+SQL> exit
+Disconnected from Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.3.0.0.0
+[oracle@oraclept ~]$ rm /u01/app/oracle/oradata/PRODDB/controlfile/o1_mf_lrn5lhl8_.ctl
+[oracle@oraclept ~]$ sqlplus / as sysdba
+
+SQL*Plus: Release 19.0.0.0.0 - Production on Sun Dec 8 09:09:46 2024
+Version 19.3.0.0.0
+
+Copyright (c) 1982, 2019, Oracle.  All rights reserved.
+
+
+Connected to:
+Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.3.0.0.0
+
+SQL> alter system switch logfile;
+
+System altered.
+
+SQL> /
+
+System altered.
+
+SQL> /
+
+System altered.
+
+SQL> /
+
+System altered.
+
+SQL> /
+
+System altered.
+
+SQL> /
+
+System altered.
+
+SQL> startup;
+ORA-01081: cannot start already-running ORACLE - shut it down first
+SQL> exit
+Disconnected from Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.3.0.0.0
+[oracle@oraclept ~]$ rm -rf /u01/app/oracle/oradata/PRODDB/controlfile/o1_mf_lrn5lhl8_.ctl
+[oracle@oraclept ~]$ 
+[oracle@oraclept ~]$ 
+[oracle@oraclept ~]$ 
+[oracle@oraclept ~]$ 
+[oracle@oraclept ~]$ 
+[oracle@oraclept ~]$ cd /u01/app/oracle/oradata/PRODDB/controlfile
+[oracle@oraclept controlfile]$ ll
+total 0
+[oracle@oraclept controlfile]$ 
+[oracle@oraclept controlfile]$ 
+[oracle@oraclept controlfile]$ 
+[oracle@oraclept controlfile]$ sqlplus / as sysdba
+
+SQL*Plus: Release 19.0.0.0.0 - Production on Sun Dec 8 09:11:10 2024
+Version 19.3.0.0.0
+
+Copyright (c) 1982, 2019, Oracle.  All rights reserved.
+
+
+Connected to:
+Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.3.0.0.0
+
+SQL> alter system switch logfile;
+
+System altered.
+
+SQL> /
+
+System altered.
+
+SQL> /
+/
+
+System altered.
+
+SQL> 
+System altered.
+
+SQL> /
+
+
+System altered.
+
+SQL> SQL>     
+SQL> 
+SQL> 
+SQL> select * from v$log_file;
+select * from v$log_file
+              *
+ERROR at line 1:
+ORA-00942: table or view does not exist
+
+
+SQL> select * from v$logfile;
+select * from v$logfile
+              *
+ERROR at line 1:
+ORA-00210: cannot open the specified control file
+ORA-00202: control file:
+'/u01/app/oracle/oradata/PRODDB/controlfile/o1_mf_lrn5lhl8_.ctl'
+ORA-27041: unable to open file
+Linux-x86_64 Error: 2: No such file or directory
+Additional information: 3
+
+
+SQL> shut abort;
+ORACLE instance shut down.
+SQL> 
+SQL> 
+SQL> 
+SQL> startup nomount;
+ORACLE instance started.
+
+Total System Global Area 1325399808 bytes
+Fixed Size		    8896256 bytes
+Variable Size		  620756992 bytes
+Database Buffers	  687865856 bytes
+Redo Buffers		    7880704 bytes
+SQL> 
+SQL> 
+SQL> 
+SQL> exit
+Disconnected from Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.3.0.0.0
+[oracle@oraclept controlfile]$ rman target /
+
+Recovery Manager: Release 19.0.0.0.0 - Production on Sun Dec 8 09:13:09 2024
+Version 19.3.0.0.0
+
+Copyright (c) 1982, 2019, Oracle and/or its affiliates.  All rights reserved.
+
+connected to target database: PRODDB (not mounted)
+
+RMAN> create controlfile from '/u01/rman_bkp/c-896617639-20241207-06';
+
+using target database control file instead of recovery catalog
+RMAN-00571: ===========================================================
+RMAN-00569: =============== ERROR MESSAGE STACK FOLLOWS ===============
+RMAN-00571: ===========================================================
+RMAN-03002: failure of sql statement command at 12/08/2024 09:14:24
+ORA-01967: invalid option for CREATE CONTROLFILE
+
+RMAN> restore controlfile from '/u01/rman_bkp/c-896617639-20241207-06';
+
+Starting restore at 08-DEC-2024 09:14:44
+allocated channel: ORA_DISK_1
+channel ORA_DISK_1: SID=38 device type=DISK
+
+channel ORA_DISK_1: restoring control file
+channel ORA_DISK_1: restore complete, elapsed time: 00:00:01
+output file name=/u01/app/oracle/oradata/PRODDB/controlfile/o1_mf_lrn5lhl8_.ctl
+output file name=/u01/app/oracle/fast_recovery_area/PRODDB/controlfile/o1_mf_lrn5lhlr_.ctl
+Finished restore at 08-DEC-2024 09:14:46
+
+RMAN> startup mount;
+
+database is already started
+database mounted
+released channel: ORA_DISK_1
+
+RMAN> recover database;
+
+Starting recover at 08-DEC-2024 09:15:41
+Starting implicit crosscheck backup at 08-DEC-2024 09:15:41
+allocated channel: ORA_DISK_1
+channel ORA_DISK_1: SID=44 device type=DISK
+allocated channel: ORA_DISK_2
+channel ORA_DISK_2: SID=45 device type=DISK
+Crosschecked 1 objects
+Crosschecked 1 objects
+Finished implicit crosscheck backup at 08-DEC-2024 09:15:42
+
+Starting implicit crosscheck copy at 08-DEC-2024 09:15:42
+using channel ORA_DISK_1
+using channel ORA_DISK_2
+Finished implicit crosscheck copy at 08-DEC-2024 09:15:42
+
+searching for all files in the recovery area
+cataloging files...
+cataloging done
+
+List of Cataloged Files
+=======================
+File Name: /u01/app/oracle/fast_recovery_area/PRODDB/archivelog/2024_12_08/o1_mf_1_1_mob4owbg_.arc
+File Name: /u01/app/oracle/fast_recovery_area/PRODDB/archivelog/2024_12_08/o1_mf_1_2_mob58p5d_.arc
+File Name: /u01/app/oracle/fast_recovery_area/PRODDB/archivelog/2024_12_08/o1_mf_1_3_mob58rqk_.arc
+File Name: /u01/app/oracle/fast_recovery_area/PRODDB/archivelog/2024_12_08/o1_mf_1_4_mob58vsm_.arc
+File Name: /u01/app/oracle/fast_recovery_area/PRODDB/archivelog/2024_12_08/o1_mf_1_5_mob59ct8_.arc
+File Name: /u01/app/oracle/fast_recovery_area/PRODDB/archivelog/2024_12_08/o1_mf_1_6_mob59f34_.arc
+File Name: /u01/app/oracle/fast_recovery_area/PRODDB/archivelog/2024_12_08/o1_mf_1_7_mob59hht_.arc
+File Name: /u01/app/oracle/fast_recovery_area/PRODDB/archivelog/2024_12_08/o1_mf_1_8_mob5c1od_.arc
+File Name: /u01/app/oracle/fast_recovery_area/PRODDB/archivelog/2024_12_08/o1_mf_1_9_mob5c370_.arc
+File Name: /u01/app/oracle/fast_recovery_area/PRODDB/archivelog/2024_12_08/o1_mf_1_10_mob5c4fh_.arc
+File Name: /u01/app/oracle/fast_recovery_area/PRODDB/archivelog/2024_12_08/o1_mf_1_11_mob5c4m2_.arc
+File Name: /u01/app/oracle/fast_recovery_area/PRODDB/archivelog/2024_12_08/o1_mf_1_12_mob5c8vd_.arc
+
+using channel ORA_DISK_1
+using channel ORA_DISK_2
+
+starting media recovery
+
+archived log for thread 1 with sequence 1 is already on disk as file /u01/app/oracle/fast_recovery_area/PRODDB/archivelog/2024_12_08/o1_mf_1_1_mob4owbg_.arc
+archived log for thread 1 with sequence 2 is already on disk as file /u01/app/oracle/fast_recovery_area/PRODDB/archivelog/2024_12_08/o1_mf_1_2_mob58p5d_.arc
+archived log for thread 1 with sequence 3 is already on disk as file /u01/app/oracle/fast_recovery_area/PRODDB/archivelog/2024_12_08/o1_mf_1_3_mob58rqk_.arc
+archived log for thread 1 with sequence 4 is already on disk as file /u01/app/oracle/fast_recovery_area/PRODDB/archivelog/2024_12_08/o1_mf_1_4_mob58vsm_.arc
+archived log for thread 1 with sequence 5 is already on disk as file /u01/app/oracle/fast_recovery_area/PRODDB/archivelog/2024_12_08/o1_mf_1_5_mob59ct8_.arc
+archived log for thread 1 with sequence 6 is already on disk as file /u01/app/oracle/fast_recovery_area/PRODDB/archivelog/2024_12_08/o1_mf_1_6_mob59f34_.arc
+archived log for thread 1 with sequence 7 is already on disk as file /u01/app/oracle/fast_recovery_area/PRODDB/archivelog/2024_12_08/o1_mf_1_7_mob59hht_.arc
+archived log for thread 1 with sequence 8 is already on disk as file /u01/app/oracle/fast_recovery_area/PRODDB/archivelog/2024_12_08/o1_mf_1_8_mob5c1od_.arc
+archived log for thread 1 with sequence 9 is already on disk as file /u01/app/oracle/fast_recovery_area/PRODDB/archivelog/2024_12_08/o1_mf_1_9_mob5c370_.arc
+archived log for thread 1 with sequence 10 is already on disk as file /u01/app/oracle/fast_recovery_area/PRODDB/archivelog/2024_12_08/o1_mf_1_10_mob5c4fh_.arc
+archived log for thread 1 with sequence 11 is already on disk as file /u01/app/oracle/fast_recovery_area/PRODDB/archivelog/2024_12_08/o1_mf_1_11_mob5c4m2_.arc
+archived log for thread 1 with sequence 12 is already on disk as file /u01/app/oracle/fast_recovery_area/PRODDB/archivelog/2024_12_08/o1_mf_1_12_mob5c8vd_.arc
+archived log for thread 1 with sequence 13 is already on disk as file /u01/app/oracle/fast_recovery_area/PRODDB/onlinelog/o1_mf_1_mo8tzg09_.log
+archived log file name=/u01/app/oracle/fast_recovery_area/PRODDB/archivelog/2024_12_08/o1_mf_1_1_mob4owbg_.arc thread=1 sequence=1
+archived log file name=/u01/app/oracle/fast_recovery_area/PRODDB/archivelog/2024_12_08/o1_mf_1_2_mob58p5d_.arc thread=1 sequence=2
+archived log file name=/u01/app/oracle/fast_recovery_area/PRODDB/archivelog/2024_12_08/o1_mf_1_3_mob58rqk_.arc thread=1 sequence=3
+archived log file name=/u01/app/oracle/fast_recovery_area/PRODDB/archivelog/2024_12_08/o1_mf_1_4_mob58vsm_.arc thread=1 sequence=4
+archived log file name=/u01/app/oracle/fast_recovery_area/PRODDB/archivelog/2024_12_08/o1_mf_1_5_mob59ct8_.arc thread=1 sequence=5
+archived log file name=/u01/app/oracle/fast_recovery_area/PRODDB/archivelog/2024_12_08/o1_mf_1_6_mob59f34_.arc thread=1 sequence=6
+archived log file name=/u01/app/oracle/fast_recovery_area/PRODDB/archivelog/2024_12_08/o1_mf_1_7_mob59hht_.arc thread=1 sequence=7
+archived log file name=/u01/app/oracle/fast_recovery_area/PRODDB/archivelog/2024_12_08/o1_mf_1_8_mob5c1od_.arc thread=1 sequence=8
+archived log file name=/u01/app/oracle/fast_recovery_area/PRODDB/archivelog/2024_12_08/o1_mf_1_9_mob5c370_.arc thread=1 sequence=9
+archived log file name=/u01/app/oracle/fast_recovery_area/PRODDB/archivelog/2024_12_08/o1_mf_1_10_mob5c4fh_.arc thread=1 sequence=10
+archived log file name=/u01/app/oracle/fast_recovery_area/PRODDB/archivelog/2024_12_08/o1_mf_1_11_mob5c4m2_.arc thread=1 sequence=11
+archived log file name=/u01/app/oracle/fast_recovery_area/PRODDB/archivelog/2024_12_08/o1_mf_1_12_mob5c8vd_.arc thread=1 sequence=12
+archived log file name=/u01/app/oracle/fast_recovery_area/PRODDB/onlinelog/o1_mf_1_mo8tzg09_.log thread=1 sequence=13
+media recovery complete, elapsed time: 00:00:02
+Finished recover at 08-DEC-2024 09:15:45
+
+RMAN> alter database open;
+
+RMAN-00571: ===========================================================
+RMAN-00569: =============== ERROR MESSAGE STACK FOLLOWS ===============
+RMAN-00571: ===========================================================
+RMAN-03002: failure of sql statement command at 12/08/2024 09:15:58
+ORA-01589: must use RESETLOGS or NORESETLOGS option for database open
+
+RMAN> alter database open resetlogs;
+
+Statement processed
+
+RMAN> 
+
+RMAN> 
+
+RMAN> 
+
+RMAN> 
+
+RMAN>             

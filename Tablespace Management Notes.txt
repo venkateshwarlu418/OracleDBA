@@ -1,0 +1,548 @@
+													Tablespace Management
+													
+								Tablespace Data Dictionary Views
+													
+The following data dictionary and dynamic performance views provide useful information about the tablespaces of a database.
+
+	View												Description
+V$TABLESPACE						Name and number of all tablespaces from the control file.
+
+SQL> set lines 200 pages 200
+col flashback_on for a15
+col bigfile for a8
+col INCLUDED_IN_DATABASE_BACKUP for a30
+col name for a12
+select TS#,NAME,CON_ID,BIGFILE,FLASHBACK_ON,INCLUDED_IN_DATABASE_BACKUP,ENCRYPT_IN_BACKUP from V$TABLESPACE;
+
+       TS# NAME 	    CON_ID 		BIGFILE  FLASHBACK_ON    INCLUDED_IN_DATABASE_BACKUP    ENC
+---------- ------------ ---------- -------- --------------- ------------------------------ ---
+		1 		SYSAUX		 0 			NO	    YES 	    			YES
+		0 		SYSTEM		 0 			NO	    YES 	    			YES
+		2 		UNDOTBS1	 0 			NO	    YES 	    			YES
+		4 		USERS		 0 			NO	    YES 	    			YES
+		3 		TEMP 		 0 			NO	    YES 	    			NO
+		6 		SOETBS		 0 			NO	    YES 	    			YES
+	
+
+V$ENCRYPTED_TABLESPACES				Name and encryption algorithm of all encrypted tablespaces.
+SQL> desc V$ENCRYPTED_TABLESPACES
+
+
+
+DBA_TABLESPACES, USER_TABLESPACES	Descriptions of all (or user accessible) tablespaces.
+
+SQL> select TABLESPACE_NAME,BLOCK_SIZE,STATUS,CONTENTS,PCT_INCREASE,MAX_SIZE from DBA_TABLESPACES;
+
+TABLESPACE_NAME 	       		BLOCK_SIZE  STATUS    CONTENTS		  	  PCT_INCREASE	 MAX_SIZE
+------------------------------ ---------- --------- --------------------- ------------ ----------
+SYSTEM				   				 8192 	ONLINE    PERMANENT			       			2147483645
+SYSAUX				   				 8192 	ONLINE    PERMANENT			       			2147483645
+UNDOTBS1			   				 8192 	ONLINE    UNDO			       				2147483645
+TEMP				   				 8192 	ONLINE    TEMPORARY			     0 			2147483645
+USERS				   				 8192 	ONLINE    PERMANENT			       			2147483645
+SOETBS				   				 8192 	ONLINE    PERMANENT			     0 			2147483645
+			
+			
+DBA_TABLESPACE_GROUPS				Displays the tablespace groups and the tablespaces that belong to them.
+DBA_SEGMENTS, USER_SEGMENTS			Information about segments within all (or user accessible) tablespaces.
+DBA_EXTENTS, USER_EXTENTS			Information about data extents within all (or user accessible) tablespaces.
+SQL> set lines 200 pages 200
+col owner for a10
+col segment_name for a20
+col partition_name for a20
+select owner,segment_name,partition_name,segment_type,tablespace_name,extent_id,file_id,block_id,bytes,blocks,relative_fno from dba_extents where tablespace_name='UNDOTBS1';SQL> SQL> SQL> SQL> 
+
+OWNER	   SEGMENT_NAME 			PARTITION_NAME	     SEGMENT_TYPE			TABLESPACE_NAME 		EXTENT_ID    FILE_ID   BLOCK_ID      BYTES     BLOCKS RELATIVE_FNO
+---------- -------------------- -------------------- ------------------ ------------------------------ ---------- ---------- ---------- ---------- ---------- ------------
+SYS	   		_SYSSMU6_813816332$			    				TYPE2 UNDO 				UNDOTBS1				0	  		4	  		 208     65536	    8		 4
+SYS	   		_SYSSMU6_813816332$			    				TYPE2 UNDO 				UNDOTBS1				1	  		4	  		 216     65536	    8		 4
+SYS	   		_SYSSMU6_813816332$			    				TYPE2 UNDO 				UNDOTBS1				2	  		4	  		2304   1048576	  128		 4
+SYS	   		_SYSSMU6_813816332$			    				TYPE2 UNDO 				UNDOTBS1				3	  		4	  		1408   1048576	  128		 4
+SYS	   		_SYSSMU7_2329891355$ 		    				TYPE2 UNDO 				UNDOTBS1				0	  		4	  		 224     65536	    8		 4
+SYS	   		_SYSSMU7_2329891355$ 		    				TYPE2 UNDO 				UNDOTBS1				1	  		4	  		 232     65536	    8		 4
+
+DBA_FREE_SPACE, USER_FREE_SPACE		Information about free extents within all (or user accessible) tablespaces.
+
+SQL> col tablespace_name for a15
+SQL> select tablespace_name,file_id,block_id,bytes,blocks,relative_fno from dba_free_space;
+
+TABLESPACE_NAME    FILE_ID   BLOCK_ID	   BYTES     BLOCKS RELATIVE_FNO
+--------------- ---------- ---------- ---------- ---------- ------------
+SYSTEM			 		1      115240	  720896		 88	       1
+SYSTEM			 		1      116096	 3145728		384	       1
+SYSAUX			 		3		65080	  393216		 48	       3
+SYSAUX			 		3		65136	  262144		 32	       3
+SYSAUX			 		3		65176	  262144		 32	       3
+SYSAUX			 		3		65216	   65536		  8	       3
+
+
+DBA_TEMP_FREE_SPACE					Displays the total allocated and free space in each temporary tablespace.
+
+SQL> select tablespace_name,tablespace_size,allocated_space,free_space,shared,inst_id from DBA_TEMP_FREE_SPACE;
+
+TABLESPACE_NAME TABLESPACE_SIZE ALLOCATED_SPACE FREE_SPACE SHARED	    INST_ID
+--------------- --------------- --------------- ---------- ------------- ----------
+TEMP		         2057306112      2057306112 2056257536 SHARED
+
+V$DATAFILE							Information about all data files, including tablespace number of owning tablespace.
+SQL>col FILE# for 99999
+col TS# for 99999
+col name for a70
+select FILE#,TS#,NAME,BLOCKS,BLOCK_SIZE from V$DATAFILE;
+ FILE#	  TS# 								NAME									   BLOCKS 	BLOCK_SIZE
+------ ------ ---------------------------------------------------------------------- ---------- ----------
+     1	    0 /u01/app/oracle/oradata/PRODDB/datafile/o1_mf_system_lrn5hvv7_.dbf	    116480       8192
+     3	    1 /u01/app/oracle/oradata/PRODDB/datafile/o1_mf_sysaux_lrn5jnxt_.dbf	     75520       8192
+     4	    2 /u01/app/oracle/oradata/PRODDB/datafile/o1_mf_undotbs1_lrn5k49l_.dbf	     44160       8192
+     5	    6 /u01/app/oracle/oradata/PRODDB/datafile/o1_mf_soetbs_lrn6blkm_.dbf	    137088       8192
+     7	    4 /u01/app/oracle/oradata/PRODDB/datafile/o1_mf_users_lrn5k5bw_.dbf 	       640       8192
+																					   
+V$TEMPFILE							Information about all temp files, including tablespace number of owning tablespace.
+
+SQL> select FILE#,RFILE#,TS#,NAME,STATUS,BLOCKS,BLOCK_SIZE,BYTES,CREATE_BYTES from v$tempfile;
+
+ FILE#	   RFILE#    TS# NAME																	 STATUS	    BLOCKS BLOCK_SIZE	   BYTES CREATE_BYTES
+------ ---------- ------ ---------------------------------------------------------------------- ------- ---------- ---------- ---------- ------------
+     1		1         3    /u01/app/oracle/oradata/PRODDB/datafile/o1_mf_temp_lrn5lp8g_.tmp	     ONLINE	    251264	   8192   2058354688     20971520
+
+DBA_DATA_FILES						Shows files (data files) belonging to tablespaces.
+
+
+
+SQL> set lines 200 pages 200
+SQL> col file_name for a70
+SQL> col maxbytes for 999999999999
+SQL> select file_name,file_id,tablespace_name,blocks,maxblocks,bytes,maxbytes from dba_data_files;
+
+							FILE_NAME								     FILE_ID TABLESPACE_NAME     BLOCKS  MAXBLOCKS      BYTES     MAXBYTES
+---------------------------------------------------------------------- ---------- --------------- ---------- ---------- ---------- ------------
+/u01/app/oracle/oradata/PRODDB/datafile/o1_mf_system_lrn5hvv7_.dbf		        1        SYSTEM	      116480	4194302  954204160  34359721984
+/u01/app/oracle/oradata/PRODDB/datafile/o1_mf_sysaux_lrn5jnxt_.dbf		        3        SYSAUX	       75520	4194302  618659840  34359721984
+/u01/app/oracle/oradata/PRODDB/datafile/o1_mf_soetbs_lrn6blkm_.dbf		        5        SOETBS	      137088	4194302 1123024896  34359721984
+/u01/app/oracle/oradata/PRODDB/datafile/o1_mf_users_lrn5k5bw_.dbf		        7        USERS 		     640	4194302    5242880  34359721984
+/u01/app/oracle/oradata/PRODDB/datafile/o1_mf_undotbs1_lrn5k49l_.dbf	        4        UNDOTBS1	   44160	4194302  361758720  34359721984
+
+
+
+DBA_TEMP_FILES						Shows files (temp files) belonging to temporary tablespaces..
+
+SQL> select file_id,FILE_NAME,TABLESPACE_NAME,AUTOEXTENSIBLE,USER_BYTES,USER_BLOCKS from DBA_TEMP_FILES;
+	
+FILE_ID                           FILE_NAME								          TABLESPACE_NAME AUT USER_BYTES USER_BLOCKS
+---------- ---------------------------------------------------------------------- --------------- --- ---------- -----------
+	 1 /u01/app/oracle/oradata/PRODDB/datafile/o1_mf_temp_lrn5lp8g_.tmp	                TEMP		  YES 2056257536      251008
+
+
+
+V$TEMP_EXTENT_MAP					Information for all extents in all locally managed temporary tablespaces.
+V$TEMP_EXTENT_POOL					For locally managed temporary tablespaces: the state of temporary space 
+										cached and used for by each instance.
+V$TEMP_SPACE_HEADER					Shows space used/free for each temp file.
+DBA_USERS							Default and temporary tablespaces for all users.
+DBA_TS_QUOTAS						Lists tablespace quotas for all users.
+
+
+SQL> set lines 200
+SQL> set lines 200 pages 200
+SQL> col username for a20
+SQL> select username,tablespace_name,bytes,max_bytes,blocks,max_blocks,dropped from dba_ts_quotas;
+
+USERNAME	     TABLESPACE_NAME	     BYTES   MAX_BYTES     BLOCKS MAX_BLOCKS DRO
+-------------------- --------------- ---------- ---------- ---------- ---------- ---
+SYS		     	          SOETBS		      0 	-1      	    0	      -1 NO
+AUDSYS		              SYSAUX		1507328 	-1      	  184	      -1 NO
+SYSTEM		              SOETBS		      0 	-1      	    0	      -1 NO
+OUTLN		              SYSTEM		 589824 	-1      	   72	      -1 NO
+GSMADMIN_INTERNAL         SYSAUX		 917504 	-1      	  112	      -1 NO
+DBSFWUSER	              SYSAUX		      0 	-1      	    0	      -1 NO
+APPQOSSYS	              SYSAUX		      0 	-1      	    0	      -1 NO
+GGSYS		              SYSAUX		      0 	-1      	    0	      -1 NO
+MDSYS		              SYSAUX	  210894848 	-1      	25744	      -1 NO
+MDSYS		              SYSTEM		      0 	-1      	    0	      -1 NO
+OLAPSYS 	              SYSAUX		      0 	-1      	    0	      -1 NO
+LBACSYS 	              SYSTEM		 327680 	-1      	   40	      -1 NO
+SOE		     	          SOETBS	 1061158912 	-1         129536	      -1 NO
+SCOTT		              USERS		     327680 	-1	           40	      -1 NO
+
+
+
+
+
+V$SORT_SEGMENT						Information about every sort segment in a given instance. 
+										The view is only updated when the tablespace is of the TEMPORARY type.
+										
+SQL> select tablespace_name,TS#,segment_file,SEGMENT_BLOCK,EXTENT_SIZE,USED_EXTENTS,TOTAL_EXTENTS,FREED_EXTENTS,FREE_BLOCKS,USED_BLOCKS,TOTAL_BLOCKS from V$SORT_SEGMENT;
+
+TABLESPACE_NAME    TS# SEGMENT_FILE SEGMENT_BLOCK EXTENT_SIZE USED_EXTENTS TOTAL_EXTENTS FREED_EXTENTS FREE_BLOCKS USED_BLOCKS TOTAL_BLOCKS
+--------------- ------ ------------ ------------- ----------- ------------ ------------- ------------- ----------- ----------- ------------
+TEMP		     3		  0		0	  128		 1	    1961	     0	    250880	   128	     251008
+										
+V$TEMPSEG_USAGE						Describes temporary (sort) segment usage by user for temporary or permanent 
+										tablespaces.
+										
+SQL> set lines 200 pages 200
+SQL> col tablespace for a15
+SQL> col user for a20
+SQL> col username for a20
+SQL> select TS#,TABLESPACE,CONTENTS,USER,USERNAME,SEGFILE#,SEGBLK#,SEGTYPE,BLOCKS,EXTENTS,SQL_ID,SQLHASH,SQLADDR,SESSION_NUM,SESSION_ADDR from V$TEMPSEG_USAGE;
+
+   TS# TABLESPACE      CONTENTS  USER		      USERNAME		     SEGFILE#	 SEGBLK# SEGTYPE       BLOCKS	 EXTENTS SQL_ID 	  SQLHASH SQLADDR	   SESSION_NUM SESSION_ADDR
+------ --------------- --------- -------------------- -------------------- ---------- ---------- --------- ---------- ---------- ------------- ---------- ---------------- ----------- ----------------
+     3 TEMP	       TEMPORARY SYS						  201	  251008 DATA		  128	       1 c9umxngkc3byq 3837898710 000000006DBC0158	 58501 000000007E68C478
+
+									
+										
+--- To know the database (datafiles + Temp files) size in different bytes
+
+-- Datafiles size
+
+SQL> select sum(bytes)/1024 as size_kb from dba_data_files;					-- KB
+SQL> select sum(bytes)/1024/1024 as size_mb from dba_data_files;			-- MB			
+SQL> SELECT SUM(bytes)/1024/1024/1024 AS size_gb FROM dba_data_files;		-- GB
+SQL> select sum(bytes)/1024/1024/1024/1024 as size_tb from dba_data_files;	-- TB
+
+
+-- Tempfiles size
+SQL> SELECT SUM(bytes)/1024 AS temp_size_kb from dba_temp_files;					-- KB
+SQL> SELECT SUM(bytes)/1024/1024 as temp_size_mb from dba_temp_files;				-- MB
+SQL> SELECT SUM(bytes)/1024/1024/1024 AS temp_size_gb FROM dba_temp_files;			-- GB
+SQL> select sum(bytes)/1024/1024/1024/1024 as temp_size_tb from dba_temp_files;		-- TB	
+
+
+-- Size of the entire database (data + temp)	
+SQL> SELECT 
+  (SELECT SUM(bytes) FROM dba_data_files) + 
+  (SELECT SUM(bytes) FROM dba_temp_files) AS total_bytes
+FROM dual;
+
+TOTAL_BYTES
+-----------
+ 5151653888
+ 
+or 
+
+SQL> SELECT 
+    ROUND(SUM(bytes) / 1024 / 1024 / 1024, 2) AS total_size_in_gb
+FROM 
+    (
+        SELECT bytes FROM dba_data_files
+        UNION ALL
+        SELECT bytes FROM dba_temp_files
+    );  
+
+TOTAL_SIZE_IN_GB
+----------------
+	     4.8
+
+📦 What is a Tablespace in Oracle?
+	A tablespace in Oracle is a logical storage unit that groups related logical structures such as tables, 
+indexes, and other database objects. Tablespaces allow for efficient storage allocation, management, 
+and separation of data.
+
+Each tablespace is made up of one or more datafiles at the OS level.
+
+🧠 Why Use Tablespaces?
+
+		♦ Logical separation of data (e.g., separating application data, indexes, temporary data).
+		♦ Easier backup and recovery (e.g., recover one tablespace instead of the whole DB).
+		♦ Quota management per user.
+		♦ Performance tuning (placing tablespaces on different disks).
+		♦ Efficient storage management with autoextend, compression, etc.
+		
+🏗️ Types of Tablespaces in Oracle 19c
+
+		Tablespace Name									Purpose
+			  SYSTEM				Stores core database metadata (dictionary tables). Mandatory.
+			  SYSAUX				Auxiliary to SYSTEM; stores performance, job scheduler, etc.
+			  UNDO					Stores undo data for transactions. One per instance.
+			  TEMP					Used for sorting, joins, and other temp operations.
+			  USERS					Default tablespace for user-created objects.
+			  DATA (custom)			Application-specific or partitioned data. Optional.
+			  INDEX (custom)		To separate indexes from tables. Optional.
+			  
+Check free/used space:
+
+sql
+Copy
+Edit
+-- Tablespace usage
+SELECT tablespace_name, 
+       ROUND(SUM(bytes)/1024/1024, 2) AS size_mb
+FROM dba_data_files
+GROUP BY tablespace_name;
+
+-- Free space
+SELECT tablespace_name, 
+       ROUND(SUM(bytes)/1024/1024, 2) AS free_mb
+FROM dba_free_space
+GROUP BY tablespace_name;
+
+
+
+
+
+
+												📊 Monitoring Tablespaces
+
+
+set lines 200 pages 200
+set colsep |
+SQL> select tablespace_name, sum(bytes) as total_space,sum(bytes) as used_space, 
+SUM(BYTES) AS FREE_SPACE FROM DBA_SEGMENTS GROUP BY TABLESPACE_NAME;
+
+TABLESPACE_NAME 		      |TOTAL_SPACE|USED_SPACE|FREE_SPACE
+------------------------------|-----------|----------|----------
+SYSTEM					      |  949288960| 949288960| 949288960
+SYSAUX					      |  586874880| 586874880| 586874880
+UNDOTBS1				      |   96468992|  96468992|	96468992
+USERS					      |    2097152|   2097152|	 2097152
+SOETBS					      | 1061158912|1061158912|1061158912
+
+
+
+
+set lines 200 pages 200
+set colsep |
+col file_name for a80
+SELECT FILE_NAME, BYTES/1024/1024 AS MB FROM DBA_DATA_FILES;
+FILE_NAME									|	 MB
+--------------------------------------------------------------------------------|----------
+/u01/app/oracle/oradata/PRODDB/datafile/o1_mf_system_lrn5hvv7_.dbf				|	910
+/u01/app/oracle/oradata/PRODDB/datafile/o1_mf_sysaux_lrn5jnxt_.dbf				|	590
+/u01/app/oracle/oradata/PRODDB/datafile/o1_mf_soetbs_lrn6blkm_.dbf				|  1071
+/u01/app/oracle/oradata/PRODDB/datafile/o1_mf_users_lrn5k5bw_.dbf				|	  5
+/u01/app/oracle/oradata/PRODDB/datafile/o1_mf_undotbs1_lrn5k49l_.dbf			|	345
+
+
+
+
+
+ Check Datafile Size (Physical Files) per Tablespace
+SQL> SELECT tablespace_name,file_name, ROUND(bytes / 1024 / 1024, 2) AS size_mb,
+autoextensible FROM dba_data_files ORDER BY tablespace_name;  
+
+TABLESPACE_NAME 		      |FILE_NAME																       |   SIZE_MB|AUT
+------------------------------|--------------------------------------------------------------------------------|----------|---
+SOETBS					      |/u01/app/oracle/oradata/PRODDB/datafile/o1_mf_soetbs_lrn6blkm_.dbf		       |      1071|YES
+SYSAUX					      |/u01/app/oracle/oradata/PRODDB/datafile/o1_mf_sysaux_lrn5jnxt_.dbf		       |       590|YES
+SYSTEM					      |/u01/app/oracle/oradata/PRODDB/datafile/o1_mf_system_lrn5hvv7_.dbf		       |       910|YES
+UNDOTBS1				      |/u01/app/oracle/oradata/PRODDB/datafile/o1_mf_undotbs1_lrn5k49l_.dbf		       |       345|YES
+USERS					      |/u01/app/oracle/oradata/PRODDB/datafile/o1_mf_users_lrn5k5bw_.dbf		       |	     5|YES
+
+
+
+
+How to Check Block Size of a Tablespace
+SQL> SELECT tablespace_name, block_size
+FROM dba_tablespaces;
+TABLESPACE_NAME 		      |BLOCK_SIZE
+------------------------------|----------
+SYSTEM					      |      8192
+SYSAUX					      |      8192
+UNDOTBS1				      |      8192
+TEMP					      |      8192
+USERS					      |      8192
+SOETBS					      |      8192
+
+
+
+SQL> SELECT table_name,pct_free,pct_used,
+tablespace_name FROM dba_tables WHERE owner = 'scott';
+
+TABLE_NAME			|  PCT_FREE|  PCT_USED|TABLESPACE_NAME
+--------------------|----------|----------|---------------
+DEPT				|		 10|	      |USERS
+EMP					|		 10|	      |USERS
+BONUS				|		 10|	      |USERS
+SALGRADE			|		 10|	      |USERS
+
+🔹 Note: If you're using Automatic Segment Space Management (ASSM), PCTUSED is ignored.
+
+
+How to Check PCTINCREASE
+SQL> SELECT segment_name,tablespace_name,pct_increase
+FROM dba_segments
+WHERE owner = 'SCOTT';
+
+
+How to Check Segment Space Management (ASSM vs MSSM)
+SQL> SELECT tablespace_name,extent_management,
+segment_space_management FROM dba_tablespaces;
+TABLESPACE_NAME 	  	      |EXTENT_MAN|SEGMEN
+------------------------------|----------|------
+SYSTEM				 	      |LOCAL	 |MANUAL
+SYSAUX					      |LOCAL	 |AUTO
+UNDOTBS1				      |LOCAL	 |MANUAL
+TEMP					      |LOCAL	 |MANUAL
+USERS					      |LOCAL	 |AUTO
+SOETBS					      |LOCAL	 |AUTO
+
+
+segment_space_management = AUTO → ASSM (PCTUSED ignored)
+
+segment_space_management = MANUAL → MSSM (PCTUSED applied)
+
+
+
+
+checking for table pctfree,pctused,row movement
+SQL> set lines 200 set pages 200
+set colsep |
+col table_name for a15
+select TABLE_NAME,TABLESPACE_NAME,PCT_FREE,PCT_USED,PCT_INCREASE,
+ROW_MOVEMENT from user_tables where table_name='CHAIN_TEST';
+TABLE_NAME     |TABLESPACE_NAME 		      |  PCT_FREE|  PCT_USED|PCT_INCREASE|ROW_MOVE
+---------------|------------------------------|----------|----------|------------|--------
+CHAIN_TEST     |SYSTEM					      |        10|		  40|			 |DISABLED
+
+
+
+Check if Row Movement is Enabled 
+
+SQL> SELECT table_name, row_movement
+FROM user_tables
+WHERE table_name = 'CHAIN_TEST';
+
+TABLE_NAME     |ROW_MOVE
+---------------|--------
+CHAIN_TEST     |DISABLED
+
+
+SQL> alter table chain_test enable ROW movement;
+
+Table altered.
+
+SQL> select TABLE_NAME,TABLESPACE_NAME,PCT_FREE,PCT_USED,PCT_INCREASE,ROW_MOVEMENT 
+from user_tables where table_name='CHAINED_ROWS';
+
+TABLE_NAME     |TABLESPACE_NAME 		      |  PCT_FREE|  PCT_USED|PCT_INCREASE|ROW_MOVE
+---------------|------------------------------|----------|----------|------------|--------
+CHAIN_TEST     |SYSTEM			 		      |        10|		  40|			 |ENABLED
+
+SQL> alter table chain_test move tablespace users;
+
+Table altered.
+SQL> select TABLE_NAME,TABLESPACE_NAME,PCT_FREE,PCT_USED,PCT_INCREASE,ROW_MOVEMENT from user_tables where table_name='CHAIN_TEST';
+
+TABLE_NAME     |TABLESPACE_NAME 		      |  PCT_FREE|  PCT_USED|PCT_INCREASE|ROW_MOVE
+---------------|------------------------------|----------|----------|------------|--------
+CHAIN_TEST     |USERS			 		      |        10|		    | 			 |ENABLED
+
+⚠️ Important Notes
+Item								Explanation
+Downtime			This operation locks the table, so it's best done during maintenance.
+Indexes				All indexes become unusable after the move. You need to rebuild them.
+LOBs				If your table has LOB columns (BLOB, CLOB), they must be moved separately.
+Partitioned Tables	Use ALTER TABLE ... MOVE PARTITION or MOVE SUBPARTITION
+
+
+
+
+Number of Blocks Used by a Table
+SQL> SELECT table_name,blocks,num_rows,avg_row_len, round((blocks * 8192) / 1024 / 1024, 2) AS size_mb
+FROM user_tables WHERE table_name = 'CHAINED_ROWS';
+
+TABLE_NAME     |    BLOCKS|  NUM_ROWS|AVG_ROW_LEN|   SIZE_MB
+---------------|----------|----------|-----------|----------
+CHAIN_TEST     |		20|		    9|	     8018|	 .16
+
+SQL> SELECT table_name,blocks,num_rows,avg_row_len, round((blocks * 8192) / 1024 / 1024, 2) AS size_mb
+FROM user_tables WHERE table_name = 'VENKY';
+
+SQL> select TABLE_NAME,PCT_FREE,PCT_USED,INI_TRANS,BLOCKS,CHAIN_CNT from user_tables where table_name='CHAINED_ROWS';
+
+TABLE_NAME     |  PCT_FREE|  PCT_USED| INI_TRANS|    BLOCKS| CHAIN_CNT
+---------------|----------|----------|----------|----------|----------
+CHAINED_ROWS   |	10|	   40|	       1|	   |
+SQL> SELECT table_name, ini_trans FROM user_tables WHERE table_name = 'CHAINED_ROWS';
+
+TABLE_NAME     | INI_TRANS
+---------------|----------
+CHAINED_ROWS   |	 1
+----This may require table reorganization or affect existing blocks minimally, 
+since INI_TRANS mostly applies to new blocks going forward. 
+---It specifies the initial number of transaction slots allocated per data block for a table.
+
+
+SQL> alter table chained_rows initrans 3;
+
+SQL> @/u01/app/oracle/product/19.0.0.0/dbhome_1/rdbms/admin/utlchain.sql
+SQL> ANALYZE TABLE CHAINED_ROWS LIST CHAINED ROWS INTO CHAINED_ROWS;
+SQL> SELECT * FROM CHAINED_ROWS WHERE TABLE_NAME = 'CHAINED_ROWS';
+
+
+
+SQL> col file_name for a80
+SQL> col maxbytes for 999999999999
+SQL> select file_name,file_id,tablespace_name,maxbytes,user_bytes,user_blocks from dba_data_files;
+FILE_NAME																		|   FILE_ID|TABLESPACE_NAME				  |	MAXBYTES	|USER_BYTES|USER_BLOCKS
+--------------------------------------------------------------------------------|----------|------------------------------|-------------|----------|-----------
+/u01/app/oracle/oradata/PRODDB/datafile/o1_mf_system_lrn5hvv7_.dbf				|		  1|SYSTEM						  |  34359721984| 953155584|	 116352
+/u01/app/oracle/oradata/PRODDB/datafile/o1_mf_sysaux_lrn5jnxt_.dbf				|		  3|SYSAUX						  |  34359721984| 649068544|	  79232
+/u01/app/oracle/oradata/PRODDB/datafile/o1_mf_soetbs_lrn6blkm_.dbf				|		  5|SOETBS						  |  34359721984|1121976320|	 136960
+/u01/app/oracle/oradata/PRODDB/datafile/o1_mf_users_lrn5k5bw_.dbf				|		  7|USERS						  |  34359721984|   4194304|	    512
+/u01/app/oracle/oradata/PRODDB/datafile/o1_mf_undotbs1_lrn5k49l_.dbf			|		  4|UNDOTBS1					  |  34359721984| 360710144|	  44032
+
+SQL> col owner for a10
+select OWNER,TABLE_NAME,TABLESPACE_NAME from dba_tables where table_name='CHAINED_ROWS';
+
+OWNER										   |TABLE_NAME	   |TABLESPACE_NAME
+-----------------------------------------------|---------------|------------------------------
+SYS											   |CHAINED_ROWS   |SYSTEM
+
+SQL> alter table CHAINED_ROWS move tablespace users;
+
+Table altered.
+
+SQL> col owner for a10
+select OWNER,TABLE_NAME,TABLESPACE_NAME from dba_tables where table_name='CHAINED_ROWS';
+
+OWNER	  |TABLE_NAME	  |TABLESPACE_NAME
+----------|---------------|------------------------------
+SYS		  |CHAINED_ROWS   |USERS
+
+
+SQL> SELECT tablespace_name,SUM(bytes)/1024/1024 AS free_space_mb FROM dba_free_space GROUP BY tablespace_name;
+	
+TABLESPACE_NAME 		      |FREE_SPACE_MB
+------------------------------|-------------
+SYSTEM					      |        3.625
+SYSAUX					      |      37.8125
+UNDOTBS1				      | 		 252
+USERS					      | 		1.25
+SOETBS					      | 		  62
+
+SQL> SELECT tablespace_name,SUM(bytes)/1024/1024 AS free_space_mb FROM dba_free_space GROUP BY tablespace_name;
+
+TABLESPACE_NAME 		      |FREE_SPACE_MB
+------------------------------|-------------
+SYSTEM					      |        3.625
+SYSAUX					      |      37.8125
+UNDOTBS1				      | 		 252
+USERS					      | 		1.25
+SOETBS					      | 		  62
+
+SQL> drop table test_chaining purge;
+SQL> SELECT tablespace_name,SUM(bytes)/1024/1024 AS free_space_mb FROM dba_free_space GROUP BY tablespace_name;
+
+TABLESPACE_NAME 		      |FREE_SPACE_MB
+------------------------------|-------------
+SYSTEM					      |        3.625
+SYSAUX					      |        37.75
+UNDOTBS1				      | 		 252
+USERS					      |        1.375
+SOETBS					      | 		  62
+
+SQL> drop table chained_rows purge;
+
+SQL> SELECT tablespace_name,SUM(bytes)/1024/1024 AS free_space_mb FROM dba_free_space GROUP BY tablespace_name;
+
+TABLESPACE_NAME 		      |FREE_SPACE_MB
+------------------------------|-------------
+SYSTEM					      |        3.625
+SYSAUX					      |        37.75
+UNDOTBS1				      | 		 252
+USERS					      |       1.4375
+SOETBS					      | 		  62
+
+	

@@ -1,0 +1,138 @@
+
+--- (configuring database in archivelog mode)
+
+shut immediate; 
+startup mount;
+alter database archivelog;
+alter database open;
+
+archive log list;
+
+
+
+
+
+--- (configuring database in noarchivelog mode)
+shut immediate;
+startup mount;
+alter database noarchivelog;
+alter database open;
+
+--- (know your archive log destination)
+
+archive log list;
+
+
+
+
+
+(value at Archive destination is the archive log destination.
+It can be a mountpoint or asm diskgroup or USE_DB_RECOVERY_FILE_DEST
+
+if FRA is enable we will have that as USE_DB_RECOVERY_FILE_DEST.)
+
+
+
+--- to find FRA location...
+
+show parameter DB_RECOVERY_FILE_DEST
+
+NAME				     				TYPE	 	VALUE
+------------------------------------ ----------- 	------------------------------
+db_recovery_file_dest		     		string	 	/u01/app/oracle/fast_recovery_area
+db_recovery_file_dest_size	     		big integer 8256M
+
+
+
+
+--- disable FRA:
+
+ALTER SYSTEM SET db_recovery_file_dest='' SCOPE=BOTH;
+ALTER SYSTEM SET db_recovery_file_dest_size=8192M scope=both;
+
+Result:
+NAME                                 TYPE        VALUE
+------------------------------------ ----------- ------------------------------
+db_recovery_file_dest                string
+db_recovery_file_dest_size           big integer 8G
+
+
+
+
+Enable FRA:
+
+
+alter system set log_archive_dest_1='LOCATION=USE_DB_RECOVERY_FILE_DEST' scope=both;
+ALTER SYSTEM SET db_recovery_file_dest='/u01/app/oracle/fast_recovery_area' SCOPE=BOTH;
+
+
+NAME                                 TYPE        VALUE
+------------------------------------ ----------- ------------------------------
+db_recovery_file_dest                string      /u01/app/oracle/fast_recovery_area
+db_recovery_file_dest_size           big integer 8G
+
+
+--- change archive log path
+
+alter system set log_archive_dest_1='LOCATION=/u01' scope=both;
+
+ALTER SYSTEM SET db_recovery_file_dest='/u01/app/oracle/fast_recovery_area' SCOPE=BOTH;
+
+alter system set log_archive_dest_1='' scope=both;
+
+
+set linesize 200 pagesize 1000
+select * from v$recovery_area_usage;
+
+
+
+
+
+Usage
+
+set linesize 200 pagesize 1000
+set colsep |
+select * from v$recovery_area_usage;
+
+FILE_TYPE               PERCENT_SPACE_USED PERCENT_SPACE_RECLAIMABLE NUMBER_OF_FILES     CON_ID
+----------------------- ------------------ ------------------------- --------------- ----------
+CONTROL FILE                             0                         0               0          0
+REDO LOG                              4.88                         0               2          0
+ARCHIVED LOG                            .1                         0               7          0
+BACKUP PIECE                             0                         0               0          0
+IMAGE COPY                               0                         0               0          0
+FLASHBACK LOG                            0                         0               0          0
+FOREIGN ARCHIVED LOG                     0                         0               0          0
+AUXILIARY DATAFILE COPY                  0                         0               0          0
+
+
+
+
+
+set linesize 500;
+set colsep |
+col NAME for a50;
+select name, ROUND(SPACE_LIMIT/1024/1024/1024,2) all_Space_GB, 
+round(SPACE_USED/1024/1024/1024,2) U_Space_GB,
+round(SPACE_RECLAIMABLE/1024/1024/1024,2) SP_RECLAM_GB ,
+(select round(ESTIMATED_FLASHBACK_SIZE/1024/1024/1024,2) 
+from V$FLASHBACK_DATABASE_LOG) Est_Space_GB
+from V$RECOVERY_FILE_DEST;
+
+NAME                                               ALL_SPACE_GB U_SPACE_GB SP_RECLAM_GB EST_SPACE_GB
+-------------------------------------------------- ------------ ---------- ------------ ------------
+/u01/app/oracle/fast_recovery_area                            8         .4            0
+
+
+
+
+
+archive destination change;
+mkdir /u01/archive_log
+alter system set log_archive_dest_1='LOCATION=/u01/archive_log' scope=both;
+
+
+
+archive destination change;
+mkdir USE_DB_RECOVERY_FILE_DEST
+alter system set log_archive_dest_1='LOCATION=USE_DB_RECOVERY_FILE_DEST' scope=both;

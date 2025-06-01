@@ -1,0 +1,285 @@
+
+[oracle@venky ~]$ cd /u01
+[oracle@venky u01]$ ll
+total 246548
+-rw-r-----. 1 oracle oinstall  39092736 Nov 10 21:35 1_22_1184242212.dbf
+-rw-r-----. 1 oracle oinstall   3640320 Nov 11 12:12 1_23_1184242212.dbf
+drwxr-xr-x. 4 oracle oinstall        40 Nov  5 11:53 app
+drwxr-xr-x. 2 oracle oinstall        35 Nov 21 15:43 dir1
+drwxr-xr-x. 2 oracle oinstall      4096 Nov 20 21:33 duplex
+-rw-r--r--. 1 oracle oinstall         0 Nov 21 15:08 filesiva
+drwxr-xr-x. 3 oracle oinstall        48 Nov 18 19:28 multiplex
+-rw-r--r--. 1 oracle oinstall         0 Nov 21 15:45 siva2
+-rw-r--r--. 1 oracle oinstall         0 Nov 21 16:47 suri
+-rw-r-----. 1 oracle oinstall 209723392 Nov 20 21:38 undo02.dbf
+drwxr-x---. 3 oracle oinstall        24 Nov 11 13:25 VENDB
+
+
+
+[oracle@venky u01]$ ssh oracle@192.168.0.166
+
+The authenticity of host '192.168.0.166 (192.168.0.166)' can't be established.
+ECDSA key fingerprint is SHA256:ncpeM/UG+bwkWqNrWPVZZkFCSh8Ah4VKLhVem4hxaBQ.
+ECDSA key fingerprint is MD5:f7:78:75:d7:dd:18:cd:41:27:cb:96:21:e4:b9:e5:ec.
+
+
+Are you sure you want to continue connecting (yes/no)? yes
+Warning: Permanently added '192.168.0.166' (ECDSA) to the list of known hosts.
+oracle@192.168.0.166's password: 
+
+Last login: Fri Nov 22 13:58:21 2024
+
+[oracle@laxmi ~]$ 
+[oracle@laxmi ~]$ cd /u01
+[oracle@laxmi u01]$ ll
+total 22800
+drwxr-xr-x. 4 oracle oinstall       40 Nov  5 12:18 app
+drwxr-xr-x. 2 oracle oinstall     4096 Nov  9 15:43 duplex
+-rw-r--r--. 1 oracle oinstall        0 Nov 22 11:30 file1
+-rw-r--r--. 1 oracle oinstall        0 Nov 22 11:34 file3
+drwxr-xr-x. 3 oracle oinstall       26 Nov  9 12:37 multiplex
+-rw-r-----. 1 oracle oinstall 23339008 Nov 22 12:28 undo02.dbf
+
+[oracle@laxmi u01]$ exit
+logout
+Connection to 192.168.0.166 closed.
+
+
+[oracle@venky u01]$ cd
+
+[oracle@venky ~]$ scp oracle@192.168.0.166:/u01/file1 /u01
+oracle@192.168.0.166's password: 
+file1                                                                                        100%    0     0.0KB/s   00:00    
+[oracle@venky ~]$ cd /u01
+[oracle@venky u01]$ ll
+total 246548
+-rw-r-----. 1 oracle oinstall  39092736 Nov 10 21:35 1_22_1184242212.dbf
+-rw-r-----. 1 oracle oinstall   3640320 Nov 11 12:12 1_23_1184242212.dbf
+drwxr-xr-x. 4 oracle oinstall        40 Nov  5 11:53 app
+drwxr-xr-x. 2 oracle oinstall        35 Nov 21 15:43 dir1
+drwxr-xr-x. 2 oracle oinstall      4096 Nov 20 21:33 duplex
+-rw-r--r--. 1 oracle oinstall         0 Nov 22 14:03 file1
+-rw-r--r--. 1 oracle oinstall         0 Nov 21 15:08 filesiva
+-rw-r--r--. 1 oracle oinstall         0 Nov 22 14:00 laxmi
+drwxr-xr-x. 3 oracle oinstall        48 Nov 18 19:28 multiplex
+-rw-r--r--. 1 oracle oinstall         0 Nov 21 15:45 siva2
+-rw-r--r--. 1 oracle oinstall         0 Nov 21 16:47 suri
+-rw-r-----. 1 oracle oinstall 209723392 Nov 20 21:38 undo02.dbf
+drwxr-x---. 3 oracle oinstall        24 Nov 11 13:25 VENDB
+[oracle@venky u01]$ cd
+
+[oracle@venky ~]$ scp /u01/laxmi oracle@192.168.0.166:/u01
+oracle@192.168.0.166's password: 
+laxmi                                                                                        100%    0     0.0KB/s   00:00    
+[oracle@venky ~]$ ssh oracle@192.168.0.166
+
+oracle@192.168.0.166's password: 
+Last login: Fri Nov 22 14:02:08 2024 from 192.168.0.144
+
+[oracle@laxmi ~]$ 
+[oracle@laxmi ~]$ 
+[oracle@laxmi ~]$ 
+[oracle@laxmi ~]$ cd /u01
+[oracle@laxmi u01]$ ll
+total 22800
+drwxr-xr-x. 4 oracle oinstall       40 Nov  5 12:18 app
+drwxr-xr-x. 2 oracle oinstall     4096 Nov  9 15:43 duplex
+-rw-r--r--. 1 oracle oinstall        0 Nov 22 11:30 file1
+-rw-r--r--. 1 oracle oinstall        0 Nov 22 11:34 file3
+-rw-r--r--. 1 oracle oinstall        0 Nov 22 14:05 laxmi
+drwxr-xr-x. 3 oracle oinstall       26 Nov  9 12:37 multiplex
+-rw-r-----. 1 oracle oinstall 23339008 Nov 22 12:28 undo02.dbf
+
+[oracle@laxmi u01]$ exit
+logout
+Connection to 192.168.0.166 closed.
+
+[oracle@venky ~]$ 
+
+[oracle@venky ~]$ cat /etc/hosts
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
+
+192.168.0.144 venky venky.com
+
+
+[oracle@venky ~]$ ssh oracle@192.168.0.166
+oracle@192.168.0.166's password: 
+
+Last login: Fri Nov 22 14:07:23 2024 from 192.168.0.144
+
+[oracle@laxmi ~]$ 
+ 
+[oracle@venky ~]$ netmgr
+***netmgr which is a utility tool to create listener file
+Here a popup appears and create listener file and check that file in $ORACLE_HOME/network/admin/ PATH 
+
+[oracle@venky ~]$ cd $ORACLE_HOME
+[oracle@venky dbhome_1]$ cd network/admin
+
+[oracle@venky admin]$ ll
+total 8
+-rw-r--r--. 1 oracle oinstall  470 Nov 22 14:14 listener.ora
+drwxr-xr-x. 2 oracle oinstall   64 Apr 17  2019 samples
+-rw-r--r--. 1 oracle oinstall 1536 Feb 14  2018 shrept.lst
+
+listener.ora crated view like as below
+
+[oracle@venky admin]$ vi listener.ora
+
+
+Now checking for listener file status with "lsnrctl" utility tool(which is a tool to run listener ) 
+[oracle@venky admin]$ lsnrctl status
+
+LSNRCTL for Linux: Version 19.0.0.0.0 - Production on 22-NOV-2024 14:19:12
+
+Copyright (c) 1991, 2019, Oracle.  All rights reserved.
+
+Connecting to (DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=venky.com)(PORT=1521)))
+TNS-12541: TNS:no listener
+ TNS-12560: TNS:protocol adapter error
+  TNS-00511: No listener
+   Linux Error: 111: Connection refused
+
+
+Now disabling firewall from root user
+do as following below
+
+
+
+[oracle@venky admin]$ cd
+[oracle@venky ~]$ su root
+Password: 
+
+Now It is connected to root user 
+and now disable firewall as below
+
+
+[root@venky oracle]# 
+[root@venky oracle]# systemctl disable firewalld
+
+
+
+firewall disabled now 
+
+check for firewall status 
+
+[root@venky oracle]# systemctl status firewalld
+
+
+Now connecting to oracle home as below 
+
+[root@venky oracle]# su oracle
+
+
+[oracle@venky ~]$ 
+connected oracle home and now creating tnsnames.ora
+do as below use netmgr utitlity tool
+
+[oracle@venky ~]$ netmgr
+
+
+[oracle@venky admin]$ netmgr
+[oracle@venky admin]$ 
+[oracle@venky admin]$ 
+[oracle@venky admin]$ ll
+total 12
+-rw-r--r--. 1 oracle oinstall  470 Nov 22 14:14 listener.ora
+drwxr-xr-x. 2 oracle oinstall   64 Apr 17  2019 samples
+-rw-r--r--. 1 oracle oinstall 1536 Feb 14  2018 shrept.lst
+-rw-r--r--. 1 oracle oinstall  337 Nov 22 15:41 tnsnames.ora
+
+Now tnsnames.ora created
+****************** listener.ora & tnsnames.ora files created in admin location **************
+
+Viewing the tnsnames.ora file 
+[oracle@venky admin]$ vi tnsnames.ora
+
+Going to oracle home location
+[oracle@venky admin]$ cd
+[oracle@venky ~]$ 
+
+now in oracle home
+[oracle@venky ~]$ 
+
+bash: cd: network/admin: No such file or directory
+[oracle@venky ~]$ cd $ORACLE_HOME
+[oracle@venky dbhome_1]$ cd network/admin
+[oracle@venky admin]$ ll
+total 12
+-rw-r--r--. 1 oracle oinstall  470 Nov 22 14:14 listener.ora
+drwxr-xr-x. 2 oracle oinstall   64 Apr 17  2019 samples
+-rw-r--r--. 1 oracle oinstall 1536 Feb 14  2018 shrept.lst
+-rw-r--r--. 1 oracle oinstall  337 Nov 22 15:41 tnsnames.ora
+
+
+connecting to sql server 
+[oracle@venky ~]$ sqlplus / as sysdba
+
+SQL>
+
+Checking for service names
+ 
+SQL> show parameter service
+
+NAME				     TYPE	 VALUE
+------------------------------------ ----------- ------------------------------
+service_names			     string	 vendb
+
+
+SQL> select instance_name, host_name from v$instance;
+
+INSTANCE_NAME
+----------------
+HOST_NAME
+----------------------------------------------------------------
+vendb
+venky.com
+
+
+SQL> exit
+
+
+[oracle@venky ~]$ 
+
+
+Starting the listener now
+[oracle@venky ~]$ lsnrctl start listener
+
+
+
+LSNRCTL for Linux: Version 19.0.0.0.0 - Production on 22-NOV-2024 16:10:10
+
+Copyright (c) 1991, 2019, Oracle.  All rights reserved.
+
+Starting /u01/app/oracle/product/19.0.0.0/dbhome_1/bin/tnslsnr: please wait...
+
+TNSLSNR for Linux: Version 19.0.0.0.0 - Production
+System parameter file is /u01/app/oracle/product/19.0.0.0/dbhome_1/network/admin/listener.ora
+Log messages written to /u01/app/oracle/diag/tnslsnr/venky/listener/alert/log.xml
+Listening on: (DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=192.168.0.144)(PORT=1521)))
+
+Connecting to (DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=192.168.0.144)(PORT=1521)))
+STATUS of the LISTENER
+------------------------
+Alias                     listener
+Version                   TNSLSNR for Linux: Version 19.0.0.0.0 - Production
+Start Date                22-NOV-2024 16:10:10
+Uptime                    0 days 0 hr. 0 min. 0 sec
+Trace Level               off
+Security                  ON: Local OS Authentication
+SNMP                      OFF
+Listener Parameter File   /u01/app/oracle/product/19.0.0.0/dbhome_1/network/admin/listener.ora
+Listener Log File         /u01/app/oracle/diag/tnslsnr/venky/listener/alert/log.xml
+Listening Endpoints Summary...
+  (DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=192.168.0.144)(PORT=1521)))
+Services Summary...
+Service "vendb" has 1 instance(s).
+  Instance "vendb", status UNKNOWN, has 1 handler(s) for this service...
+The command completed successfully
+
+
+
+
+
+[oracle@venky ~]$ 

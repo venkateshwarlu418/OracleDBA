@@ -1,0 +1,105 @@
+													Migration
+											Transportable Tablespaces
+											
+📘 Step-by-Step Guide to TTS Migration in Oracle 19c
+1. Check Platform Compatibility (Cross-Platform Only)
+
+
+SQL> set lines 200 pages 200;
+SELECT d.platform_name, endian_format
+FROM v$transportable_platform tp, v$database d
+WHERE tp.platform_name = d.platform_name;
+
+PLATFORM_NAME                        ENDIAN_FORMAT
+------------------------------------ --------------
+Linux x86 64-bit                     Little
+
+
+--Checking for existed datafiles with tablespaces
+
+SQL> set lines 200 pages 200;
+col file_name for a100;
+select file_name,file_id,tablespace_name from dba_data_files;
+FILE_NAME                                                                      FILE_ID TABLESPACE_NAME
+--------------------------------------------------------------------------- ---------- ------------------------------
+/u01/app/oracle/oradata/PRODDB/datafile/o1_mf_system_lrn5hvv7_.dbf                   1 SYSTEM
+/u01/app/oracle/oradata/PRODDB/datafile/o1_mf_sysaux_lrn5jnxt_.dbf                   3 SYSAUX
+/u01/app/oracle/oradata/PRODDB/datafile/o1_mf_soetbs_lrn6blkm_.dbf                   5 SOETBS
+/u01/app/oracle/oradata/PRODDB/datafile/o1_mf_users_lrn5k5bw_.dbf                    7 USERS
+/u01/app/oracle/oradata/PRODDB/datafile/o1_mf_undotbs1_lrn5k49l_.dbf                 4 UNDOTBS1
+
+
+
+
+
+
+2. Identify the Tablespaces to Transport
+SQL> SELECT tablespace_name FROM dba_tablespaces WHERE tablespace_name IN ('TBS1', 'TBS2');
+3. Check Self-Containment of Tablespaces
+sql
+Copy
+Edit
+SQL> EXECUTE DBMS_TTS.TRANSPORT_SET_CHECK('TBS1,TBS2', TRUE);
+SQL> SELECT * FROM transport_set_violations;
+If transport_set_violations returns rows, you must resolve the issues before proceeding.
+
+4. Make Tablespaces Read-Only
+sql
+Copy
+Edit
+SQL> ALTER TABLESPACE TBS1 READ ONLY;
+SQL> ALTER TABLESPACE TBS2 READ ONLY;
+5. Export Metadata Using Data Pump
+bash
+Copy
+Edit
+expdp system/password@source_db \
+  dumpfile=tts_export.dmp directory=DATA_PUMP_DIR \
+  transport_tablespaces=TBS1,TBS2 \
+  logfile=tts_export.log
+This only exports metadata, not actual data blocks.
+
+6. Copy Datafiles to Target Server
+Copy the .dbf files of the datafiles belonging to TBS1, TBS2 from source to target server.
+
+Example:
+
+bash
+Copy
+Edit
+scp /u01/app/oracle/oradata/source/TBS1_01.dbf oracle@target:/u01/app/oracle/oradata/target/
+7. Make Tablespaces Read-Write Again (On Source)
+sql
+Copy
+Edit
+SQL> ALTER TABLESPACE TBS1 READ WRITE;
+SQL> ALTER TABLESPACE TBS2 READ WRITE;
+8. Import Metadata on Target Database
+bash
+Copy
+Edit
+impdp system/password@target_db \
+  dumpfile=tts_export.dmp directory=DATA_PUMP_DIR \
+  transport_datafiles='/u01/app/oracle/oradata/target/TBS1_01.dbf','/u01/app/oracle/oradata/target/TBS2_01.dbf' \
+  logfile=tts_import.log
+9. Post-Import Steps
+Compile any invalid objects:
+
+sql
+Copy
+Edit
+SQL> EXEC UTL_RECOMP.RECOMP_PARALLEL(4);
+Check for missing or failed objects:
+
+sql
+Copy
+Edit
+SQL> SELECT object_name, status FROM dba_objects WHERE status = 'INVALID';
+📦 Additional Notes
+You can transport across different Oracle versions, but ensure compatibility.
+
+For encrypted tablespaces or TDE-enabled databases, additional steps are needed.
+
+Use TRANSPORT_FULL_CHECK=YES if you're unsure about references across tablespaces.
+
+

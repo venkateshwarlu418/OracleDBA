@@ -1,0 +1,305 @@
+
+--To get current value of retention and interval
+select snap_interval, retention from dba_hist_wr_control;
+
+-- to modify existing values of retention and interval
+exec dbms_workload_repository.modify_snapshot_settings(interval => 15, retention => 44640) ;
+--44640 is in minutes which is 31 days
+
+--to get list of snapids available
+SELECT snap_id, begin_interval_time, end_interval_time FROM dba_hist_snapshot  ORDER BY snap_id;
+
+-- to take manual snapshot
+exec dbms_workload_repository.create_snapshot;
+
+
+--to generate AWR report
+$ORACLE_HOME/rdbms/admin/awrrpt.sql
+
+--to generate ADDM report
+$ORACLE_HOME/rdbms/admin/addmrpt.sql
+
+--to generate ASH report
+$ORACLE_HOME/rdbms/admin/ashrpt.sql
+
+-- to generate AWRdiff report
+$ORACLE_HOME/rdbms/admin/awrddrpt.sql
+
+
+
+
+
+
+
+
+practical 21/01/2025
+
+
+Go to the location
+[oracle@oraclept ~]$ cd $ORACLE_HOME/rdbms/admin
+check for awr sql FILE
+[oracle@oraclept admin]$ ls -lrtah *awr*
+after getting awr sql file, connect to sqlplus
+
+[oracle@oraclept admin]$ sqlplus / as sysdba
+now EXECUTE the awrrpt.sql
+SQL> @awrrpt.sql
+Specify the Report Type
+~~~~~~~~~~~~~~~~~~~~~~~
+AWR reports can be generated in the following formats.	Please enter the
+name of the format at the prompt.  Default value is 'html'.
+
+'html'		HTML format (default)
+'text'		Text format
+'active-html'	Includes Performance Hub active report
+
+Enter value for report_type: html
+
+Enter value for report_type: htmlCurrent Instance
+~~~~~~~~~~~~~~~~
+DB Id	       DB Name	      Inst Num	     Instance	    Container Name
+-------------- -------------- -------------- -------------- --------------
+  896617639	PRODDB			    1 proddb	     proddb
+
+Instances in this Workload Repository schema
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  DB Id      Inst Num	DB Name      Instance	  Host
+------------ ---------- ---------    ----------   ------
+* 896617639	 1	PRODDB	     proddb	  oraclept.com
+
+Using 896617639 for database Id
+Using	       1 for instance number
+
+Enter value for num_days: 10
+Listing the last 10 days of Completed Snapshots
+Instance     DB Name	  Snap Id	Snap Started	Snap Level
+------------ ------------ ---------- ------------------ ----------
+
+proddb	     PRODDB		 17  12 Jan 2025 11:26	  1
+				 18  12 Jan 2025 12:30	  1
+				 19  12 Jan 2025 14:25	  1
+				 20  13 Jan 2025 10:18	  1
+				 21  13 Jan 2025 11:30	  1
+				 22  15 Jan 2025 17:34	  1
+				 23  15 Jan 2025 18:30	  1
+				 24  16 Jan 2025 11:48	  1
+				 25  16 Jan 2025 12:30	  1
+				 26  17 Jan 2025 11:33	  1
+				 27  17 Jan 2025 14:39	  1
+				 28  17 Jan 2025 15:30	  1
+				 29  17 Jan 2025 16:30	  1
+				 30  17 Jan 2025 17:30	  1
+				 31  18 Jan 2025 19:30	  1
+				 32  18 Jan 2025 20:31	  1
+				 33  18 Jan 2025 21:34	  1
+				 34  19 Jan 2025 14:53	  1
+				 35  19 Jan 2025 15:30	  1
+				 36  19 Jan 2025 16:30	  1
+				 37  19 Jan 2025 17:30	  1
+Specify the Begin and End Snapshot Ids
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Enter value for begin_snap: 17
+Begin Snapshot Id specified: 17
+
+Enter value for end_snap: 34
+End   Snapshot Id specified: 34
+
+
+declare
+*
+ERROR at line 1:
+ORA-20200: The instance was shutdown between snapshots 17 and 34
+ORA-06512: at line 46
+
+
+Disconnected from Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.3.0.0.0
+[oracle@oraclept admin]$ 
+[oracle@oraclept admin]$ ls -lrtah *awr*
+
+
+
+SQL> @awrrpt.sql
+Enter value for report_type: html
+Enter value for num_days: 10
+Specify the Begin and End Snapshot Ids
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Enter value for begin_snap: 34
+Begin Snapshot Id specified: 34
+
+Enter value for end_snap: 37
+End   Snapshot Id specified: 37
+Specify the Report Name
+~~~~~~~~~~~~~~~~~~~~~~~
+The default report file name is awrrpt_1_34_37.html.  To use this name,
+press <return> to continue, otherwise enter an alternative.
+
+Enter value for report_name: awrrpt_21012025_1_34_37.html
+
+Using the report name awrrpt_21012025_1_34_37.html
+Report written to awrrpt_21012025_1_34_37.html -- location($ORACLE_HOME/rdbms/admin/awrrpt_21012025_1_34_37.html)
+
+Now open this file with chrome/edge/mozilla web browsers to check the report
+Process to open this file
+1. Minimise the current terminal and select home button in machine
+
+
+
+
+
+
+
+
+
+
+[oracle@oraclept admin]$ sqlplus / as sysdba
+
+
+SQL> set lines 200     
+SQL> set pages 200
+SQL> select snap_interval, retention from dba_hist_wr_control;
+
+SNAP_INTERVAL								    RETENTION
+--------------------------------------------------------------------------- ---------------------------------------------------------------------------
++00000 01:00:00.0							    +00008 00:00:00.0
+
+SQL> exec dbms_workload_repository.modify_snapshot_settings(interval => 15, retention => 44640) ;
+
+PL/SQL procedure successfully completed.
+
+SQL> SELECT snap_id, begin_interval_time, end_interval_time FROM dba_hist_snapshot  ORDER BY snap_id;
+
+   SNAP_ID BEGIN_INTERVAL_TIME							       END_INTERVAL_TIME
+---------- --------------------------------------------------------------------------- ---------------------------------------------------------------------------
+	22 15-JAN-25 05.24.44.000 PM						       15-JAN-25 05.34.46.705 PM
+	23 15-JAN-25 05.57.27.000 PM						       15-JAN-25 06.30.40.337 PM
+	24 16-JAN-25 11.38.01.000 AM						       16-JAN-25 11.48.58.341 AM
+	25 16-JAN-25 11.48.58.341 AM						       16-JAN-25 12.30.10.367 PM
+	26 17-JAN-25 11.22.58.000 AM						       17-JAN-25 11.33.23.762 AM
+	27 17-JAN-25 02.29.34.000 PM						       17-JAN-25 02.39.58.984 PM
+	28 17-JAN-25 02.39.58.984 PM						       17-JAN-25 03.30.14.659 PM
+	29 17-JAN-25 03.30.14.659 PM						       17-JAN-25 04.30.37.107 PM
+	30 17-JAN-25 04.30.37.107 PM						       17-JAN-25 05.30.05.328 PM
+	31 18-JAN-25 07.19.44.000 PM						       18-JAN-25 07.30.44.245 PM
+	32 18-JAN-25 07.30.44.245 PM						       18-JAN-25 08.31.00.197 PM
+	33 18-JAN-25 09.23.52.000 PM						       18-JAN-25 09.34.52.940 PM
+	34 19-JAN-25 02.42.14.000 PM						       19-JAN-25 02.53.18.289 PM
+	35 19-JAN-25 02.53.18.289 PM						       19-JAN-25 03.30.28.900 PM
+	36 19-JAN-25 03.30.28.900 PM						       19-JAN-25 04.30.51.389 PM
+	37 19-JAN-25 04.30.51.389 PM						       19-JAN-25 05.30.15.223 PM
+	38 21-JAN-25 11.11.44.000 AM						       21-JAN-25 11.22.16.481 AM
+
+17 rows selected.
+
+SQL> exec dbms_workload_repository.create_snapshot;
+
+PL/SQL procedure successfully completed.
+
+SQL> exit
+
+[oracle@oraclept admin]$ sqlplus / as sysdba
+
+
+SQL> @awrddrpt.sql
+
+Specify the Report Type
+~~~~~~~~~~~~~~~~~~~~~~~
+Would you like an HTML report, or a plain text report?
+Enter 'html' for an HTML report, or 'text' for plain text
+Defaults to 'html'
+Enter value for report_type: html
+old   1: select 'Type Specified: ',lower(nvl('&&report_type','html')) report_type from dual
+new   1: select 'Type Specified: ',lower(nvl('html','html')) report_type from dual
+
+Type Specified:  html
+
+old   1: select '&&report_type' report_type_def from dual
+new   1: select 'html' report_type_def from dual
+
+
+
+old   1: select '&&view_loc' view_loc_def from dual
+new   1: select 'AWR_PDB' view_loc_def from dual
+
+
+
+
+
+
+   DB Id       DB Id	DB Name      Inst Num Inst Num Instance
+----------- ----------- ------------ -------- -------- ------------
+  896617639   896617639 PRODDB		    1	     1 proddb
+
+
+
+
+
+
+
+
+
+
+Instances in this Workload Repository schema
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  DB Id      Inst Num	DB Name      Instance	  Host
+------------ ---------- ---------    ----------   ------
+* 896617639	 1	PRODDB	     proddb	  oraclept.com
+
+
+Enter value for num_days: 10
+
+Listing the last 10 days of Completed Snapshots
+Instance     DB Name	  Snap Id	Snap Started	Snap Level
+------------ ------------ ---------- ------------------ ----------
+
+proddb	     PRODDB		 22  15 Jan 2025 17:34	  1
+				 23  15 Jan 2025 18:30	  1
+				 24  16 Jan 2025 11:48	  1
+				 25  16 Jan 2025 12:30	  1
+				 26  17 Jan 2025 11:33	  1
+				 27  17 Jan 2025 14:39	  1
+				 28  17 Jan 2025 15:30	  1
+				 29  17 Jan 2025 16:30	  1
+				 30  17 Jan 2025 17:30	  1
+				 31  18 Jan 2025 19:30	  1
+				 32  18 Jan 2025 20:31	  1
+				 33  18 Jan 2025 21:34	  1
+				 34  19 Jan 2025 14:53	  1
+				 35  19 Jan 2025 15:30	  1
+				 36  19 Jan 2025 16:30	  1
+				 37  19 Jan 2025 17:30	  1
+				 38  21 Jan 2025 11:22	  1
+				 39  21 Jan 2025 11:59	  1
+
+
+Specify the First Pair of Begin and End Snapshot Ids
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Enter value for begin_snap: 26
+First Begin Snapshot Id specified: 26
+
+Enter value for end_snap: 30
+First End   Snapshot Id specified: 30
+
+
+declare
+*
+ERROR at line 1:
+ORA-20200: The instance was shutdown between snapshots 26 and 30
+ORA-06512: at line 43
+
+
+Disconnected from Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.3.0.0.0
+[oracle@oraclept admin]$ 
+
+
+select INST_ID,STATISTIC#,NAME,CLASS,VALUE,STAT_ID,CON_ID from GV$SYSSTAT where STATISTIC#=266;
+
+✅ Summary
+
+What to Check			Tool/View					Key Info
+Block transfers			GV$SYSSTAT					CR and current blocks received
+Real-time waits			GV$SESSION_WAIT				gc% events
+Performance impact		AWR							Top wait events, GC stats
+Session history			GV$ACTIVE_SESSION_HISTORY	gc% waits over time
+Interconnect load		GV$GCS_STATISTICS			Remote reads/writes
