@@ -1,0 +1,1433 @@
+
+					set lines 200 pages 200;
+					col username for a25;
+					col profile for a20;
+					col DEFAULT_TABLESPACE for a20;
+					col TEMPORARY_TABLESPACE for a20;dro
+					col ACCOUNT_STATUS for a20;
+					select username,DEFAULT_TABLESPACE,TEMPORARY_TABLESPACE,PROFILE,ACCOUNT_STATUS from dba_users order by 1 ;
+					
+		USERNAME		  			DEFAULT_TABLESPACE   TEMPORARY_TABLESPACE    PROFILE		   ACCOUNT_STATUS
+		------------------------- -------------------- -------------------- -------------------- --------------------
+	
+
+
+
+
+			PROFILES:
+
+			Get profile information....
+
+			set lines 200 ;
+			set pages 200;
+			col profile for a32;
+			col resource_name for a50;
+			col limit for a50;
+
+			select distinct profile from dba_profiles ;
+
+			PROFILE
+			--------------------------------
+			DEFAULT
+			ORA_STIG_PROFILE
+
+
+				CREATE PROFILE:
+
+				CREATE PROFILE VENKY_PROFILE
+				LIMIT
+				COMPOSITE_LIMIT UNLIMITED
+				SESSIONS_PER_USER 2
+				CPU_PER_SESSION UNLIMITED
+				CPU_PER_CALL UNLIMITED
+				LOGICAL_READS_PER_SESSION UNLIMITED
+				LOGICAL_READS_PER_CALL UNLIMITED
+				IDLE_TIME 1
+				CONNECT_TIME 5
+				PRIVATE_SGA UNLIMITED
+				FAILED_LOGIN_ATTEMPTS 10
+				PASSWORD_LIFE_TIME 180
+				PASSWORD_REUSE_TIME UNLIMITED
+				PASSWORD_REUSE_MAX UNLIMITED
+				PASSWORD_VERIFY_FUNCTION NULL
+				PASSWORD_LOCK_TIME UNLIMITED
+				PASSWORD_GRACE_TIME UNLIMITED;
+
+
+
+set lines 200 pages 200
+set colsep |
+col profile for a20
+col resource_name for a30
+col resource_type for a20
+col limit for a30
+select PROFILE,RESOURCE_NAME,RESOURCE_TYPE,LIMIT,COMMON,INHERITED,IMPLICIT from dba_profiles where profile='DEFAULT';
+
+
+
+To check app_profile
+
+		select profile,resource_name, limit from dba_profiles where profile = 'APP_PROFILE';
+		PROFILE 			 RESOURCE_NAME					    LIMIT
+		-------------------------------- --------------------------------------------------
+		APP_PROFILE			 COMPOSITE_LIMIT				    UNLIMITED
+		APP_PROFILE			 SESSIONS_PER_USER				    2
+		APP_PROFILE			 CPU_PER_SESSION				    UNLIMITED
+		APP_PROFILE			 CPU_PER_CALL					    UNLIMITED
+		APP_PROFILE			 LOGICAL_READS_PER_SESSION			UNLIMITED
+		APP_PROFILE			 LOGICAL_READS_PER_CALL 			UNLIMITED
+		APP_PROFILE			 IDLE_TIME					        1
+		APP_PROFILE			 CONNECT_TIME					    5
+		APP_PROFILE			 PRIVATE_SGA					    UNLIMITED
+		APP_PROFILE			 FAILED_LOGIN_ATTEMPTS				10
+		APP_PROFILE			 PASSWORD_LIFE_TIME				    180
+		APP_PROFILE			 PASSWORD_REUSE_TIME				UNLIMITED
+		APP_PROFILE			 PASSWORD_REUSE_MAX				    UNLIMITED
+		APP_PROFILE			 PASSWORD_VERIFY_FUNCTION			NULL
+		APP_PROFILE			 PASSWORD_LOCK_TIME				    UNLIMITED
+		APP_PROFILE			 PASSWORD_GRACE_TIME				UNLIMITED
+		APP_PROFILE			 INACTIVE_ACCOUNT_TIME				DEFAULT
+
+
+
+NOTE: you cannot use scope = memory or scope = both for the static parameters(w.r.t instance).
+
+you should use scope = spfile 
+And that parameter to reflect you should restart/bounce instance.
+
+
+		set lines 200 pages 200;
+		col username for a25;
+		col profile for a20;
+		col DEFAULT_TABLESPACE for a20;
+		col TEMPORARY_TABLESPACE for a20;
+		col ACCOUNT_STATUS for a20;
+		select username,DEFAULT_TABLESPACE,TEMPORARY_TABLESPACE,PROFILE,ACCOUNT_STATUS from dba_users order by 1 ;
+
+		USERNAME		  DEFAULT_TABLESPACE   TEMPORARY_TABLESPACE PROFILE		 ACCOUNT_STATUS
+		------------------------- -------------------- -------------------- -------------------- --------------------
+		ANONYMOUS		  SYSAUX	       TEMP_NEW 	    DEFAULT		 EXPIRED & LOCKED
+		APPQOSSYS		  SYSAUX	       TEMP_NEW 	    DEFAULT		 LOCKED
+		AUDSYS			  USERS 	       TEMP_NEW 	    DEFAULT		 LOCKED
+		CTXSYS			  SYSAUX	       TEMP_NEW 	    DEFAULT		 EXPIRED & LOCKED
+		DBSFWUSER		  SYSAUX	       TEMP_NEW 	    DEFAULT		 LOCKED
+		DBSNMP			  SYSAUX	       TEMP_NEW 	    DEFAULT		 LOCKED
+		DIP			  USERS 	       TEMP_NEW 	    DEFAULT		 LOCKED
+		DVF			  SYSAUX	       TEMP_NEW 	    DEFAULT		 LOCKED
+		DVSYS			  SYSAUX	       TEMP_NEW 	    DEFAULT		 LOCKED
+		GGSYS			  SYSAUX	       TEMP_NEW 	    DEFAULT		 LOCKED
+		GSMADMIN_INTERNAL	  SYSAUX	       TEMP_NEW 	    DEFAULT		 LOCKED
+		GSMCATUSER		  USERS 	       TEMP_NEW 	    DEFAULT		 LOCKED
+		GSMROOTUSER		  USERS 	       TEMP_NEW 	    DEFAULT		 LOCKED
+		GSMUSER 		  USERS 	       TEMP_NEW 	    DEFAULT		 LOCKED
+		LBACSYS 		  SYSTEM	       TEMP_NEW 	    DEFAULT		 LOCKED
+		MDDATA			  USERS 	       TEMP_NEW 	    DEFAULT		 LOCKED
+		MDSYS			  SYSAUX	       TEMP_NEW 	    DEFAULT		 LOCKED
+		OJVMSYS 		  SYSTEM	       TEMP_NEW 	    DEFAULT		 LOCKED
+		OLAPSYS 		  SYSAUX	       TEMP_NEW 	    DEFAULT		 LOCKED
+		ORACLE_OCM		  USERS 	       TEMP_NEW 	    DEFAULT		 LOCKED
+		ORDDATA 		  USERS 	       TEMP_NEW 	    DEFAULT		 LOCKED
+		ORDPLUGINS		  USERS 	       TEMP_NEW 	    DEFAULT		 LOCKED
+		ORDSYS			  USERS 	       TEMP_NEW 	    DEFAULT		 LOCKED
+		OUTLN			  SYSTEM	       TEMP_NEW 	    DEFAULT		 LOCKED
+		REMOTE_SCHEDULER_AGENT	  USERS 	       TEMP_NEW 	    DEFAULT		 LOCKED
+		SCOTT			  USERS 	       TEMP		    APP_PROFILE 	 OPEN
+		SI_INFORMTN_SCHEMA	  USERS 	       TEMP_NEW 	    DEFAULT		 LOCKED
+		SYS			  SYSTEM	       TEMP_NEW 	    DEFAULT		 OPEN
+		SYS$UMF 		  SYSTEM	       TEMP_NEW 	    DEFAULT		 LOCKED
+		SYSBACKUP		  USERS 	       TEMP_NEW 	    DEFAULT		 LOCKED
+		SYSDG			  USERS 	       TEMP_NEW 	    DEFAULT		 LOCKED
+		SYSKM			  USERS 	       TEMP_NEW 	    DEFAULT		 LOCKED
+		SYSRAC			  USERS 	       TEMP_NEW 	    DEFAULT		 LOCKED
+		SYSTEM			  SYSTEM	       TEMP_NEW 	    DEFAULT		 OPEN
+		TEST			  USERS 	       TEMP		    DEFAULT		 OPEN
+		WMSYS			  SYSAUX	       TEMP_NEW 	    DEFAULT		 LOCKED
+		XDB			  SYSAUX	       TEMP_NEW 	    DEFAULT		 LOCKED
+		XS$NULL 		  SYSTEM	       TEMP_NEW 	    DEFAULT		 EXPIRED & LOCKED
+
+
+
+
+
+
+
+PROFILES:
+
+Get profile information....
+
+set lines 200 pages 200
+set colsep |
+col profile for a32
+col resource_name for a50
+col limit for a50
+select distinct profile from dba_profiles;
+		
+		PROFILE
+		--------------------------------
+		DEFAULT
+		ORA_STIG_PROFILE
+		APP_PROFILE
+
+
+set lines 200
+col profile for a15
+col resource_name for a30
+col limit for a10
+select profile,resource_name, limit from dba_profiles where profile = 'APP_PROFILE';
+
+
+CREATE PROFILE:
+
+CREATE PROFILE APP_PROFILE
+LIMIT
+COMPOSITE_LIMIT UNLIMITED
+SESSIONS_PER_USER 2
+CPU_PER_SESSION UNLIMITED
+CPU_PER_CALL UNLIMITED
+LOGICAL_READS_PER_SESSION UNLIMITED
+LOGICAL_READS_PER_CALL UNLIMITED
+IDLE_TIME 1
+CONNECT_TIME 5
+PRIVATE_SGA UNLIMITED
+FAILED_LOGIN_ATTEMPTS 10
+PASSWORD_LIFE_TIME 180
+PASSWORD_REUSE_TIME UNLIMITED
+PASSWORD_REUSE_MAX UNLIMITED
+PASSWORD_VERIFY_FUNCTION NULL
+PASSWORD_LOCK_TIME UNLIMITED
+PASSWORD_GRACE_TIME UNLIMITED;
+
+
+
+set lines 200
+col profile for a15
+col resource_name for a30
+col limit for a10
+select profile,resource_name, limit from dba_profiles where profile = 'VENKY_PROFILE';
+CREATE PROFILE VENKY_PROFILE
+LIMIT
+COMPOSITE_LIMIT UNLIMITED
+SESSIONS_PER_USER 2
+CPU_PER_SESSION UNLIMITED
+CPU_PER_CALL UNLIMITED
+LOGICAL_READS_PER_SESSION UNLIMITED
+LOGICAL_READS_PER_CALL UNLIMITED
+IDLE_TIME 10
+CONNECT_TIME 2
+PRIVATE_SGA UNLIMITED
+FAILED_LOGIN_ATTEMPTS 2
+PASSWORD_LIFE_TIME 10
+PASSWORD_REUSE_TIME UNLIMITED
+PASSWORD_REUSE_MAX UNLIMITED
+PASSWORD_VERIFY_FUNCTION NULL
+PASSWORD_LOCK_TIME UNLIMITED
+PASSWORD_GRACE_TIME UNLIMITED;
+alter profile:
+
+ALTER PROFILE APP_PROFILE LIMIT SESSIONS_PER_USER 1;
+ALTER PROFILE APP_PROFILE LIMIT FAILED_LOGIN_ATTEMPTS 3;
+
+
+ROLES
+--check available roles.
+		col role for a30
+		select distinct ROLE  from role_role_privs ;
+		ROLE
+		------------------------------
+		DATAPUMP_IMP_FULL_DATABASE
+		HS_ADMIN_ROLE
+		JAVASYSPRIV
+		DATAPUMP_EXP_FULL_DATABASE
+		OEM_MONITOR
+		EXP_FULL_DATABASE
+		SELECT_CATALOG_ROLE
+		EXECUTE_CATALOG_ROLE
+		LOGSTDBY_ADMINISTRATOR
+		EM_EXPRESS_BASIC
+		RECOVERY_CATALOG_OWNER_VPD
+
+		ROLE
+		------------------------------
+		GSMADMIN_ROLE
+		DBA
+		IMP_FULL_DATABASE
+		SYSUMF_ROLE
+		GSMUSER_ROLE
+		RESOURCE
+		GSM_POOLADMIN_ROLE
+		EM_EXPRESS_ALL
+		GSMROOTUSER_ROLE
+
+
+---to check grants of a ROLES
+
+select ROLE, GRANTED_ROLE  from role_role_privs where role='CONNECT';
+select ROLE, GRANTED_ROLE  from role_role_privs where role='VENKY';
+
+-- ALL System privileges  
+
+		SELECT distinct PRIVILEGE FROM DBA_SYS_PRIVS order by 1;
+		
+		
+		
+
+-- System privileges granted to an user ( scott)
+
+SELECT * FROM DBA_SYS_PRIVS where grantee='BATCH8';
+
+-- Roles granted to an user ( scott)
+col grantee for a20;
+col GRANTED_ROLE for a20;
+SELECT * FROM DBA_ROLE_PRIVS where grantee='BATCH8';
+
+-- Object privileges granted to an user ( SCOTT)
+col owner for a20;
+col grantee for a20;
+col GRANTOR for a20;
+col table_name for a20;
+select GRANTEE,OWNER,TABLE_NAME,GRANTOR,PRIVILEGE from DBA_TAB_PRIVS WHERE GRANTEE='VENKY';
+
+-- Column specific privileges granted
+
+SELECT * FROM DBA_COL_PRIVS WHERE GRANTEE='BATCH8';
+
+-- Table privileges
+
+--GRANT READ ANY TABLE TO SCOTT;
+
+GRANT SELECT ANY TABLE TO SCOTT;
+
+GRANT INSERT, UPDATE, DELETE ON TESTUSER1.EMPTABL on SCOTT;
+GRANT ALL ON TESTUSER1.EMPTABL on SCOTT;
+
+-- Grant privilege on few columns of a table
+--Only INSERT,UPDATE can be granted at COLUMN level.
+
+--GRANT insert (emp_id) ON TESTUSER1.EMPTABL TO SCOTT;
+--GRANT UPDATE(emp_id) ON TESTUSER1.EMPTABL TO SCOTT;
+
+USER
+create user test identified by password default tablespace users  temporary tablespace temp;
+
+select dbms_metadata.get_ddl('USER', u.username) AS ddl from dba_users u where u.username = 'USER1';
+
+alter user user1 identified by values 'S:3C030687D5FB49EFF32112FA5462C3D4E97E52F50E4CCCA72E009D822998;T:FBB3287F269FC426D3490C05827070CA8D289068F62EA736A0C632A448BC1FC515D359633A4CF79FB37A2CC74072C40F0C479F70C63F588B1C24A0BF0296336B24E2FCD1CE89C590A6AFE31A25504734';
+
+
+
+
+
+
+
+Eg:
+
+create user SCOTT identified by oracle#41234
+default tablespace users
+temporary tablespace TEMP;
+
+-To create an user, which will prompt for new password upon login:
+
+		create user venky identified by oracle#41234
+		default tablespace users
+		temporary tablespace TEMP
+		account unlock 
+		profile APP_PROFILE
+		password expire;
+		
+		
+Minimum privilege required to connect to a database is create session
+grant create session to VENKY;
+
+-- Change password of a user
+
+		ALTER USER VENKY identified by VENKY;
+
+grant connect, resource to username;
+
+set lines 100 pages 200
+set colsep |
+col name for a30
+col null? for a10
+col type for a15
+desc dba_users;
+ Name						       Null?	Type
+ ----------------------------------------------------- -------- ------------------------------------
+ USERNAME					       NOT NULL VARCHAR2(128)
+ USER_ID					       NOT NULL NUMBER
+ PASSWORD							VARCHAR2(4000)
+ ACCOUNT_STATUS 				       NOT NULL VARCHAR2(32)
+ LOCK_DATE							DATE
+ EXPIRY_DATE							DATE
+ DEFAULT_TABLESPACE				       NOT NULL VARCHAR2(30)
+ TEMPORARY_TABLESPACE				       NOT NULL VARCHAR2(30)
+ LOCAL_TEMP_TABLESPACE						VARCHAR2(30)
+ CREATED					       NOT NULL DATE
+ PROFILE					       NOT NULL VARCHAR2(128)
+ INITIAL_RSRC_CONSUMER_GROUP					VARCHAR2(128)
+ EXTERNAL_NAME							VARCHAR2(4000)
+ PASSWORD_VERSIONS						VARCHAR2(17)
+ EDITIONS_ENABLED						VARCHAR2(1)
+ AUTHENTICATION_TYPE						VARCHAR2(8)
+ PROXY_ONLY_CONNECT						VARCHAR2(1)
+ COMMON 							VARCHAR2(3)
+ LAST_LOGIN							TIMESTAMP(9) WITH TIME ZONE
+ ORACLE_MAINTAINED						VARCHAR2(1)
+ INHERITED							VARCHAR2(3)
+ DEFAULT_COLLATION						VARCHAR2(100)
+ IMPLICIT							VARCHAR2(3)
+ ALL_SHARD							VARCHAR2(3)
+ PASSWORD_CHANGE_DATE						DATE
+
+SQL> set lines 200
+set colsep |
+col username for a20
+col account_status for a20
+col expiry_date for a20
+col lock_date for a20
+col profile for a20
+col authentication_type for a20
+col last_login for a20
+select username, account_status, expiry_date, lock_date, profile, authentication_type, last_login from dba_users where username='VENKAT';SQL> SQL> SQL> SQL> SQL> SQL> SQL> SQL> SQL> 
+
+USERNAME	    |ACCOUNT_STATUS	 |EXPIRY_DATE	      |LOCK_DATE	   |PROFILE		|AUTHENTICATION_TYPE |LAST_LOGIN
+--------------------|--------------------|--------------------|--------------------|--------------------|--------------------|--------------------
+VENKAT		    |OPEN			 |26-MAY-25	     	  | 			   |DEFAULT		|PASSWORD	  	     |27-NOV-24 09.15.57.0
+				|			 	 |		  		      | 	           |			|		 		     |00000000 PM +05:30
+
+
+
+
+
+select username from dba_users;
+
+USERNAME
+-----------------------
+TEST
+VENKY
+SCOTT
+SYS
+SYSTEM
+XS$NULL
+OJVMSYS
+LBACSYS
+OUTLN
+
+
+
+-- Change user profile;
+
+		ALTER USER VENKY PROFILE APP_PROFILE;
+ERROR:
+ORA-28000: The account is locked
+
+
+-- Unlock/lock a user
+		ALTER USER VENKY account unlock;
+
+
+
+After creating user and tried to login into username & you got error like 
+ORA-01045: user VENKY lacks CREATE SESSION privilege; logon denied
+then you should do the following below
+
+		grant create session to VENKY;
+and then try to login to scott User
+
+		
+		ALTER USER VENKY account lock;
+
+
+
+
+
+Make a user password expiry:
+When we make a user id expiry, then when the user does login, it will prompt him to set a new password. 
+		
+		ALTER USER VENKY password expire;
+		
+and try to login in other window, you will get the below error
+		ORA-28001: the password has expired
+		Changing password for scott
+now set password here and get login next
+
+-- Get default tablespace of a user:
+
+Changing default tablespace of a user:
+set lines 200
+col username for a23
+select username, DEFAULT_TABLESPACE from dba_users where username='VENKY';
+USERNAME		DEFAULT_TABLESPACE
+----------------------- ----------------------------------------
+VENKY			USERS
+
+create tablespace TS;
+alter user VENKY default tablespace TS;
+
+select username,default_tablespace from dba_users where username= 'VENKY';
+
+USERNAME		DEFAULT_TABLESPACE
+----------------------- ----------------------------------------
+VENKY			TS
+
+
+SET LINESIZE 200
+SELECT tablespace_name,
+       block_size,
+       extent_management,
+       segment_space_management,
+       status
+FROM   dba_tablespaces
+ORDER BY tablespace_name;
+TABLESPACE_NAME 	       BLOCK_SIZE EXTENT_MAN SEGMEN STATUS
+------------------------------ ---------- ---------- ------ ---------
+HRMS_TS 			     8192 LOCAL      AUTO   ONLINE
+SYSAUX				     8192 LOCAL      AUTO   ONLINE
+SYSTEM				     8192 LOCAL      MANUAL ONLINE
+TEMP				     8192 LOCAL      MANUAL ONLINE
+TEMP_NEW			     8192 LOCAL      MANUAL ONLINE
+TEMP_NEW_01			     8192 LOCAL      MANUAL ONLINE
+TS				     	 8192 LOCAL      AUTO   ONLINE
+UNDOTBS1			     8192 LOCAL      MANUAL ONLINE
+UNDOTBS_02			     8192 LOCAL      MANUAL ONLINE
+USERS				     8192 LOCAL      AUTO   ONLINE
+
+
+-- Change default tablespace of a user:
+
+		ALTER USER VENKY DEFAULT TABLESPACE HRMS_TS;
+
+select username,default_tablespace from dba_users where username= 'VENKY';
+USERNAME		DEFAULT_TABLESPACE
+----------------------- ----------------------------------------
+VENKY			HRMS_TS
+
+checking the user tablespace name
+SELECT default_tablespace FROM dba_users WHERE username='VENKY';
+DEFAULT_TABLESPACE
+----------------------------------------
+HRMS_TS
+
+Changing default TEMP tablespace of a user:
+check for temp tablespace
+select username,TEMPORARY_TABLESPACE from dba_users where username='VENKY';
+USERNAME		TEMPORARY_TABLESPACE
+----------------------- ------------------------------
+VENKY			TEMP
+
+check for temp tablespace and to change temp tablespace for User
+SELECT tablespace_name FROM dba_tablespaces WHERE contents = 'TEMPORARY';
+TABLESPACE_NAME
+------------------------------
+TEMP
+TEMP_NEW
+TEMP_NEW_01
+
+
+alter user VENKY temporary tablespace TEMP_NEW;
+select username,TEMPORARY_TABLESPACE from dba_users where username='VENKY';
+USERNAME		TEMPORARY_TABLESPACE
+----------------------- ------------------------------
+VENKY			TEMP_NEW
+
+-- Get the current tablespace quota information of an user
+		set lines 299
+		select TABLESPACE_NAME,BYTES/1024/1024 "UTILIZIED_SPACE" ,MAX_BYTES/1024/1024 "QUOTA_ALLOCATED" from dba_ts_quotas where username='VENKY';
+
+		TABLESPACE_NAME                                 UTILIZIED_SPACE                  QUOTA_ALLOCATED
+		------------------------------         ---------------------------        --------------------------
+		USERS                                           .0625                                    1024
+
+--- Change the tablespace quota for the user to 5G
+
+		ALTER USER SCOTT QUOTA 5G ON USERS;
+
+--- Grant unlimited tablespace quota:
+
+		ALTER USER SCOTT QUOTA UNLIMITED ON USERS;
+
+--- You can connect to another user without knowing the password, with grant connect through privilege
+--- Suppose a user TEST1 wants to connect to TEST2 user and create a table and we don’t know the password of TEST2.
+
+Conn / as sysdba
+		alter user TEST2 grant connect through TEST1;
+
+User altered.
+
+		conn TEST1[TEST2]
+		Enter password:< Give password for TEST1>
+
+		show user
+USER is "TEST2"
+		create table emp_test as select * from emp;
+
+Table created.
+
+		conn / as sysdba
+connected
+		select owner from dba_tables where table_name='EMP_TEST';
+
+		OWNER
+		------
+		TEST2
+
+
+--get all the privilages of the user.
+set lines 300;
+column PRIVILEGE for a30;
+column OBJ_OWNER for a15;
+column OBJ_NAME for a30;
+column USERNAME for a15;
+column GRANT_SOURCES for a15;
+column ADMIN_OR_GRANT_OPT for a5;
+column HIERARCHY_OPT for a5;
+
+SELECT
+    PRIVILEGE,
+    OBJ_OWNER,
+    OBJ_NAME,
+    USERNAME,
+    LISTAGG(GRANT_TARGET, ',') WITHIN GROUP (ORDER BY GRANT_TARGET) AS GRANT_SOURCES, -- Lists the sources of the permission
+    MAX(ADMIN_OR_GRANT_OPT) AS ADMIN_OR_GRANT_OPT, -- MAX acts as a Boolean OR by picking 'YES' over 'NO'
+    MAX(HIERARCHY_OPT) AS HIERARCHY_OPT -- MAX acts as a Boolean OR by picking 'YES' over 'NO'
+FROM (
+    -- Gets all roles a user has, even inherited ones
+    WITH ALL_ROLES_FOR_USER AS (
+        SELECT DISTINCT CONNECT_BY_ROOT GRANTEE AS GRANTED_USER, GRANTED_ROLE
+        FROM DBA_ROLE_PRIVS
+        CONNECT BY GRANTEE = PRIOR GRANTED_ROLE
+    )
+    SELECT
+        PRIVILEGE,
+        OBJ_OWNER,
+        OBJ_NAME,
+        USERNAME,
+        REPLACE(GRANT_TARGET, USERNAME, 'Direct to user') AS GRANT_TARGET,
+        ADMIN_OR_GRANT_OPT,
+        HIERARCHY_OPT
+    FROM (
+        -- System privileges granted directly to users
+        SELECT PRIVILEGE, NULL AS OBJ_OWNER, NULL AS OBJ_NAME, GRANTEE AS USERNAME, GRANTEE AS GRANT_TARGET, ADMIN_OPTION AS ADMIN_OR_GRANT_OPT, NULL AS HIERARCHY_OPT
+        FROM DBA_SYS_PRIVS
+        WHERE GRANTEE IN (SELECT USERNAME FROM DBA_USERS)
+        UNION ALL
+        -- System privileges granted users through roles
+        SELECT PRIVILEGE, NULL AS OBJ_OWNER, NULL AS OBJ_NAME, ALL_ROLES_FOR_USER.GRANTED_USER AS USERNAME, GRANTEE AS GRANT_TARGET, ADMIN_OPTION AS ADMIN_OR_GRANT_OPT, NULL AS HIERARCHY_OPT
+        FROM DBA_SYS_PRIVS
+        JOIN ALL_ROLES_FOR_USER ON ALL_ROLES_FOR_USER.GRANTED_ROLE = DBA_SYS_PRIVS.GRANTEE
+        UNION ALL
+        -- Object privileges granted directly to users
+        SELECT PRIVILEGE, OWNER AS OBJ_OWNER, TABLE_NAME AS OBJ_NAME, GRANTEE AS USERNAME, GRANTEE AS GRANT_TARGET, GRANTABLE, HIERARCHY
+        FROM DBA_TAB_PRIVS
+        WHERE GRANTEE IN (SELECT USERNAME FROM DBA_USERS)
+        UNION ALL
+        -- Object privileges granted users through roles
+        SELECT PRIVILEGE, OWNER AS OBJ_OWNER, TABLE_NAME AS OBJ_NAME, ALL_ROLES_FOR_USER.GRANTED_USER AS USERNAME, ALL_ROLES_FOR_USER.GRANTED_ROLE AS GRANT_TARGET, GRANTABLE, HIERARCHY
+        FROM DBA_TAB_PRIVS
+        JOIN ALL_ROLES_FOR_USER ON ALL_ROLES_FOR_USER.GRANTED_ROLE = DBA_TAB_PRIVS.GRANTEE
+    ) ALL_USER_PRIVS
+    -- Adjust your filter here
+    WHERE USERNAME = 'SCOTT'
+) DISTINCT_USER_PRIVS
+GROUP BY
+    PRIVILEGE,
+    OBJ_OWNER,
+    OBJ_NAME,
+    USERNAME
+;
+
+PRIVILEGE		       OBJ_OWNER       OBJ_NAME 		      USERNAME	      GRANT_SOURCES   ADMIN HIERA
+------------------------------ --------------- ------------------------------ --------------- --------------- ----- -----
+CREATE SESSION								      SCOTT	      Direct to user  NO
+SELECT ANY TABLE							      SCOTT	      Direct to user  NO
+
+
+
+
+
+*SESSION_PER_USER – No. of allowed concurrent sessions for a user
+*CPU_PER_SESSION – CPU time limit for a session, expressed in hundredth of seconds.
+*CPU_PER_CALL – Specify the CPU time limit for a call (a parse, execute, or fetch), expressed in hundredths of seconds.
+*CONNECT_TIME – Specify the total elapsed time limit for a session, expressed in minutes.
+*IDLE_TIME – Specify the permitted periods of continuous inactive time during a session, expressed in minutes.
+*LOGICAL_READS_PER_SESSION – Specify the permitted number of data blocks read in a session, including blocks read from memory and disk
+*LOGICAL_READS_PER_CALL –permitted number of data blocks read for a call to process a SQL statement (a parse, execute, or fetch).
+*PRIVATE_SGA – SGA a session can allocate in the shared pool of the system global area (SGA), expressed in bytes.
+
+*FAILED_LOGIN_ATTEMPTS – No. of failed attempts to log in to the user account before the account is locked
+*PASSWORD_LIFE_TIME: No. of days the account will be open. after that it will expiry.
+*PASSWORD_REUSE_TIME: number of days before which a password cannot be reused
+*PASSWORD_REUSE_MAX: number of days before which a password can be reused
+*PASSWORD_LOCK_TIME: Number of days the user account remains locked after failed login
+*PASSWORD_GRACE_TIME: Number of grace days for user to change password
+*PASSWORD_VERIFY_FUNCTION: PL/SQL that can be used for password verification
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+8888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888
+20/11/2024 
+
+
+ creating user in sysdba
+ 
+SQL> create user pavan identified by pavan;
+
+User created.
+
+exiting from sysdba
+
+SQL> exit 
+
+logging with user pavan with PASSWORD
+[oracle@venky bin]$ sqlplus pavan/pavan
+
+
+
+------ Unable to logging in because user has no session privilages
+ERROR:
+ORA-01045: user PAVAN lacks CREATE SESSION privilege; logon denied
+
+
+
+-------- Now go to sysdba and give connect & resource to user PAVAN
+
+[oracle@venky bin]$ sqlplus / as sysdba
+
+
+SQL> grant connect,resource to pavan;
+
+Grant succeeded.
+
+SQL> exit -----exiting from sysdba
+
+
+
+[oracle@venky bin]$ sqlplus pavan/pavan
+
+
+
+and successfully connected with pavan User
+
+Trying to create table in pavan user 
+
+SQL> create table emp(empno number);
+
+Table created.
+
+Table created but, if you try to enter values cannot happen because
+
+SQL> insert into emp values(7788);
+insert into emp values(7788)
+            *
+ERROR at line 1:
+ORA-01950: no privileges on tablespace 'USERS'
+
+disconnecting from pavan user and connecting to sysdba
+
+SQL> exit
+
+[oracle@venky bin]$ sqlplus / as sysdba
+
+
+giving quota to pavan for giving table values
+
+SQL> alter user pavan quota unlimited on users;
+
+User altered.
+ exiting from sysdba and connecting to user PAVAN
+SQL> exit
+
+[oracle@venky bin]$ sqlplus pavan/pavan
+
+
+
+SQL> insert into emp values(7788);
+
+1 row created.
+now insertion happen
+
+Trying to create tablespace in pavan User
+SQL> 
+SQL> 
+SQL> create tablespace hdfc datafile '/u01/app/oracle/oradata/datafile/hdfc_002.dbf' size 100m autoextend on;
+create tablespace hdfc datafile '/u01/app/oracle/oradata/datafile/hdfc_002.dbf' size 100m autoextend on
+*
+ERROR at line 1:
+ORA-01031: insufficient privileges
+
+DISCONNECT user  and CONNECT to SYSDBA
+
+
+
+SQL> exit
+
+[oracle@venky bin]$ sqlplus / as sysdba
+
+
+giving Tablespace permission to User
+
+SQL> grant create tablespace to pavan;
+
+Grant succeeded.
+
+SQL> exit
+
+[oracle@venky bin]$ sqlplus pavan/pavan
+
+
+
+
+SQL> create tablespace hdfc datafile '/u01/app/oracle/oradata/hdfc_002.dbf' size 100m autoextend on;
+
+Tablespace created.
+
+SQL> 
+SQL> 
+SQL> exit
+
+
+[oracle@venky bin]$ sqlplus / as sysdba
+
+
+
+revoking tablespace privilages from PAVAN
+
+
+SQL> revoke create tablespace from pavan;
+
+Revoke succeeded.
+
+SQL> exit
+
+[oracle@venky bin]$ sqlplus pavan/pavan
+
+
+
+after revoking tablespace privilages back try now to create tablespace
+
+SQL> create tablespace hdfc1 datafile '/u01/app/oracle/oradata/hdfc_003.dbf' size 100m autoextend on;
+create tablespace hdfc1 datafile '/u01/app/oracle/oradata/hdfc_003.dbf' size 100m autoextend on
+*
+ERROR at line 1:
+ORA-01031: insufficient privileges
+
+
+SQL> exit
+
+[oracle@venky bin]$ sqlplus / as sysdba
+
+
+SQL> grant dba to pavan;
+
+Grant succeeded.
+
+SQL> exit
+
+[oracle@venky bin]$ sqlplus pavan/pavan
+
+
+SQL> create tablespace hdfc1 datafile '/u01/app/oracle/oradata/hdfc_003.dbf' size 100m autoextend on;
+
+Tablespace created.
+
+SQL> exit
+
+[oracle@venky bin]$ sqlplus / as sysdba
+
+
+SQL> revoke dba from pavan;
+
+Revoke succeeded.
+
+SQL> exit
+
+[oracle@venky bin]$ sqlplus pavan/pavan
+
+
+SQL> create user shiva identified by shiva;
+create user shiva identified by shiva
+*
+ERROR at line 1:
+ORA-01031: insufficient privileges
+
+
+SQL> exit
+
+[oracle@venky bin]$ sqlplus / as sysdba
+
+
+SQL> grant create user to pavan;
+
+Grant succeeded.
+
+SQL> exit
+
+[oracle@venky bin]$ sqlplus pavan/pavan
+
+
+
+SQL> create user shiva identified by shiva;
+
+User created.
+
+SQL> exit
+
+[oracle@venky bin]$ sqlplus / as sysdba
+
+
+
+SQL> revoke create user from pavan;
+
+Revoke succeeded.
+
+SQL> exit
+
+[oracle@venky bin]$ sqlplus pavan/pavan
+
+
+SQL> create user shiva2 identified by shiva2;
+create user shiva2 identified by shiva2
+*
+ERROR at line 1:
+ORA-01031: insufficient privileges
+
+
+SQL> exit
+
+[oracle@venky bin]$ sqlplus / as sysdba
+
+
+
+SQL> grant dba to pavan with admin option;
+
+Grant succeeded.
+
+SQL> exit
+[oracle@venky bin]$ sqlplus pavan/pavan
+
+
+
+SQL> create user shiva2 identified by shiva2;
+
+User created.
+
+SQL> grant dba to shiva2 with admin option;
+
+Grant succeeded.
+
+SQL> exit
+
+[oracle@venky bin]$ sqlplus shiva2/shiva2
+
+
+
+SQL> create user shiva3 identified by shiva3;
+
+User created.
+
+SQL> exit
+
+[oracle@venky bin]$ sqlplus / as sysdba
+
+
+
+SQL> revoke dba from pavan;
+
+Revoke succeeded.
+
+SQL> exit
+
+[oracle@venky bin]$ sqlplus pavan/pavan
+
+
+
+SQL> create user shiva4 identified by shiva4;
+create user shiva4 identified by shiva4
+*
+ERROR at line 1:
+ORA-01031: insufficient privileges
+
+
+SQL> exit
+
+[oracle@venky bin]$ sqlplus shiva2/shiva2
+
+
+
+SQL> exit       
+Disconnected from Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.3.0.0.0
+[oracle@venky bin]$ 
+
+
+
+
+
+
+
+
+
+
+***************     ******************   ***********************  ****************
+
+
+
+1. Creating User
+create user venkateshwarlu identified by VENKY;
+
+2. Allocating tablespace after creating the User
+
+alter user venkateshwarlu default tablespace tablespace_name
+quota <number m/g> / unlimited
+on tablespace_name;
+
+3. Allocating tablespace at the time of creating the User
+create user username
+identified by PASSWORD
+default Tablespace tablespace_name
+quota <number m/g> / unlimited
+on tablespace_name;
+
+
+4. Giving prilvileges to a user to create database objects
+
+
+grant create session to useshor_name; (for user logging)
+Grant create table to user_name; (for user table creation)
+grant create view to user_name; (for user insert values to Table)
+grant create synonym to user_name; (for user synonym)
+grant create sequence to user_name; (for user sequence)
+grant create procedure to user_name; (for user logging)
+grant create trigger to user_name; (for user logging)
+
+5. Creating a role
+Role: A set of privileges are packed together for the 
+ease of user administration. That pack is called a Role.
+A Role should have a user defined name.
+
+Create role role_name;
+
+role privileges
+
+grant create session to role_name;
+Grant create table to role_name;
+grant create view to urole_name;
+grant create synonym to role_name;
+grant create sequence to role_name;
+grant create procedure to role_name;
+grant create trigger to role_name;
+grant create cluster to role_name;
+grant create operator to role_name;
+grant create indextype to role_name;
+
+*select all the role name and granted role
+set lines 200 pages 200
+col ROLE for a30
+col GRANTED_ROLE for a30
+col ADM for a10
+col COM for a10
+col INH for a10
+col DATAPUMP_EXP_FULL_DATABASE for a30
+col EXP_FULL_DATABASE for a30
+col DATAPUMP_IMP_FULL_DATABASE for a30
+col IMP_FULL_DATABASE for a30
+select * from role_role_privs order by 1;
+6. Giving privileges to a User
+grant role_name to user-name;
+
+
+7. System defined roles
+Connect (creating session) 
+Resource (Requirements)
+DBA (creating user, grant privileges, drop user)
+
+
+8. System defined roles & user defined Roles
+grant connect to user_name;
+(Create table, Create view, Create synonym, Create sequence, Create session, etc.)
+
+grant resource to user_name;
+(Create Procedure, Create Sequence, Create Table, Create Trigger etc. 
+The primary usage of the Resource role is to restrict access to database objects.)
+grant dba to user_name;
+
+or
+
+grant connect, resource, dba to user_name;
+
+
+
+
+9. Dropping User
+
+drop user username;
+(A user will be dropeed, if the user has
+not created any object in the database)  & 
+ (A user will not be dropped by oracle, if the 
+ user has created objects in the database)
+ 
+ 
+ In this case use the command below
+ 
+ drop user username cascade;
+ 
+ (First the objects owned by the user will be dropped
+ and then the user will be droped)
+ 
+ 
+ 
+ 
+ *****  ***** *************** ***********
+ 
+ *user management practice 24/11/2024
+ * creating user normal without tablespace quota (creating user should be in sysdba)
+ 
+ 
+ create user venk identified by venk;
+ 
+ * allocating tablespce to the user
+ 
+ alter user venk default tablespace hrms_ts quota 10m on hrms_ts;
+ 
+ * exit to ORACLE and connect to user venk
+ sqlplus venk/venk
+ 
+ERROR:
+ORA-01045: user VENK lacks CREATE SESSION privilege; logon denied
+
+
+* now giving create session privilege to user for logging issue
+
+grant create session to venk;
+
+ * exit to ORACLE and connect to user venk
+Now it is connected to venk user & allocate a table to User
+
+create table book (sno number, name varchar2(20), price number);
+ERROR at line 1:
+ORA-01031: insufficient privileges
+
+*exit from user and conn to sysdba and grant permission on Table
+
+grant create table to venk;
+
+*exit from sysdba and conn to venk user and create table now
+
+create table book (sno number, name varchar2(20), price number);
+
+*try inserting values into book Table
+
+insert into book values (1, 'notebook', 20);
+ERROR at line 1:
+ORA-00984: column not allowed here
+
+*exit from user and conn to sysdba and grant permission on Table
+
+grant create view to venk;
+
+*exit from sysdba and conn to venk user 
+
+insert into book values (1, 'notebook', 20);
+insert into book values (2, 'book', 30);
+
+* show user (for which user connected)
+user is "VENK"
+
+* give synonym to user
+
+create synonym venks for venk;
+
+*** we cannot login with synonym name and PASSWORD ***
+
+user_synonyms: Private synonyms owned by the current user.
+set pages 200 lines 200
+col OWNER for a30
+col SYNONYM_NAME for a30
+col TABLE_OWNER for a30
+col TABLE_NAME for a30
+col DB_LINK for a30
+col ORIGIN_CON_ID for a(256)
+select * from user_synonyms;
+
+*exit from user and conn to sysdba and grant permission on Table
+
+grant create sequence to venk;
+
+*exit from sysdba and conn to venk user 
+
+create sequence aa_pid_seq
+start with 1
+increment by 1
+minvalue 1
+maxvalue 5
+nocache
+nocycle;
+
+insert into book values (aa_pid_seq.nextval, 'pen', 152);
+
+ERROR at line 1:
+ORA-08004: sequence AA_PID_SEQ.NEXTVAL exceeds MAXVALUE and cannot be
+instantiated
+
+create sequence b_pid_seq
+start with 1
+increment by 1
+minvalue 1
+maxvalue 5; 
+insert into book values (b_pid_seq.nextval, 'pencil', 251);
+
+taken max sno 5 and given error like as below
+ERROR at line 1:
+ORA-08004: sequence B_PID_SEQ.NEXTVAL exceeds MAXVALUE and cannot be
+instantiated
+
+
+create sequence aab_pid_seq
+start with 1
+increment by 1
+minvalue 1
+maxvalue 5
+nocache
+cycle;
+
+
+
+
+
+
+CREATE TRIGGER trbook
+[BEFORE | AFTER] [INSERT | UPDATE | DELETE]
+ON book
+FOR EACH ROW
+BEGIN
+    -- SQL statements
+END;
+
+
+
+
+
+** set lines 200 pages 200
+ col username for a20
+ col privilege for a40
+ select * from user_sys_privs;
+
+
+
+
+  
+ 
+ 
+ SQL> set lines 200 pages 200
+set colsep |
+col grantor for a15
+col grantee for a15
+col table_schema for a15
+col table_name for a20
+col privilege for a15
+col grantable for a15
+col hierarchy for a20
+col common for a15
+col type for a15
+col inherited for a15
+select grantor, grantee, table_schema, table_name, privilege, grantable, hierarchy, common, type, inherited from all_tab_privs where grantor='VENKATESH';SQL> SQL> SQL> SQL> SQL> SQL> SQL> SQL> SQL> SQL> SQL> SQL> 
+
+GRANTOR        |GRANTEE        |TABLE_SCHEMA   |TABLE_NAME	    |PRIVILEGE	    |GRANTABLE	    |HIERARCHY		 |COMMON	 |TYPE		 |INHERITED
+---------------|---------------|---------------|--------------------|---------------|---------------|--------------------|---------------|---------------|---------------
+VENKATESH      |PUBLIC	       |VENKATESH      |VENKATESH	    |INHERIT PRIVILE|NO 	    |NO 		 |NO		 |USER		 |NO
+	       |	       |	       |		    |GES	    |		    |			 |		 |		 |
+
+
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+set lines 200 pages 200
+set colsep |
+col grantor for a15
+col grantee for a15
+col table_schema for a15
+col table_name for a20
+col privilege for a25
+col grantable for a15
+col hierarchy for a20
+col common for a15
+col type for a15
+col inherited for a15
+select grantor, grantee, table_schema, table_name, privilege, grantable, hierarchy, common, type, inherited from all_tab_privs where grantor='VENKATESH';SQL> SQL> SQL> SQL> SQL> SQL> SQL> SQL> SQL> SQL> SQL> SQL> 
+
+GRANTOR        |GRANTEE        |TABLE_SCHEMA   |TABLE_NAME	    |PRIVILEGE		      |GRANTABLE      |HIERARCHY	   |COMMON	   |TYPE	   |INHERITED
+---------------|---------------|---------------|--------------------|-------------------------|---------------|--------------------|---------------|---------------|---------------
+VENKATESH      |PUBLIC	       |VENKATESH      |VENKATESH	    |INHERIT PRIVILEGES       |NO	      |NO		   |NO		   |USER	   |NO
+
+SQL> show user
+USER is "SYS"
+SQL> conn venkatesh/venkatesh
+Connected.
+SQL> select * from tab;
+
+TNAME																|TABTYPE      | CLUSTERID
+--------------------------------------------------------------------------------------------------------------------------------|-------------|----------
+VENKATESHTABLE															|TABLE	      |
+
+
+
+
+SQL> create user v identified by v;
+
+User created.
+
+SQL> grant connect, resource to v;
+
+Grant succeeded.
+
+SQL> grant create session to v;
+
+Grant succeeded.
+
+SQL> grant create job to v; 
+
+Grant succeeded.
+
+SQL> grant read,write on directory backups_dir to v;
+
+Grant succeeded.
+
+SQL> grant exp_full_database to v;
+
+Grant succeeded.
+
+SQL> grant imp_full_database to v;
+
+Grant succeeded.
+
+SQL> conn v/v
+Connected.
+SQL> select * from tab;
+
+no rows selected
+
+SQL> conn / as sysdba
+Connected.
+SQL> alter user v quota unlimited on venkyts;
+
+User altered.
+
+SQL> alter user v default tablespace venkyts;
+
+User altered.
+
+SQL> conn v/v
+Connected.
+SQL> create table vtable (sl number, name varchar2(20), amount varchar2(20));
+
+Table created.
+
+SQL> insert into vtable values(10, 'v',1000);
+
+SQL> set lines 200 pages 100
+set colsep |
+col username for a10
+col user_id for a20
+col account_status for a10
+col default_tablespace for a20
+col temporary_tablespace for a20
+col profile for a15
+select username, user_id, account_status, default_tablespace, temporary_tablespace, profile from dba_users where username='V';SQL> SQL> SQL> SQL> SQL> SQL> SQL> SQL> 
+
+USERNAME  |   USER_ID|ACCOUNT_ST|DEFAULT_TABLESPACE  |TEMPORARY_TABLESPACE|PROFILE
+----------|----------|----------|--------------------|--------------------|---------------
+V	  |##########|OPEN	|VENKYTS	     |TEMP		  |DEFAULT
+
+SQL> select grantor, grantee, table_schema, table_name, privilege, grantable, hierarchy, common, type from all_tab_privs where grantor='V';
+
+GRANTOR        |GRANTEE        |TABLE_SCHEMA   |TABLE_NAME	    |PRIVILEGE		      |GRANTABLE      |HIERARCHY	   |COMMON	   |TYPE
+---------------|---------------|---------------|--------------------|-------------------------|---------------|--------------------|---------------|---------------
+V	       |PUBLIC	       |V	       |V		    |INHERIT PRIVILEGES       |NO	      |NO		   |NO		   |USER
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+SQL> select USERNAME,PRIVILEGE,ADMIN_OPTION from user_sys_privs where username='VENKAT';
+
+no rows selected
+
+
+SQL> select GRANTEE,PRIVILEGE,ADMIN_OPTION from dba_sys_privs where grantee='VENKAT';
+
+GRANTE|PRIVILEGE			       |ADM
+------|----------------------------------------|---
+VENKAT|CREATE SESSION			       |NO
+
+
+select GRANTEE,OWNER,TABLE_NAME,GRANTOR,PRIVILEGE,GRANTABLE,HIERARCHY from DBA_TAB_PRIVS where grantee='VENKAT';
+
+
+
+SQL> col GRANTOR for a15
+col GRANTEE for a20
+col TABLE_SCHEMA for a15
+col TABLE_NAME for a15
+col PRIVILEGE for a25
+select GRANTOR,GRANTEE,TABLE_SCHEMA,TABLE_NAME,PRIVILEGE,GRANTABLE from ALL_TAB_PRIVS where grantor='VENKAT';
+GRANTOR        |GRANTEE 	    |TABLE_SCHEMA   |TABLE_NAME     |PRIVILEGE		      |GRA
+---------------|--------------------|---------------|---------------|-------------------------|---
+VENKAT	       |PUBLIC		    |VENKAT	    |VENKAT	    |INHERIT PRIVILEGES       |NO
+
+
+
+SQL> select GRANTEE,OWNER,TABLE_NAME,GRANTOR,PRIVILEGE,GRANTABLE,HIERARCHY from USER_TAB_PRIVS where grantee='VENKAT';
+
+
+SQL> set lines 200 pages 200
+set colsep |
+col granted_role for a20
+select grantee,granted_role,admin_option,delegate_option,default_role from DBA_ROLE_PRIVS where grantee='VENKAT';
+
+GRANTEE 	    |GRANTED_ROLE	 |ADM|DEL|DEF
+--------------------|--------------------|---|---|---
+VENKAT		    |RESOURCE		 |NO |NO |YES
+VENKAT		    |CONNECT		 |NO |NO |YES
+
+
+
+
+
+
+SQL> set lines 200 pages 200
+set colsep |
+select username,granted_role,admin_option,delegate_option,default_role,os_granted from USER_ROLE_PRIVS where username='VENKAT';
+
+USERNAME		 		 |GRANTED_ROLE	      |ADM|DEL|DEF|OS_
+-------------------------|--------------------|---|---|---|---
+VENKAT					 |CONNECT	   	 	  |NO |NO |YES|NO
+VENKAT					 |RESOURCE	    	  |NO |NO |YES|NO
+
+
+SQL> col role for a10
+col granted_role for a30
+select role,granted_role,admin_option,common,inherited from ROLE_ROLE_PRIVS where role='DBA';

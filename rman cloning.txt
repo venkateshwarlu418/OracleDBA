@@ -1,0 +1,677 @@
+https://doyensys.com/blogs/rman-backup-based-cloning-database-using-oracle-12c/
+
+
+orapwd file=$ORACLE_HOME/dbs/orapwpr password=prodDB_789 entries=3;
+
+edit parameter file
+*.audit_file_dest='/u01/app/oracle/admin/proddb/adump'
+*.audit_trail='db'
+*.compatible='19.0.0'
+*.control_files='/u01/app/oracle/oradata/PRODDB/controlfile/o1_mf_k2tzlpys_.ctl','/u01/app/oracle/fast_recovery_area/PRODDB/controlfile/o1_mf_k2tzlq0c_.ctl'
+*.db_block_size=8192
+*.db_create_file_dest='/u01/app/oracle/oradata'
+*.db_name='proddb'
+*.db_recovery_file_dest='/u01/app/oracle/fast_recovery_area'
+*.db_recovery_file_dest_size=12732m
+*.diagnostic_dest='/u01/app/oracle'
+*.dispatchers='(PROTOCOL=TCP) (SERVICE=proddbXDB)'
+*.enable_pluggable_database=true
+*.memory_target=1457m
+*.open_cursors=300
+*.processes=300
+*.remote_login_passwordfile='EXCLUSIVE'
+*.undo_tablespace='UNDOTBS1'
+
+
+to...
+
+*.audit_file_dest='/u01/app/oracle/admin/clone/adump'
+*.audit_trail='db'
+*.compatible='19.0.0'
+*.control_files='/u01/app/oracle/oradata/CLONE/controlfile/o1_mf_k2tzlpys_.ctl','/u01/app/oracle/fast_recovery_area/CLONE/controlfile/o1_mf_k2tzlq0c_.ctl'
+*.db_block_size=8192
+*.db_create_file_dest='/u01/app/oracle/oradata'
+*.db_name='clone'
+*.db_recovery_file_dest='/u01/app/oracle/fast_recovery_area'
+*.db_recovery_file_dest_size=12732m
+*.diagnostic_dest='/u01/app/oracle'
+*.dispatchers='(PROTOCOL=TCP) (SERVICE=cloneXDB)'
+*.enable_pluggable_database=true
+*.memory_target=1457m
+*.open_cursors=300
+*.processes=300
+*.remote_login_passwordfile='EXCLUSIVE'
+*.undo_tablespace='UNDOTBS1'
+
+You need also to create the following directories on the auxiliary server and add them to the parameter file:
+
+adump
+
+bdump
+
+udump
+
+cdump
+
+Flash Recovery Area
+
+$ cd $ORACLE_BASE
+$ mkdir admin
+$ cd admin/
+$ mkdir clone
+$ cd clone/
+$ mkdir adump bdump cdump udump
+$ cd ..
+$ mkdir flash_recovery_area
+
+cd /u01/app/oracle
+mkdir admin
+cd admin
+mkdir clone
+cd clone
+mkdir adump bdump cdump udump
+cd ..
+mkdir flash_recovery_area
+
+modify pfile entries with new database name.
+
+create spfile from pfile in new environment.
+
+startup nomount;
+
+duplicate database to 'clone' backup location '/u01/rman_bkp' nofilenamecheck;
+
+source
+backup database plus archivelog;
+scp initclone.ora oracle@clone2.com:$ORACLE_HOME/dbs/
+scp -r rman_bkp/ oracle@clone2.com:/u01/
+
+
+target:
+edit parameter to new db name:
+
+mkdir -p /u01/app/oracle/oradata/CLONE/controlfile/ /u01/app/oracle/fast_recovery_area/CLONE/controlfile/ /u01/app/oracle/fast_recovery_area
+
+
+########restore controlfile from '/u01/rman_bkp/c-839267374-20220313-07';
+
+duplicate database to 'clone' backup location '/u01/rman_bkp' nofilenamecheck;
+
+
+
+
+
+
+
+
+Target devdb
+[oracle@oraclept ~]$ vi /etc/oratab
+[oracle@oraclept ~]$ cat /etc/oratab
+#
+
+
+
+# This file is used by ORACLE utilities.  It is created by root.sh
+# and updated by either Database Configuration Assistant while creating
+# a database or ASM Configuration Assistant while creating ASM instance.
+
+# A colon, ':', is used as the field terminator.  A new line terminates
+# the entry.  Lines beginning with a pound sign, '#', are comments.
+#
+# Entries are of the form:
+#   $ORACLE_SID:$ORACLE_HOME:<N|Y>:
+#
+# The first and second fields are the system identifier and home
+# directory of the database respectively.  The third field indicates
+# to the dbstart utility that the database should , "Y", or should not,
+# "N", be brought up at system boot time.
+#
+# Multiple entries with the same $ORACLE_SID are not allowed.
+#
+#
+#devdb:/u01/app/oracle/product/19.0.0.0/dbhome_1:Y
+
+
+[oracle@oraclept ~]$ vi .bash_profile
+[oracle@oraclept ~]$ 
+[oracle@oraclept ~]$ 
+[oracle@oraclept ~]$ . oraenv
+bash: [: too many arguments
+ORACLE_SID = [devdb] ? devdb
+ORACLE_HOME = [/home/oracle] ? sqlplus / as sysdba
+bash: [: too many arguments
+ORACLE_BASE environment variable is not being set since this
+information is not available for the current user ID oracle.
+You can set ORACLE_BASE manually if it is required.
+Resetting ORACLE_BASE to its previous value or ORACLE_HOME
+The Oracle base remains unchanged with value /u01/app/oracle
+[oracle@oraclept ~]$ vi .bash_profile
+[oracle@oraclept ~]$ . oraenv
+bash: [: too many arguments
+ORACLE_SID = [devdb] ? devdb
+ORACLE_HOME = [/home/oracle] ? sqlplus / as sysdba
+bash: [: too many arguments
+ORACLE_BASE environment variable is not being set since this
+information is not available for the current user ID oracle.
+You can set ORACLE_BASE manually if it is required.
+Resetting ORACLE_BASE to its previous value or ORACLE_HOME
+The Oracle base remains unchanged with value /u01/app/oracle
+[oracle@oraclept ~]$ echo $ORACLE_HOME
+sqlplus / as sysdba
+[oracle@oraclept ~]$ echo $ORACLE_SID
+devdb
+[oracle@oraclept ~]$ echo $ORACLE_BASE
+/u01/app/oracle
+[oracle@oraclept ~]$ vi .bash_profile
+[oracle@oraclept ~]$ sqlplus / as sysdba
+bash: sqlplus: command not found...
+[oracle@oraclept ~]$ . oraenv
+bash: [: too many arguments
+ORACLE_SID = [devdb] ? devdb
+ORACLE_HOME = [/home/oracle] ? sqlplus / as sysdba
+bash: [: too many arguments
+ORACLE_BASE environment variable is not being set since this
+information is not available for the current user ID oracle.
+You can set ORACLE_BASE manually if it is required.
+Resetting ORACLE_BASE to its previous value or ORACLE_HOME
+The Oracle base remains unchanged with value /u01/app/oracle
+[oracle@oraclept ~]$ vi /home/oracle/.bash_profile
+[oracle@oraclept ~]$ echo grep| ORA
+bash: ORA: command not found...
+[oracle@oraclept ~]$ env grep| ORA
+Usage: grep [OPTION]... PATTERN [FILE]...
+Try 'grep --help' for more information.
+bash: ORA: command not found...
+[oracle@oraclept ~]$ vi .bash_profile
+[oracle@oraclept ~]$ . oraenv
+bash: [: too many arguments
+ORACLE_SID = [devdb] ? devdb
+ORACLE_HOME = [/home/oracle] ? sqlplus / as sysdba
+bash: [: too many arguments
+ORACLE_BASE environment variable is not being set since this
+information is not available for the current user ID oracle.
+You can set ORACLE_BASE manually if it is required.
+Resetting ORACLE_BASE to its previous value or ORACLE_HOME
+The Oracle base remains unchanged with value /u01/app/oracle
+[oracle@oraclept ~]$ vi .bash_profile
+[oracle@oraclept ~]$ . oraenv
+bash: [: too many arguments
+ORACLE_SID = [devdb] ? devdb
+ORACLE_HOME = [/home/oracle] ? sqlplus / as sysdba
+bash: [: too many arguments
+ORACLE_BASE environment variable is not being set since this
+information is not available for the current user ID oracle.
+You can set ORACLE_BASE manually if it is required.
+Resetting ORACLE_BASE to its previous value or ORACLE_HOME
+The Oracle base remains unchanged with value /u01/app/oracle
+[oracle@oraclept ~]$ vi .bash_profile
+[oracle@oraclept ~]$ sqlplus / as sysdba
+bash: sqlplus: command not found...
+[oracle@oraclept ~]$ 
+[oracle@oraclept ~]$ 
+[oracle@oraclept ~]$ 
+[oracle@oraclept ~]$ crontab -e
+no crontab for oracle - using an empty one
+crontab: no changes made to crontab
+[oracle@oraclept ~]$ crontab -e
+no crontab for oracle - using an empty one
+crontab: installing new crontab
+[oracle@oraclept ~]$ crontab -e
+crontab: no changes made to crontab
+[oracle@oraclept ~]$ 
+[oracle@oraclept ~]$ 
+[oracle@oraclept ~]$ . oraenv
+bash: [: too many arguments
+ORACLE_SID = [devdb] ? devdb
+ORACLE_HOME = [/home/oracle] ? sqlplus / as sysdba
+bash: [: too many arguments
+ORACLE_BASE environment variable is not being set since this
+information is not available for the current user ID oracle.
+You can set ORACLE_BASE manually if it is required.
+Resetting ORACLE_BASE to its previous value or ORACLE_HOME
+The Oracle base remains unchanged with value /u01/app/oracle
+[oracle@oraclept ~]$ 
+[oracle@oraclept ~]$ 
+[oracle@oraclept ~]$ 
+[oracle@oraclept ~]$ . oraenv
+bash: [: too many arguments
+ORACLE_SID = [devdb] ? vi /etc/oratab 
+ORACLE_HOME = [/home/oracle] ? 
+ORACLE_BASE environment variable is not being set since this
+information is not available for the current user ID oracle.
+You can set ORACLE_BASE manually if it is required.
+Resetting ORACLE_BASE to its previous value or ORACLE_HOME
+The Oracle base remains unchanged with value /u01/app/oracle
+[oracle@oraclept ~]$ 
+[oracle@oraclept ~]$ 
+[oracle@oraclept ~]$ vi /etc/oratab
+[oracle@oraclept ~]$ sqlplus / as sysdba
+bash: sqlplus: command not found...
+[oracle@oraclept ~]$ . oraenv
+ORACLE_SID = [vi /etc/oratab] ? devdb
+The Oracle base remains unchanged with value /u01/app/oracle
+[oracle@oraclept ~]$ sqlplus / as sysdba
+
+SQL*Plus: Release 19.0.0.0.0 - Production on Sun Dec 8 14:54:24 2024
+Version 19.3.0.0.0
+
+Copyright (c) 1982, 2019, Oracle.  All rights reserved.
+
+Connected to an idle instance.
+
+SQL> startup;
+ORA-01078: failure in processing system parameters
+LRM-00109: could not open parameter file '/u01/app/oracle/product/19.0.0.0/dbhome_1/dbs/initdevdb.ora'
+SQL> exit
+Disconnected
+[oracle@oraclept ~]$ cat .bash_profile
+# .bash_profile
+if [ -f ~/.bashrc ]; then
+. ~/.bashrc
+fi
+
+ORACLE_SID=devdb; export ORACLE_SID
+ORACLE_BASE=/u01/app/oracle; export ORACLE_BASE
+ORACLE_HOME=/u01/app/oracle/product/19.0.0.0/dbhome_1; export ORACLE_HOME
+ORACLE_TERM=xterm; export ORACLE_TERM
+NLS_DATE_FORMAT="DD-MON-YYYY HH24:MI:SS"; export NLS_DATE_FORMAT
+TNS_ADMIN=$ORACLE_HOME/network/admin; export TNS_ADMIN
+PATH=.:${PATH}:$ORACLE_HOME/bin
+PATH=${PATH}:/usr/bin:/bin:/usr/local/bin
+export PATH
+LD_LIBRARY_PATH=$ORACLE_HOME/lib
+LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:$ORACLE_HOME/oracm/lib
+LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/lib:/usr/lib:/usr/local/lib
+export LD_LIBRARY_PATH
+export TEMP=/tmp
+export TMPDIR=/tmp
+export EDITOR=vi
+umask 022
+
+[oracle@oraclept ~]$ crontab -e
+crontab: no changes made to crontab
+[oracle@oraclept ~]$ ifconfig
+enp0s3: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 192.168.8.105  netmask 255.255.255.0  broadcast 192.168.8.255
+        inet6 2401:4900:2083:7e6d:1001:a2dc:da0d:ab7f  prefixlen 64  scopeid 0x0<global>
+        inet6 fe80::7c8e:6082:12e7:5902  prefixlen 64  scopeid 0x20<link>
+        inet6 fe80::7565:d1c7:b8c8:873f  prefixlen 64  scopeid 0x20<link>
+        ether 08:00:27:e0:78:e2  txqueuelen 1000  (Ethernet)
+        RX packets 958  bytes 286929 (280.2 KiB)
+        RX errors 2  dropped 0  overruns 0  frame 0
+        TX packets 1340  bytes 121928 (119.0 KiB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+        device interrupt 19  base 0xd020  
+
+lo: flags=73<UP,LOOPBACK,RUNNING>  mtu 65536
+        inet 127.0.0.1  netmask 255.0.0.0
+        inet6 ::1  prefixlen 128  scopeid 0x10<host>
+        loop  txqueuelen 1000  (Local Loopback)
+        RX packets 515  bytes 32067 (31.3 KiB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 515  bytes 32067 (31.3 KiB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+virbr0: flags=4099<UP,BROADCAST,MULTICAST>  mtu 1500
+        inet 192.168.122.1  netmask 255.255.255.0  broadcast 192.168.122.255
+        ether 52:54:00:07:39:e9  txqueuelen 1000  (Ethernet)
+        RX packets 0  bytes 0 (0.0 B)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 0  bytes 0 (0.0 B)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+[oracle@oraclept ~]$ cd $ORACLE_HOME/dbs
+[oracle@oraclept dbs]$ ll
+total 10376
+-rw-rw----. 1 oracle oinstall     1544 Dec  8 14:17 hc_proddb.dat
+-rwxrwxrwx. 1 oracle oinstall     3079 May 14  2015 init.ora
+-rw-r--r--. 1 oracle oinstall     1158 Jan  1  2024 initproddb.ora
+-rw-r-----. 1 oracle oinstall       24 Dec 26  2023 lkPRODDB
+-rw-r-----. 1 oracle oinstall     2048 Dec 26  2023 orapwproddb
+-rw-r-----. 1 oracle oinstall 10600448 Dec  6 19:41 snapcf_proddb.f
+-rw-r-----. 1 oracle oinstall     3584 Dec  8 14:17 spfileproddb.ora
+[oracle@oraclept dbs]$ rm initproddb.ora orapwproddb
+[oracle@oraclept dbs]$ ll
+total 10368
+-rw-rw----. 1 oracle oinstall     1544 Dec  8 14:17 hc_proddb.dat
+-rwxrwxrwx. 1 oracle oinstall     3079 May 14  2015 init.ora
+-rw-r-----. 1 oracle oinstall       24 Dec 26  2023 lkPRODDB
+-rw-r-----. 1 oracle oinstall 10600448 Dec  6 19:41 snapcf_proddb.f
+-rw-r-----. 1 oracle oinstall     3584 Dec  8 14:17 spfileproddb.ora
+[oracle@oraclept dbs]$ ll
+total 10376
+-rw-rw----. 1 oracle oinstall     1544 Dec  8 14:17 hc_proddb.dat
+-rwxrwxrwx. 1 oracle oinstall     3079 May 14  2015 init.ora
+-rw-r--r--. 1 oracle oinstall     1158 Dec  8 15:02 initproddb.ora
+-rw-r-----. 1 oracle oinstall       24 Dec 26  2023 lkPRODDB
+-rw-r-----. 1 oracle oinstall     2048 Dec  8 15:02 orapwproddb
+-rw-r-----. 1 oracle oinstall 10600448 Dec  6 19:41 snapcf_proddb.f
+-rw-r-----. 1 oracle oinstall     3584 Dec  8 14:17 spfileproddb.ora
+[oracle@oraclept dbs]$ 
+[oracle@oraclept dbs]$ vi initproddb.ora
+[oracle@oraclept dbs]$ vi initproddb.ora
+[oracle@oraclept dbs]$ vi initdevdb.ora
+[oracle@oraclept dbs]$ ll
+total 10380
+-rw-rw----. 1 oracle oinstall     1544 Dec  8 14:17 hc_proddb.dat
+-rw-r--r--. 1 oracle oinstall     1287 Dec  8 15:08 initdevdb.ora
+-rwxrwxrwx. 1 oracle oinstall     3079 May 14  2015 init.ora
+-rw-r--r--. 1 oracle oinstall     1140 Dec  8 15:07 initproddb.ora
+-rw-r-----. 1 oracle oinstall       24 Dec 26  2023 lkPRODDB
+-rw-r-----. 1 oracle oinstall     2048 Dec  8 15:02 orapwproddb
+-rw-r-----. 1 oracle oinstall 10600448 Dec  6 19:41 snapcf_proddb.f
+-rw-r-----. 1 oracle oinstall     3584 Dec  8 14:17 spfileproddb.ora
+[oracle@oraclept dbs]$ rm initproddb.ora 
+[oracle@oraclept dbs]$ ll
+total 10376
+-rw-rw----. 1 oracle oinstall     1544 Dec  8 14:17 hc_proddb.dat
+-rw-r--r--. 1 oracle oinstall     1287 Dec  8 15:08 initdevdb.ora
+-rwxrwxrwx. 1 oracle oinstall     3079 May 14  2015 init.ora
+-rw-r-----. 1 oracle oinstall       24 Dec 26  2023 lkPRODDB
+-rw-r-----. 1 oracle oinstall     2048 Dec  8 15:02 orapwproddb
+-rw-r-----. 1 oracle oinstall 10600448 Dec  6 19:41 snapcf_proddb.f
+-rw-r-----. 1 oracle oinstall     3584 Dec  8 14:17 spfileproddb.ora
+[oracle@oraclept dbs]$ ll
+total 10376
+-rw-rw----. 1 oracle oinstall     1544 Dec  8 14:17 hc_proddb.dat
+-rw-r--r--. 1 oracle oinstall     1287 Dec  8 15:08 initdevdb.ora
+-rwxrwxrwx. 1 oracle oinstall     3079 May 14  2015 init.ora
+-rw-r-----. 1 oracle oinstall       24 Dec 26  2023 lkPRODDB
+-rw-r-----. 1 oracle oinstall     2048 Dec  8 15:02 orapwproddb
+-rw-r-----. 1 oracle oinstall 10600448 Dec  6 19:41 snapcf_proddb.f
+-rw-r-----. 1 oracle oinstall     3584 Dec  8 14:17 spfileproddb.ora
+[oracle@oraclept dbs]$ vi orapwproddb 
+[oracle@oraclept dbs]$ mv orapwproddb orapwdevdb
+[oracle@oraclept dbs]$ ll
+total 10376
+-rw-rw----. 1 oracle oinstall     1544 Dec  8 14:17 hc_proddb.dat
+-rw-r--r--. 1 oracle oinstall     1287 Dec  8 15:08 initdevdb.ora
+-rwxrwxrwx. 1 oracle oinstall     3079 May 14  2015 init.ora
+-rw-r-----. 1 oracle oinstall       24 Dec 26  2023 lkPRODDB
+-rw-r-----. 1 oracle oinstall     2048 Dec  8 15:02 orapwdevdb
+-rw-r-----. 1 oracle oinstall 10600448 Dec  6 19:41 snapcf_proddb.f
+-rw-r-----. 1 oracle oinstall     3584 Dec  8 14:17 spfileproddb.ora
+[oracle@oraclept dbs]$ rm spfileproddb.ora 
+[oracle@oraclept dbs]$ ll
+total 10372
+-rw-rw----. 1 oracle oinstall     1544 Dec  8 14:17 hc_proddb.dat
+-rw-r--r--. 1 oracle oinstall     1287 Dec  8 15:08 initdevdb.ora
+-rwxrwxrwx. 1 oracle oinstall     3079 May 14  2015 init.ora
+-rw-r-----. 1 oracle oinstall       24 Dec 26  2023 lkPRODDB
+-rw-r-----. 1 oracle oinstall     2048 Dec  8 15:02 orapwdevdb
+-rw-r-----. 1 oracle oinstall 10600448 Dec  6 19:41 snapcf_proddb.f
+[oracle@oraclept dbs]$ vi initdevdb.ora 
+[oracle@oraclept dbs]$ 
+[oracle@oraclept dbs]$ 
+[oracle@oraclept dbs]$ ll
+total 10372
+-rw-rw----. 1 oracle oinstall     1544 Dec  8 14:17 hc_proddb.dat
+-rw-r--r--. 1 oracle oinstall     1287 Dec  8 15:08 initdevdb.ora
+-rwxrwxrwx. 1 oracle oinstall     3079 May 14  2015 init.ora
+-rw-r-----. 1 oracle oinstall       24 Dec 26  2023 lkPRODDB
+-rw-r-----. 1 oracle oinstall     2048 Dec  8 15:02 orapwdevdb
+-rw-r-----. 1 oracle oinstall 10600448 Dec  6 19:41 snapcf_proddb.f
+[oracle@oraclept dbs]$ cd
+[oracle@oraclept ~]$ mkdir -p /u01/rman_bkp
+[oracle@oraclept ~]$ ll
+total 330704
+drwxr-xr-x. 2 oracle oinstall         6 Dec 26  2023 Desktop
+drwxr-xr-x. 2 oracle oinstall         6 Dec 26  2023 Documents
+drwxr-xr-x. 2 oracle oinstall         6 Dec 26  2023 Downloads
+-rw-r--r--. 1 oracle oinstall        65 Dec 26  2023 flush.sql
+drwxr-xr-x. 2 oracle oinstall         6 Dec 26  2023 Music
+drwxr-----. 3 oracle oinstall        18 Jan  1  2024 oradiag_oracle
+drwxr-xr-x. 2 oracle oinstall         6 Dec 26  2023 Pictures
+drwxr-xr-x. 2 oracle oinstall         6 Dec 26  2023 Public
+-rw-r--r--. 1 oracle oinstall 338636800 Feb 16  2019 soe.dmp
+drwxr-xr-x. 2 oracle oinstall         6 Dec 26  2023 Templates
+drwxr-xr-x. 2 oracle oinstall         6 Dec 26  2023 Videos
+[oracle@oraclept ~]$ cd /u01/rman_bkp
+[oracle@oraclept rman_bkp]$ ll
+total 2470880
+-rw-r-----. 1 oracle oinstall 1322311680 Dec  8 09:19 1p3c5h80_1_1
+-rw-r-----. 1 oracle oinstall 1130414080 Dec  8 09:19 1q3c5h81_1_1
+-rw-r-----. 1 oracle oinstall   10715136 Dec  6 22:16 c-896617639-20241206-08
+-rw-r-----. 1 oracle oinstall   11010048 Dec  7 14:16 c-896617639-20241207-02
+-rw-r-----. 1 oracle oinstall   11010048 Dec  7 21:00 c-896617639-20241207-05
+-rw-r-----. 1 oracle oinstall   11206656 Dec  7 21:08 c-896617639-20241207-06
+-rw-r-----. 1 oracle oinstall   11206656 Dec  8 09:19 c-896617639-20241208-01
+-rw-r-----. 1 oracle oinstall   11206656 Dec  8 15:18 c-896617639-20241208-02
+-rw-r-----. 1 oracle oinstall   11091968 Dec  8 14:27 snapcf_DB.f
+[oracle@oraclept rman_bkp]$ ls -lrtah
+total 2.4G
+drwxrwxrwx. 7 oracle oinstall   84 Dec  6 19:46 ..
+-rw-r-----. 1 oracle oinstall  11M Dec  6 22:16 c-896617639-20241206-08
+-rw-r-----. 1 oracle oinstall  11M Dec  7 14:16 c-896617639-20241207-02
+-rw-r-----. 1 oracle oinstall  11M Dec  7 21:00 c-896617639-20241207-05
+-rw-r-----. 1 oracle oinstall  11M Dec  7 21:08 c-896617639-20241207-06
+-rw-r-----. 1 oracle oinstall 1.1G Dec  8 09:19 1q3c5h81_1_1
+-rw-r-----. 1 oracle oinstall 1.3G Dec  8 09:19 1p3c5h80_1_1
+-rw-r-----. 1 oracle oinstall  11M Dec  8 09:19 c-896617639-20241208-01
+-rw-r-----. 1 oracle oinstall  11M Dec  8 14:27 snapcf_DB.f
+drwxr-xr-x. 2 oracle oinstall 4.0K Dec  8 14:27 .
+-rw-r-----. 1 oracle oinstall  11M Dec  8 15:18 c-896617639-20241208-02
+[oracle@oraclept rman_bkp]$ cd
+[oracle@oraclept ~]$ sqlplus / as sysdba
+
+SQL*Plus: Release 19.0.0.0.0 - Production on Sun Dec 8 15:22:23 2024
+Version 19.3.0.0.0
+
+Copyright (c) 1982, 2019, Oracle.  All rights reserved.
+
+Connected to an idle instance.
+
+SQL> startup nomount;
+ORA-09925: Unable to create audit trail file
+Linux-x86_64 Error: 2: No such file or directory
+Additional information: 9925
+SQL> 
+SQL> 
+SQL> 
+SQL> create spfile from pfile;
+
+File created.
+
+SQL> startup nomount;
+ORA-09925: Unable to create audit trail file
+Linux-x86_64 Error: 2: No such file or directory
+Additional information: 9925
+SQL> exit
+Disconnected
+[oracle@oraclept ~]$ ls -lrtah
+total 324M
+-rw-r--r--.  1 oracle oinstall 323M Feb 16  2019 soe.dmp
+-rw-r--r--.  1 oracle oinstall  231 Nov 22  2019 .bashrc
+-rw-r--r--.  1 oracle oinstall   18 Nov 22  2019 .bash_logout
+drwxr-xr-x.  4 oracle oinstall   39 Dec 26  2023 .mozilla
+drwxr-xr-x.  4 root   root       34 Dec 26  2023 ..
+drwxr-xr-x.  3 oracle oinstall   19 Dec 26  2023 .java
+drwxr-x---.  2 oracle oinstall   40 Dec 26  2023 .oracle_jre_usage
+drwx------.  3 oracle oinstall   25 Dec 26  2023 .dbus
+drwx------.  3 oracle oinstall   19 Dec 26  2023 .local
+-rw-------.  1 oracle oinstall   16 Dec 26  2023 .esd_auth
+drwxr-xr-x.  2 oracle oinstall    6 Dec 26  2023 Templates
+drwxr-xr-x.  2 oracle oinstall    6 Dec 26  2023 Public
+drwxr-xr-x.  2 oracle oinstall    6 Dec 26  2023 Music
+drwxr-xr-x.  2 oracle oinstall    6 Dec 26  2023 Downloads
+drwxr-xr-x.  2 oracle oinstall    6 Dec 26  2023 Documents
+drwxr-xr-x.  2 oracle oinstall    6 Dec 26  2023 Desktop
+drwxr-xr-x.  2 oracle oinstall    6 Dec 26  2023 Videos
+drwxr-xr-x.  2 oracle oinstall    6 Dec 26  2023 Pictures
+drwxr-xr-x. 14 oracle oinstall 4.0K Dec 26  2023 .config
+-rw-r--r--.  1 oracle oinstall   65 Dec 26  2023 flush.sql
+drwxr-----.  3 oracle oinstall   18 Jan  1  2024 oradiag_oracle
+drwxr-xr-x. 15 oracle oinstall 4.0K Jan  2  2024 .cache
+-rw-------.  1 oracle oinstall  116 Jan  3  2024 .Xauthority
+-rw-------.  1 oracle oinstall 2.6K Dec  7 19:53 .bash_history
+drwx------.  2 oracle oinstall   25 Dec  7 21:14 .ssh
+-rw-r-----.  1 oracle oinstall    5 Dec  8 14:22 .vboxclient-clipboard-tty1-control.pid
+-rw-r-----.  1 oracle oinstall    5 Dec  8 14:22 .vboxclient-clipboard-tty1-service.pid
+-rw-r-----.  1 oracle oinstall    5 Dec  8 14:22 .vboxclient-seamless-tty1-control.pid
+-rw-r-----.  1 oracle oinstall    5 Dec  8 14:22 .vboxclient-seamless-tty1-service.pid
+-rw-r-----.  1 oracle oinstall    5 Dec  8 14:22 .vboxclient-draganddrop-tty1-control.pid
+-rw-r-----.  1 oracle oinstall    5 Dec  8 14:22 .vboxclient-vmsvga-session-tty1-control.pid
+-rw-r-----.  1 oracle oinstall    5 Dec  8 14:22 .vboxclient-draganddrop-tty1-service.pid
+-rw-r-----.  1 oracle oinstall    5 Dec  8 14:22 .vboxclient-vmsvga-session-tty1-service.pid
+-rw-------.  1 oracle oinstall 8.2K Dec  8 14:22 .ICEauthority
+-rw-r-----.  1 oracle oinstall    5 Dec  8 14:22 .vboxclient-hostversion-tty1-control.pid
+-rw-r--r--.  1 oracle oinstall  702 Dec  8 14:47 .bash_profile
+-rw-------.  1 oracle oinstall 7.2K Dec  8 15:13 .viminfo
+drwx------. 19 oracle oinstall 4.0K Dec  8 15:13 .
+[oracle@oraclept ~]$ sqlplus / as sysdba
+
+SQL*Plus: Release 19.0.0.0.0 - Production on Sun Dec 8 15:28:32 2024
+Version 19.3.0.0.0
+
+Copyright (c) 1982, 2019, Oracle.  All rights reserved.
+
+Connected to an idle instance.
+
+SQL> show parameter AUDIT_FILE_DEST;
+ORA-01034: ORACLE not available
+Process ID: 0
+Session ID: 0 Serial number: 0
+
+
+SQL> exit
+Disconnected
+[oracle@oraclept ~]$ cd $ORACLE_BASE
+[oracle@oraclept oracle]$ mkdir admin
+mkdir: cannot create directory ‘admin’: File exists
+[oracle@oraclept oracle]$ cd admin/
+[oracle@oraclept admin]$ ll
+total 0
+drwxr-xr-x. 3 oracle oinstall 24 Dec  8 15:22 devdb
+drwxr-x---. 6 oracle oinstall 64 Dec 26  2023 proddb
+[oracle@oraclept admin]$ cd devdb
+[oracle@oraclept devdb]$ ll
+total 0
+drwxr-xr-x. 2 oracle oinstall 44 Dec  8 15:22 xdb_wallet
+[oracle@oraclept devdb]$ mkdir clone
+[oracle@oraclept devdb]$ ll
+total 0
+drwxr-xr-x. 2 oracle oinstall  6 Dec  8 15:31 clone
+drwxr-xr-x. 2 oracle oinstall 44 Dec  8 15:22 xdb_wallet
+[oracle@oraclept devdb]$ cd clone
+[oracle@oraclept clone]$ ll
+total 0
+[oracle@oraclept clone]$ mkdir adump bdump cdump ddump
+[oracle@oraclept clone]$ cd ..
+[oracle@oraclept devdb]$ mkdir flash_recovery_area
+[oracle@oraclept devdb]$ cd
+[oracle@oraclept ~]$ cd /u01/app/oracle
+[oracle@oraclept oracle]$ cd
+[oracle@oraclept ~]$ . oraenv
+ORACLE_SID = [devdb] ? devdb
+The Oracle base remains unchanged with value /u01/app/oracle
+[oracle@oraclept ~]$ sqlplus / as sysdba
+
+SQL*Plus: Release 19.0.0.0.0 - Production on Sun Dec 8 15:33:14 2024
+Version 19.3.0.0.0
+
+Copyright (c) 1982, 2019, Oracle.  All rights reserved.
+
+Connected to an idle instance.
+
+SQL> startup nomount;
+ORA-09925: Unable to create audit trail file
+Linux-x86_64 Error: 2: No such file or directory
+Additional information: 9925
+SQL> 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Source proddb
+[oracle@oraclept ~]$ 
+[oracle@oraclept ~]$ 
+[oracle@oraclept ~]$ 
+[oracle@oraclept ~]$ rman target /
+
+Recovery Manager: Release 19.0.0.0.0 - Production on Sun Dec 8 14:17:05 2024
+Version 19.3.0.0.0
+
+Copyright (c) 1982, 2019, Oracle and/or its affiliates.  All rights reserved.
+
+connected to target database: PRODDB (DBID=896617639)
+
+RMAN> list backup;
+
+
+RMAN> delete backup;
+
+RMAN> backup database plus archivelog;
+RMAN> exit
+
+
+Recovery Manager complete.
+
+[oracle@oraclept ~]$ echo $ORACLE_HOME
+/u01/app/oracle/product/19.0.0.0/dbhome_1
+
+[oracle@oraclept ~]$ cd $ORACLE_HOME/dbs
+[oracle@oraclept dbs]$ ll
+total 10376
+-rw-rw----. 1 oracle oinstall     1544 Dec  8 14:16 hc_proddb.dat
+-rwxrwxrwx. 1 oracle oinstall     3079 May 14  2015 init.ora
+-rw-r--r--. 1 oracle oinstall     1158 Jan  1  2024 initproddb.ora
+-rw-r-----. 1 oracle oinstall       24 Dec 26  2023 lkPRODDB
+-rw-r-----. 1 oracle oinstall     2048 Dec 26  2023 orapwproddb
+-rw-r-----. 1 oracle oinstall 10600448 Dec  6 19:41 snapcf_proddb.f
+-rw-r-----. 1 oracle oinstall     3584 Dec  8 14:16 spfileproddb.ora
+
+[oracle@oraclept dbs]$ scp initproddb.ora,orapwproddb oracle@192.168.8.105:$ORACLE_HOME/dbs
+
+Are you sure you want to continue connecting (yes/no)? yes
+
+oracle@192.168.8.105's password: 
+
+[oracle@oraclept dbs]$ scp $ORACLE_HOME/dbs/initproddb.ora oracle@192.168.8.105:$ORACLE_HOME/dbs
+oracle@192.168.8.105's password: 
+initproddb.ora                                                                                                  100% 1158   151.2KB/s   00:00    
+[oracle@oraclept dbs]$ scp $ORACLE_HOME/dbs/orapwproddb oracle@192.168.8.105:$ORACLE_HOME/dbs
+oracle@192.168.8.105's password: 
+orapwproddb                                                                                                     100% 2048   236.9KB/s   00:00    
+[oracle@oraclept dbs]$ cd
+[oracle@oraclept ~]$ cd /u01/rman_bkp
+[oracle@oraclept rman_bkp]$ ls -lrtah
+
+[oracle@oraclept rman_bkp]$ scp $ORACLE_HOME/u01/rman_bkp/c-896617639-20241208-02 oracle@192.168.8.105:$ORACLE_HOME/u01/rman_bkp
+oracle@192.168.8.105's password: 
+/u01/app/oracle/product/19.0.0.0/dbhome_1/u01/rman_bkp/c-896617639-20241208-02: No such file or directory
+[oracle@oraclept rman_bkp]$ scp c-896617639-20241208-02 oracle@192.168.8.105:/u01/rman_bkp
+oracle@192.168.8.105's password: 
+c-896617639-20241208-02                                                                                         100%   11MB  14.4MB/s   00:00    
+
+[oracle@oraclept ~]$ 
+[oracle@oraclept ~]$ sqlplus / as sysdba
+
+
+
+SQL> show parameter AUDIT_FILE_DEST;
+
+NAME				     TYPE	 VALUE
+------------------------------------ ----------- ------------------------------
+audit_file_dest 		     string	 /u01/app/oracle/admin/proddb/a
+						 dump
+SQL> 
+
+
+
+
+crosscheck backup
+delete expired backup;
+ crosscheck archivelog all;
+ delete expired archivelog all;
+ exit

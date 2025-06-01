@@ -1,0 +1,44 @@
+         6 ICICI_DUP                      MOUNTED
+         7 ICICI                          MOUNTED
+         8 AXIS_PRODDB                    READ WRITE NO
+SQL> alter session set container =HDFC;
+
+Session altered.
+
+SQL>
+SQL>
+SQL>
+SQL>
+SQL> create database link scott_axis connect to scott identified by tiger using 'to_axis';
+create database link scott_axis connect to scott identified by tiger using 'to_axis'
+                     *
+ERROR at line 1:
+ORA-01109: database not open
+
+
+SQL> alter database open;
+
+Database altered.
+
+SQL> create database link scott_axis connect to scott identified by tiger using 'to_axis';
+
+Database link created.
+
+SQL>
+SQL>
+SQL> create materialized view emp_Scott_mv as select * from emp@scott_axis;
+
+Materialized view created.
+
+SQL>
+SQL>
+SQL> select * from emp_Scott_mv;
+
+     EMPNO ENAME
+---------- ----------
+         1 scott
+         2 tiger
+         3 abc
+
+SQL>
+                                                                                                                                                                                                 797,1         Bot

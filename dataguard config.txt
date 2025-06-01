@@ -1,0 +1,1512 @@
+
+
+DB_UNIQUE_NAME
+
+Primary Database: This parameter is used to uniquely identify the primary database in a Data Guard configuration.
+Standby Database: Similarly, the standby database must have a unique name as well.
+
+LOG_ARCHIVE_CONFIG
+
+Specifies the Data Guard configuration and the list of databases involved in the configuration. 
+This is required on both the primary and standby databases to define the Data Guard environment.
+
+LOG_ARCHIVE_DEST_1 (Primary Database)
+
+This parameter specifies the location where the primary database archives its logs. 
+It typically points to the local disk or a remote location.
+
+
+LOG_ARCHIVE_DEST_2 (Primary Database)
+
+This is used to specify the archive destination for the standby database. 
+It is often set to the service name of the standby database to facilitate shipping of logs to the standby.
+
+
+FAL_SERVER (Primary Database)
+
+This parameter specifies the name of the standby database that the primary database 
+will use to fetch missing archived logs in case of gaps.
+
+ARCHIVE_LAG_TARGET (Primary Database)
+
+This specifies the target lag time between the primary and standby databases. 
+This is used to monitor the lag in shipping logs from the primary to the standby.
+
+
+Standby Database Parameters
+LOG_ARCHIVE_DEST_1 (Standby Database)
+
+This is the location where the standby database receives archived logs. 
+It typically points to a recovery area on the standby server.
+
+LOG_ARCHIVE_DEST_2 (Standby Database)
+
+This could be configured to enable the standby database to fetch logs from the primary, 
+or from another standby database if configured in a cascaded setup.
+
+
+FAL_CLIENT (Standby Database)
+
+Specifies the primary database (or another standby) from which the standby will request missing archived logs.
+
+DB_FILE_NAME_CONVERT (Standby Database)
+
+This parameter is used to define the conversion rule for file names when 
+recovering the standby database from the primary database.
+
+LOG_FILE_NAME_CONVERT (Standby Database)
+
+This parameter is used to handle the conversion of log file names between the 
+primary and standby systems (useful when directories differ between primary and standby).
+
+STANDBY_FILE_MANAGEMENT (Standby Database)
+
+Enables automatic management of datafiles for the standby database. This should typically be set to AUTO in a Data Guard configuration.
+
+
+ARCHIVE_DEST_STATE (Primary and Standby)
+
+Used to enable or disable specific archive log destinations. 
+For example, you can disable shipping logs to a destination if it is unavailable.
+
+LOG_ARCHIVE_MAX_PROCESS (Primary Database)
+
+Configures the maximum number of archive processes that can be used for shipping logs from the primary to the standby.
+
+
+
+Primary Database
+
+ALTER SYSTEM SET DB_UNIQUE_NAME = 'primdb' SCOPE=BOTH;
+ALTER SYSTEM SET LOG_ARCHIVE_CONFIG = 'DG_CONFIG=(primdb, standbydb)' SCOPE=BOTH;
+ALTER SYSTEM SET LOG_ARCHIVE_DEST_1 = 'LOCATION=/u01/app/oracle/fast_recovery_area' SCOPE=BOTH;
+ALTER SYSTEM SET LOG_ARCHIVE_DEST_2 = 'SERVICE=standbydb LGWR ASYNC VALID_FOR=(ONLINE_LOGFILES,PRIMARY_ROLE) DB_UNIQUE_NAME=standbydb' SCOPE=BOTH;
+ALTER SYSTEM SET FAL_SERVER = 'standbydb' SCOPE=BOTH;
+ALTER SYSTEM SET ARCHIVE_LAG_TARGET = 30 SCOPE=BOTH;
+
+
+standby Database
+
+ALTER SYSTEM SET DB_UNIQUE_NAME = 'standbydb' SCOPE=BOTH;
+ALTER SYSTEM SET LOG_ARCHIVE_CONFIG = 'DG_CONFIG=(primdb, standbydb)' SCOPE=BOTH;
+ALTER SYSTEM SET LOG_ARCHIVE_DEST_1 = 'LOCATION=/u01/app/oracle/standby_recovery_area' SCOPE=BOTH;
+ALTER SYSTEM SET LOG_ARCHIVE_DEST_2 = 'SERVICE=primdb LGWR ASYNC VALID_FOR=(ONLINE_LOGFILES,STANDBY_ROLE) DB_UNIQUE_NAME=primdb' SCOPE=BOTH;
+ALTER SYSTEM SET LOG_ARCHIVE_DEST_2 = 'SERVICE=to_std ARC SYNC VALID_FOR=(ONLINE_LOGFILES,STANDBY_ROLE) DB_UNIQUE_NAME=standby' SCOPE=BOTH;
+ALTER SYSTEM SET FAL_CLIENT = 'primdb' SCOPE=BOTH;
+ALTER SYSTEM SET DB_FILE_NAME_CONVERT = ('/primarydb/data/', '/standbydb/data/') SCOPE=BOTH;
+ALTER SYSTEM SET LOG_FILE_NAME_CONVERT = ('/primarydb/redo/', '/standbydb/redo/') SCOPE=BOTH;
+ALTER SYSTEM SET STANDBY_FILE_MANAGEMENT = 'AUTO' SCOPE=BOTH;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+PRIMARY DATABASE
+****************
+
+
+
+changing the hostname
+
+[oracle]hostnamectl set-hostname VENKAT.com
+
+checking for hostname
+[oracle]cat /etc/hostname
+venkat.com
+export ORACLE_HOME=/u01/app/oracle/product/19.0.0.0/dbhome_1
+export PATH=$ORACLE_HOME/bin:$PATH
+
+connect to sql and check for "archive log" MODE
+archive log list;
+
+
+if it is not in archive log mode then must be keep it in archive mode
+
+shut IMMEDIATE;
+startup mount;
+alter database archivelog;
+alter database open;
+
+
+
+
+
+
+connect to sql and check for archive MODE
+
+archive log list;
+SQL> archive log list
+Database log mode	       Archive Mode
+Automatic archival	       Enabled
+Archive destination	       USE_DB_RECOVERY_FILE_DEST
+Oldest online log sequence     4
+Next log sequence to archive   6
+Current log sequence	       6
+
+
+
+
+making the database force logging 
+ALTER DATABASE FORCE LOGGING;
+
+
+checking for the redologs groups/members LIST:
+
+
+set lines 200 pages 200
+set colsep |
+col MEMBER for a80
+col thread# for a10
+col is_recovery_dest_file for a20
+select group#, status, type, member, con_id, is_recovery_dest_file from v$logfile order by group#;
+    GROUP# STATUS  TYPE    MEMBER										CON_ID IS_
+---------- ------- ------- -------------------------------------------------------------------------------- ---------- ---
+	 3	   ONLINE  /u01/app/oracle/oradata/TESTDB/onlinelog/o1_mf_3_momfr6b9_.log			     0 NO
+	 3	   ONLINE  /u01/app/oracle/fast_recovery_area/TESTDB/onlinelog/o1_mf_3_momfr7cm_.log		     0 YES
+	 2	   ONLINE  /u01/app/oracle/oradata/TESTDB/onlinelog/o1_mf_2_momfr690_.log			     0 NO
+	 2	   ONLINE  /u01/app/oracle/fast_recovery_area/TESTDB/onlinelog/o1_mf_2_momfr7gg_.log		     0 YES
+	 1	   ONLINE  /u01/app/oracle/oradata/TESTDB/onlinelog/o1_mf_1_momfr68k_.log			     0 NO
+	 1	   ONLINE  /u01/app/oracle/fast_recovery_area/TESTDB/onlinelog/o1_mf_1_momfr6wx_.log		     0 YES
+
+
+
+
+
+/u01/app/oracle/oradata/PRODDB/onlinelog/
+
+Adding the standby redologs into primary database:
+
+ALTER DATABASE ADD STANDBY LOGFILE GROUP 8 ('/u01/app/oracle/oradata/VENDB/onlinelog/redo08.log') SIZE 200M;
+ALTER DATABASE ADD STANDBY LOGFILE GROUP 9 ('/u01/app/oracle/oradata/VENDB/onlinelog/redo09.log') SIZE 200M;
+ALTER DATABASE ADD STANDBY LOGFILE GROUP 10 ('/u01/app/oracle/oradata/VENDB/onlinelog/redo10.log') SIZE 200M;
+
+
+
+againg checking for the list of redolog group/members:
+
+SQL> set lines 200 pages 200
+set colsep |
+col MEMBER for a80
+col thread# for a10
+col is_recovery_dest_file for a20
+select group#, status, type, member, con_id, is_recovery_dest_file from v$logfile order by group#;SQL> SQL> SQL> SQL> SQL> 
+
+    GROUP#|STATUS |TYPE   |MEMBER									 							   |	CON_ID|IS_RECOVERY_DEST_FIL
+----------|-------|-------|--------------------------------------------------------------------------------|----------|--------------------
+	 1|	  |ONLINE |/u01/app/oracle/oradata/TESTDB/onlinelog/o1_mf_1_momfr68k_.log		 		   |	     0|NO
+	 1|	  |ONLINE |/u01/app/oracle/fast_recovery_area/TESTDB/onlinelog/o1_mf_1_momfr6wx_.log	   |	     0|YES
+	 2|	  |ONLINE |/u01/app/oracle/oradata/TESTDB/onlinelog/o1_mf_2_momfr690_.log		 		   |	     0|NO
+	 2|	  |ONLINE |/u01/app/oracle/fast_recovery_area/TESTDB/onlinelog/o1_mf_2_momfr7gg_.log	   |	     0|YES
+	 3|	  |ONLINE |/u01/app/oracle/fast_recovery_area/TESTDB/onlinelog/o1_mf_3_momfr7cm_.log	   |	     0|YES
+	 3|	  |ONLINE |/u01/app/oracle/oradata/TESTDB/onlinelog/o1_mf_3_momfr6b9_.log				   |	     0|NO
+	 8|	  |STANDBY|/u01/app/oracle/oradata/TESTDB/onlinelog/redo08.log				  			   |	     0|NO
+	 9|	  |STANDBY|/u01/app/oracle/oradata/TESTDB/onlinelog/redo09.log				   			   |	     0|NO
+	10|	  |STANDBY|/u01/app/oracle/oradata/TESTDB/onlinelog/redo10.log				   			   |	     0|NO
+
+
+
+
+
+
+Giving the db UNIQUE NAME for both primary and standby
+alter system set db_unique_name='vendb' scope=both;
+alter system set db_unique_name='standbydb' scope=both;
+
+
+
+check for listener & tnsnames
+
+
+configuring the LOG_ARCHIVE_CONFIG
+ALTER SYSTEM SET LOG_ARCHIVE_CONFIG='DG_CONFIG=(vendb,standbydb)' scope=both;
+
+
+ 
+
+
+ALTER SYSTEM SET LOG_ARCHIVE_DEST_2='SERVICE=to_std LGWR ASYNC AFFIRM VALID_FOR=(ONLINE_LOGFILES,PRIMARY_ROLE) DB_UNIQUE_NAME=standbydb' SCOPE= both;
+
+
+This name is typically used in Oracle Data Guard configurations to differentiate between the primary and standby databases.
+
+ALTER SYSTEM SET LOG_ARCHIVE_DEST_2='SERVICE=to_ven LGWR ASYNC VALID_FOR=(ONLINE_LOGFILES,PRIMARY_ROLE) DB_UNIQUE_NAME=vendb' scope=both;
+ALTER SYSTEM SET LOG_ARCHIVE_DEST_2='SERVICE=TO_TESTDB LGWR ASYNC VALID_FOR=(ONLINE_LOGFILES,PRIMARY_ROLE) DB_UNIQUE_NAME=VENKATDB' scope=both;
+ORA-16053: DB_UNIQUE_NAME standbydb is not in the Data Guard Configuration
+
+
+
+
+
+
+
+If you want to set the FAL_SERVER to the unique name of your standby database (standbydb), you can use:
+ALTER SYSTEM SET fal_server=to_std scope=both;
+
+
+
+
+ALTER SYSTEM SET STANDBY_FILE_MANAGEMENT=AUTO;
+
+create pfile from spfile;
+alter pluggable database all open;
+exit;
+
+mkdir -p /u01/rman_bkp/
+
+rman target /
+
+CONFIGURE RETENTION POLICY TO REDUNDANCY 2; # default
+CONFIGURE BACKUP OPTIMIZATION ON; # default
+CONFIGURE DEFAULT DEVICE TYPE TO DISK; # default
+CONFIGURE CONTROLFILE AUTOBACKUP ON; # default
+CONFIGURE CONTROLFILE AUTOBACKUP FORMAT FOR DEVICE TYPE DISK TO '/u01/rman_bkp/%F'; # default
+CONFIGURE DEVICE TYPE DISK PARALLELISM 2 BACKUP TYPE TO BACKUPSET; # default
+CONFIGURE DATAFILE BACKUP COPIES FOR DEVICE TYPE DISK TO 1; # default
+CONFIGURE ARCHIVELOG BACKUP COPIES FOR DEVICE TYPE DISK TO 1; # default
+CONFIGURE MAXSETSIZE TO UNLIMITED; # default
+CONFIGURE ENCRYPTION FOR DATABASE OFF; # default
+CONFIGURE ENCRYPTION ALGORITHM 'AES128'; # default
+CONFIGURE COMPRESSION ALGORITHM 'BASIC' AS OF RELEASE 'DEFAULT' OPTIMIZE FOR LOAD TRUE ; # default
+CONFIGURE RMAN OUTPUT TO KEEP FOR 7 DAYS; # default
+CONFIGURE ARCHIVELOG DELETION POLICY TO NONE; # default
+CONFIGURE SNAPSHOT CONTROLFILE NAME TO '/u01/rman_bkp/snapcf_DB.f'; # default
+CONFIGURE CHANNEL 1 DEVICE TYPE DISK FORMAT '/u01/rman_bkp/%U';
+CONFIGURE CHANNEL 2 DEVICE TYPE DISK FORMAT '/u01/rman_bkp/%U';
+
+
+	backup database plus archivelog;
+exit;
+lsnrctl start
+
+cd  /u01/app/oracle/product/19.0.0.0/dbhome_1/dbs/
+
+/u01/app/oracle/product/19.0.0.0/dbhome_1/dbs
+
+scp initproddb.ora orapwproddb oracle@192.168.0.139:/u01/app/oracle/product/19.0.0.0/dbhome_1/dbs
+cd ../network/admin/
+scp listener.ora tnsnames.ora oracle@192.168.0.139:/u01/app/oracle/product/19.0.0.0/dbhome_1/network/admin/
+scp -r /u01/rman_bkp/ oracle@192.168.0.139:/u01/
+scp -r /u01/rman_bkp/ oracle@oracles.com:/u01/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+***************************************************************************************************************************************
+
+
+standby
+cd $ORACLE_HOME
+cd dbs
+mv orapwproddb orapwproddbs
+mv initproddb.ora initproddbs.ora
+
+
+
+
+
+edit pfile
+
+after modification your pfile will look like below.
+[oracle@oradbsrv2 dbs]$ cat initproddbs.ora
+proddbs.__data_transfer_cache_size=0
+proddbs.__db_cache_size=1761607680
+proddbs.__inmemory_ext_roarea=0
+proddbs.__inmemory_ext_rwarea=0
+proddbs.__java_pool_size=0
+proddbs.__large_pool_size=16777216
+proddbs.__oracle_base='/u01/app/oracle'#ORACLE_BASE set from environment
+proddbs.__pga_aggregate_target=805306368
+proddbs.__sga_target=2415919104
+proddbs.__shared_io_pool_size=117440512
+proddbs.__shared_pool_size=503316480
+proddbs.__streams_pool_size=0
+proddbs.__unified_pga_pool_size=0
+*.audit_file_dest='/u01/app/oracle/admin/proddb/adump'
+*.audit_trail='db'
+*.compatible='19.0.0'
+*.control_files='/u01/app/oracle/oradata/PRODDB/controlfile/o1_mf_lzt01bvo_.ctl','/u01/app/oracle/fast_recovery_area/PRODDB/controlfile/o1_mf_lzt01bwt_.ctl'
+*.db_block_size=8192
+*.db_create_file_dest='/u01/app/oracle/oradata'
+*.db_name='proddb'
+*.db_recovery_file_dest='/u01/app/oracle/fast_recovery_area'
+*.db_recovery_file_dest_size=12732m
+*.db_unique_name='proddbs'
+*.diagnostic_dest='/u01/app/oracle'
+*.dispatchers='(PROTOCOL=TCP) (SERVICE=proddbsXDB)'
+*.enable_pluggable_database=true
+*.fal_server='PRODDB'
+*.log_archive_config='DG_CONFIG=(proddb,proddbs)'
+*.log_archive_dest_2='SERVICE=to_proddb LGWR ASYNC VALID_FOR=(ONLINE_LOGFILES,PRIMARY_ROLE) DB_UNIQUE_NAME=proddb'
+*.open_cursors=300
+*.pga_aggregate_target=767m
+*.processes=320
+*.remote_login_passwordfile='EXCLUSIVE'
+*.sga_target=2301m
+*.standby_file_management='AUTO'
+*.undo_tablespace='UNDOTBS1'
+
+
+
+mkdir -p /u01/app/oracle/admin/proddb/adump /u01/app/oracle/oradata/PRODDB/controlfile/ /u01/app/oracle/fast_recovery_area/PRODDB/controlfile/ /u01/app/oracle/oradata /u01/app/oracle/fast_recovery_area
+
+
+NOTE : make sure your environment variable ORACLE_SID is set to proddbs
+
+sqlplus / as sysdba
+create spfile from pfile;
+startup nomount;
+exit;
+
+
+edit listener file with global database name as proddbs and oracle_sid as proddbs and ip as standby server ip.
+make sure your tns has both tns entries of primary and standby 
+cd /u01/app/oracle/product/19.0.0.0/dbhome_1/network/admin/
+
+lsnrctl start
+
+
+rman auxiliary /
+
+run {
+allocate auxiliary channel t1 type disk;
+duplicate target database for standby backup location '/u01/rman_bkp/' nofilenamecheck;
+}
+
+--- from active database or target database
+
+[oracle@standby ~]$ rman target sys/oracle@to_vendb auxiliary sys/oracle@to_std
+connected to target database: VENDB (DBID=3867495045)
+connected to auxiliary database: VENDB (not mounted)
+
+
+run {
+allocate auxiliary channel t1 type disk;
+allocate channel c1 type disk;
+duplicate target database for standby from active database nofilenamecheck;
+}
+
+run {
+duplicate target database for standby from active database nofilenamecheck;
+}
+
+
+exit
+
+sqlplus / as sysdba
+
+ALTER DATABASE RECOVER MANAGED STANDBY DATABASE disconnect from session;
+Database altered.
+
+
+SQL> desc v$managed_standby
+ Name					   Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ PROCESS					    VARCHAR2(9)
+ PID						    VARCHAR2(24)
+ STATUS 					    VARCHAR2(12)
+ CLIENT_PROCESS 				    VARCHAR2(8)
+ CLIENT_PID					    VARCHAR2(40)
+ CLIENT_DBID					    VARCHAR2(40)
+ GROUP# 					    VARCHAR2(40)
+ RESETLOG_ID					    NUMBER
+ THREAD#					    NUMBER
+ SEQUENCE#					    NUMBER
+ BLOCK# 					    NUMBER
+ BLOCKS 					    NUMBER
+ DELAY_MINS					    NUMBER
+ KNOWN_AGENTS					    NUMBER
+ ACTIVE_AGENTS					    NUMBER
+ CON_ID 					    NUMBER
+
+
+
+primary
+
+alter system set log_archive_dest_state_2=DEFER scope=both sid='*';
+alter system set log_archive_dest_state_2=enable scope=both sid='*';
+
+
+set lines 300 pages 300;
+SELECT sequence#, first_time, next_time, applied FROM v$archived_log ORDER BY sequence#;
+
+SEQUENCE# FIRST_TIM NEXT_TIME APPLIED
+---------- --------- --------- ---------
+	 1 11-DEC-24 12-DEC-24 NO
+	 2 12-DEC-24 12-DEC-24 NO
+
+set lines 300 pages 300;
+col DB_UNIQUE_NAME for a10;
+select name,db_unique_name,open_mode,DATABASE_ROLE,PROTECTION_MODE,SWITCHOVER#,SWITCHOVER_status,current_scn from v$database;
+NAME	  DB_UNIQUE_ OPEN_MODE		  DATABASE_ROLE    PROTECTION_MODE	SWITCHOVER# SWITCHOVER_STATUS	 CURRENT_SCN
+--------- ---------- -------------------- ---------------- -------------------- ----------- -------------------- -----------
+TESTDB	  VENKATDB   READ WRITE 	  PRIMARY	   MAXIMUM PERFORMANCE	 2970813020 FAILED DESTINATION	     5947372
+
+***********standby**********
+SQL> set lines 300 pages 300;
+col DB_UNIQUE_NAME for a10;
+select name,db_unique_name,open_mode,DATABASE_ROLE,PROTECTION_MODE,SWITCHOVER#,SWITCHOVER_status,current_scn from v$database;SQL> SQL> 
+
+NAME	 |DB_UNIQUE_|OPEN_MODE		 |DATABASE_ROLE   |PROTECTION_MODE     |SWITCHOVER#|SWITCHOVER_STATUS	|CURRENT_SCN
+---------|----------|--------------------|----------------|--------------------|-----------|--------------------|-----------
+TESTDB	 |devdbb    |MOUNTED		 |PHYSICAL STANDBY|MAXIMUM PERFORMANCE |	  0|TO PRIMARY		|    5943060
+
+
+####################################
+listerconfig
+############.########################
+primary
+############
+# listener.ora Network Configuration File: /u01/app/oracle/product/19.0.0.0/dbhome_1/network/admin/listener.ora
+# Generated by Oracle configuration tools.
+
+SID_LIST_LISTENER =
+  (SID_LIST =
+    (SID_DESC =
+      (GLOBAL_DBNAME = proddb)
+      (ORACLE_HOME = /u01/app/oracle/product/19.0.0.0/dbhome_1)
+      (SID_NAME = proddb)
+    )
+  )
+
+LISTENER =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = 192.168.0.174)(PORT = 1521))
+  )
+
+ADR_BASE_LISTENER = /u01/app/oracle
+
+
+
+############
+standby 
+############
+
+
+[oracle@arun admin]$ cat listener.ora
+# listener.ora Network Configuration File: /u01/app/oracle/product/19.0.0.0/dbhome_1/network/admin/listener.ora
+# Generated by Oracle configuration tools.
+
+SID_LIST_LISTENER =
+  (SID_LIST =
+    (SID_DESC =
+      (GLOBAL_DBNAME = proddbs)
+      (ORACLE_HOME = /u01/app/oracle/product/19.0.0.0/dbhome_1)
+      (SID_NAME = proddbs)
+    )
+  )
+
+LISTENER =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = 192.168.0.214)(PORT = 1521))
+  )
+
+ADR_BASE_LISTENER = /u01/app/oracle
+
+
+
+set lines 200
+col DESTINATION for a30
+col ERROR for a50
+select DESTINATION,TYPE,ARCHIVED_THREAD#,APPLIED_SEQ#,ARCHIVED_SEQ#,GAP_STATUS,error from v$archive_dest_status where DEST_ID=2;
+
+
+DESTINATION		       TYPE		ARCHIVED_THREAD# APPLIED_SEQ# ARCHIVED_SEQ# GAP_STATUS		     ERROR
+------------------------------ ---------------- ---------------- ------------ ------------- ------------------------ --------------------------------------------------
+to_devdbb		       UNKNOWN			       0	    0		  0 RESOLVABLE GAP	     ORA-12154: TNS:could not resolve the connect
+														     identifier specified
+
+for this ORA-12154 error check the names of tnsnames
+
+
+
+
+set colsep |
+select process,status from v$managed_standby;
+PROCESS   STATUS
+--------- ------------
+DGRD	  ALLOCATED
+ARCH	  CLOSING
+DGRD	  ALLOCATED
+ARCH	  CLOSING
+ARCH	  CLOSING
+ARCH	  CLOSING
+LNS	  OPENING
+DGRD	  ALLOCATED
+LNS	  OPENING
+
+-- to check the sysnc.
+
+
+
+SEQUENCE# FIRST_TIM NEXT_TIME APPLIED
+	58 14-DEC-24 14-DEC-24 NO
+	58 14-DEC-24 14-DEC-24 YES
+
+
+set lines 300 pages 300;
+set colsep |
+col DB_UNIQUE_NAME for a10;
+select name,db_unique_name,open_mode,DATABASE_ROLE,PROTECTION_MODE,SWITCHOVER#,SWITCHOVER_status,current_scn from v$database; 
+
+NAME	  DB_UNIQUE_ OPEN_MODE		  DATABASE_ROLE    PROTECTION_MODE	SWITCHOVER# SWITCHOVER_STATUS	 CURRENT_SCN
+--------- ---------- -------------------- ---------------- -------------------- ----------- -------------------- -----------
+TESTDB	  VENKATDB   READ WRITE 	  PRIMARY	   MAXIMUM PERFORMANCE	 2970813020 TO STANDBY		     5949728
+
+set lines 300 pages 300;
+SELECT sequence#, FIRST_CHANGE#,NEXT_CHANGE# FROM v$archived_log ORDER BY sequence#;
+SEQUENCE# FIRST_CHANGE# NEXT_CHANGE#
+---------- ------------- ------------
+	 1	 4857251      4960117
+	 2	 4960117      5065461
+
+
+
+standby
+SQL> SELECT NAME, VALUE FROM V$DATAGUARD_STATS;
+
+NAME				|VALUE
+--------------------------------|----------------------------------------------------------------
+transport lag			|+00 00:00:00
+apply lag			|+00 00:00:00
+apply finish time		|+00 00:00:00.000
+estimated startup time		|49
+
+
+
+
+
+
+
+
+
+
+
+ALTER SYSTEM SET LOG_ARCHIVE_DEST_STATE_1=ENABLE scope=both;
+
+ALTER SYSTEM SET LOG_ARCHIVE_DEST_STATE_2=ENABLE scope=both;
+
+
+PRIMARY DATABASE														
+****************
+SQL> desc v$archive_dest_status
+ Name														   Null?    Type
+ ----------------------------------------------------------------------------------------------------------------- -------- ----------------------------------------------------------------------------
+ DEST_ID														    NUMBER
+ DEST_NAME														    VARCHAR2(256)
+ STATUS 														    VARCHAR2(9)
+ TYPE															    VARCHAR2(16)
+ DATABASE_MODE														    VARCHAR2(15)
+ RECOVERY_MODE														    VARCHAR2(34)
+ PROTECTION_MODE													    VARCHAR2(20)
+ DESTINATION														    VARCHAR2(256)
+ STANDBY_LOGFILE_COUNT													    NUMBER
+ STANDBY_LOGFILE_ACTIVE 												    NUMBER
+ ARCHIVED_THREAD#													    NUMBER
+ ARCHIVED_SEQ#														    NUMBER
+ APPLIED_THREAD#													    NUMBER
+ APPLIED_SEQ#														    NUMBER
+ ERROR															    VARCHAR2(256)
+ SRL															    VARCHAR2(3)
+ DB_UNIQUE_NAME 													    VARCHAR2(30)
+ SYNCHRONIZATION_STATUS 												    VARCHAR2(22)
+ SYNCHRONIZED														    VARCHAR2(3)
+ GAP_STATUS														    VARCHAR2(24)
+ CON_ID 														    NUMBER
+
+SQL> desc v$archived_log
+ Name														   Null?    Type
+ ----------------------------------------------------------------------------------------------------------------- -------- ----------------------------------------------------------------------------
+ RECID															    NUMBER
+ STAMP															    NUMBER
+ NAME															    VARCHAR2(513)
+ DEST_ID														    NUMBER
+ THREAD#														    NUMBER
+ SEQUENCE#														    NUMBER
+ RESETLOGS_CHANGE#													    NUMBER
+ RESETLOGS_TIME 													    DATE
+ RESETLOGS_ID														    NUMBER
+ FIRST_CHANGE#														    NUMBER
+ FIRST_TIME														    DATE
+ NEXT_CHANGE#														    NUMBER
+ NEXT_TIME														    DATE
+ BLOCKS 														    NUMBER
+ BLOCK_SIZE														    NUMBER
+ CREATOR														    VARCHAR2(7)
+ REGISTRAR														    VARCHAR2(7)
+ STANDBY_DEST														    VARCHAR2(3)
+ ARCHIVED														    VARCHAR2(3)
+ APPLIED														    VARCHAR2(9)
+ DELETED														    VARCHAR2(3)
+ STATUS 														    VARCHAR2(1)
+ COMPLETION_TIME													    DATE
+ DICTIONARY_BEGIN													    VARCHAR2(3)
+ DICTIONARY_END 													    VARCHAR2(3)
+ END_OF_REDO														    VARCHAR2(3)
+ BACKUP_COUNT														    NUMBER
+ ARCHIVAL_THREAD#													    NUMBER
+ ACTIVATION#														    NUMBER
+ IS_RECOVERY_DEST_FILE													    VARCHAR2(3)
+ COMPRESSED														    VARCHAR2(3)
+ FAL															    VARCHAR2(3)
+ END_OF_REDO_TYPE													    VARCHAR2(10)
+ BACKED_BY_VSS														    VARCHAR2(3)
+ CON_ID 														    NUMBER
+
+Check the Data Guard Configuration Status
+
+On the Primary Database
+SELECT DEST_ID, DESTINATION, STATUS, NETWORK_MODE, ERROR FROM V$ARCHIVE_DEST WHERE DEST_ID = 2;
+
+On the Standby Database
+SELECT DEST_ID, DESTINATION, STATUS, ERROR, NETWORK_MODE FROM V$ARCHIVE_DEST WHERE DEST_ID = 2;
+
+
+Check Redo Log Shipping and Application Status
+On the Primary Database
+SELECT THREAD#, SEQUENCE#, ARCHIVED, APPLIED FROM V$ARCHIVED_LOG WHERE DEST_ID = 2 ORDER BY SEQUENCE#;
+   THREAD#  SEQUENCE# ARC APPLIED
+---------- ---------- --- ---------
+	 1	    9 YES YES
+
+
+On the Standby Database
+SELECT THREAD#, SEQUENCE#, ARCHIVED, APPLIED FROM V$ARCHIVED_LOG WHERE DEST_ID = 2 ORDER BY SEQUENCE#;
+  THREAD#| SEQUENCE#|ARC|APPLIED
+----------|----------|---|---------
+	 1|	   60|YES|YES
+
+
+Check Redo Apply Status (Managed Recovery Process)
+On the Primary Database:
+SELECT THREAD#, SEQUENCE#, ARCHIVED FROM V$LOG WHERE THREAD# = 1 ORDER BY SEQUENCE#;
+On the Standby Database:
+	
+
+
+
+Check Data Guard Lag (Redo Apply Lag)
+On the Primary Database:
+SELECT NAME, VALUE FROM V$DATAGUARD_STATS;
+
+On the Standby Database
+SELECT NAME, VALUE FROM V$DATAGUARD_STATS;
+
+
+Check Log Archive Gap
+On the Primary Database:
+SELECT THREAD#, SEQUENCE#, APPLIED, GAP FROM V$ARCHIVE_DEST_STATUS WHERE DEST_ID = 2;
+On the Standby Database
+SELECT THREAD#, SEQUENCE#, APPLIED, GAP FROM V$ARCHIVE_DEST_STATUS WHERE DEST_ID = 2;
+
+
+Check Data Guard Broker Status
+On Any Database (Primary or Standby): 
+SHOW CONFIGURATION;
+SHOW DATABASE VERBOSE;
+
+
+
+Check Data Guard Protection Mode
+On the Primary Database:
+SHOW DATABASE PROTECTION MODE;
+
+
+Check if there are any gaps between the logs available on the primary and the logs applied on the standby.
+
+
+Check the current role of the database (Primary or Standby)
+SELECT DATABASE_ROLE FROM V$DATABASE;
+SQL> SELECT DATABASE_ROLE FROM V$DATABASE;
+
+DATABASE_ROLE
+----------------
+PHYSICAL STANDBY
+
+DATABASE_ROLE
+----------------
+PRIMARY
+
+
+
+
+if you create a table in primay Database, you get the details if the standby Database in open mode ONLY
+stop mrp(alter database recover managed standy database canel)
+alter database open;
+select * from venky;
+
+NETWORK_MODE: This column will show whether the transport mode is SYNC, ASYNC, or AFFIRM.
+SYNC: The primary waits for the redo log to be written on the standby before it commits the transaction.
+AFFIRM: A variation of synchronous mode where the primary waits for an acknowledgment that the redo log has been written to the standby.
+ASYNC: The primary doesn't wait for acknowledgment and proceeds with the transaction.
+
+
+
+
+*****
+Redo transport and apply status: V$ARCHIVE_DEST, V$ARCHIVE_DEST_STATUS, V$MANAGED_STANDBY
+Log shipping and application: V$ARCHIVED_LOG, V$LOG
+Lag and gap status: V$DATAGUARD_STATS
+Data Guard broker configuration: SHOW CONFIGURATION, SHOW DATABASE VERBOSE
+Protection mode: SHOW DATABASE PROTECTION MODE
+
+
+
+
+
+
+active DG
+
+on standby :
+stop mrp
+alter database open;
+start mrp
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+PRIMARY practice 15/12/24
+
+
+
+
+[oracle@venky ~]$ cat /etc/oratab
+#
+
+
+
+# This file is used by ORACLE utilities.  It is created by root.sh
+# and updated by either Database Configuration Assistant while creating
+# a database or ASM Configuration Assistant while creating ASM instance.
+
+# A colon, ':', is used as the field terminator.  A new line terminates
+# the entry.  Lines beginning with a pound sign, '#', are comments.
+#
+# Entries are of the form:
+#   $ORACLE_SID:$ORACLE_HOME:<N|Y>:
+#
+# The first and second fields are the system identifier and home
+# directory of the database respectively.  The third field indicates
+# to the dbstart utility that the database should , "Y", or should not,
+# "N", be brought up at system boot time.
+#
+# Multiple entries with the same $ORACLE_SID are not allowed.
+#
+#
+vendb:/u01/app/oracle/product/19.0.0.0/dbhome_1:N
+[oracle@venky ~]$ . oraenv
+ORACLE_SID = [vendb] ? vendb
+The Oracle base remains unchanged with value /u01/app/oracle
+[oracle@venky ~]$ sqlplus / as sysdba
+
+SQL*Plus: Release 19.0.0.0.0 - Production on Sun Dec 15 18:19:59 2024
+Version 19.3.0.0.0
+
+Copyright (c) 1982, 2019, Oracle.  All rights reserved.
+
+Connected to an idle instance.
+
+SQL> startup;
+ORACLE instance started.
+
+Total System Global Area 1543500144 bytes
+Fixed Size		    8896880 bytes
+Variable Size		  889192448 bytes
+Database Buffers	  637534208 bytes
+Redo Buffers		    7876608 bytes
+Database mounted.
+Database opened.
+SQL> 
+SQL> 
+SQL> 
+SQL> create user venky identified by venky;
+
+User created.
+
+SQL> grant connect,resource, create session to venky;
+
+Grant succeeded.
+
+SQL> create tablespace venkyts datafile '/u01/app/oracle/oradata/VENDB/datafile/venkyts001.dbf' size 20M;
+
+Tablespace created.
+
+SQL> alter user venky default tablespace venkyts;
+
+User altered.
+
+SQL> alter user venky quota unlimited on venkyts;
+
+User altered.
+
+SQL> conn venky/venky
+Connected.
+SQL> create table venky(slno number);
+
+Table created.
+
+SQL> insert into venky values (10);
+
+1 row created.
+
+SQL> /
+
+1 row created.
+
+SQL> /
+
+1 row created.
+
+SQL> /
+
+1 row created.
+
+SQL> /
+
+1 row created.
+
+SQL> /
+
+1 row created.
+
+SQL> /
+
+1 row created.
+
+SQL> /
+
+1 row created.
+
+SQL> commit;
+
+Commit complete.
+
+SQL> select * from venky;
+
+      SLNO
+----------
+	10
+	10
+	10
+	10
+	10
+	10
+	10
+	10
+
+8 rows selected.
+
+SQL> desc venky 
+ Name					   Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ SLNO						    NUMBER
+
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> ^[
+SP2-0042: unknown command "" - rest of line ignored.
+SQL> 
+SQL> conn / as sysdba
+Connected.
+SQL> desc venky.venky
+ Name					   Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ SLNO						    NUMBER
+
+SQL> desc dba_tab_columns
+ Name					   Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ OWNER					   NOT NULL VARCHAR2(128)
+ TABLE_NAME				   NOT NULL VARCHAR2(128)
+ COLUMN_NAME				   NOT NULL VARCHAR2(128)
+ DATA_TYPE					    VARCHAR2(128)
+ DATA_TYPE_MOD					    VARCHAR2(3)
+ DATA_TYPE_OWNER				    VARCHAR2(128)
+ DATA_LENGTH				   NOT NULL NUMBER
+ DATA_PRECISION 				    NUMBER
+ DATA_SCALE					    NUMBER
+ NULLABLE					    VARCHAR2(1)
+ COLUMN_ID					    NUMBER
+ DEFAULT_LENGTH 				    NUMBER
+ DATA_DEFAULT					    LONG
+ NUM_DISTINCT					    NUMBER
+ LOW_VALUE					    RAW(2000)
+ HIGH_VALUE					    RAW(2000)
+ DENSITY					    NUMBER
+ NUM_NULLS					    NUMBER
+ NUM_BUCKETS					    NUMBER
+ LAST_ANALYZED					    DATE
+ SAMPLE_SIZE					    NUMBER
+ CHARACTER_SET_NAME				    VARCHAR2(44)
+ CHAR_COL_DECL_LENGTH				    NUMBER
+ GLOBAL_STATS					    VARCHAR2(3)
+ USER_STATS					    VARCHAR2(3)
+ AVG_COL_LEN					    NUMBER
+ CHAR_LENGTH					    NUMBER
+ CHAR_USED					    VARCHAR2(1)
+ V80_FMT_IMAGE					    VARCHAR2(3)
+ DATA_UPGRADED					    VARCHAR2(3)
+ HISTOGRAM					    VARCHAR2(15)
+ DEFAULT_ON_NULL				    VARCHAR2(3)
+ IDENTITY_COLUMN				    VARCHAR2(3)
+ SENSITIVE_COLUMN				    VARCHAR2(3)
+ EVALUATION_EDITION				    VARCHAR2(128)
+ UNUSABLE_BEFORE				    VARCHAR2(128)
+ UNUSABLE_BEGINNING				    VARCHAR2(128)
+ COLLATION					    VARCHAR2(100)
+
+SQL> select COLUMN_NAME,TABLE_NAME,OWNER from dba_tab_columns where owner='VENKY';
+
+COLUMN_NAME
+--------------------------------------------------------------------------------
+TABLE_NAME
+--------------------------------------------------------------------------------
+OWNER
+--------------------------------------------------------------------------------
+SLNO
+VENKY
+VENKY
+
+
+SQL> set lines 100
+SQL> set colsep |
+SQL> select COLUMN_NAME,TABLE_NAME,OWNER from dba_tab_columns where owner='VENKY';
+
+COLUMN_NAME
+----------------------------------------------------------------------------------------------------
+TABLE_NAME
+----------------------------------------------------------------------------------------------------
+OWNER
+----------------------------------------------------------------------------------------------------
+SLNO
+VENKY
+VENKY
+
+
+SQL> set lines 100 pages 100;
+SQL> set colsep |
+SQL> select COLUMN_NAME,TABLE_NAME,OWNER from dba_tab_columns where owner='VENKY';
+
+COLUMN_NAME
+----------------------------------------------------------------------------------------------------
+TABLE_NAME
+----------------------------------------------------------------------------------------------------
+OWNER
+----------------------------------------------------------------------------------------------------
+SLNO
+VENKY
+VENKY
+
+
+SQL> show user
+USER is "SYS"
+SQL> archive log list
+Database log mode	       No Archive Mode
+Automatic archival	       Disabled
+Archive destination	       USE_DB_RECOVERY_FILE_DEST
+Oldest online log sequence     4
+Current log sequence	       6
+SQL> shut immediate;
+Database closed.
+Database dismounted.
+ORACLE instance shut down.
+
+SQL> SQL> 
+SQL> 
+SQL> 
+SQL> startup mount;
+ORACLE instance started.
+
+Total System Global Area|1543500144|bytes
+Fixed Size		|   8896880|bytes
+Variable Size		| 889192448|bytes
+Database Buffers	| 637534208|bytes
+Redo Buffers		|   7876608|bytes
+Database mounted.
+SQL> 
+SQL> 
+SQL> alter database archivelog;
+
+Database altered.
+
+SQL> alter database open;
+
+Database altered.
+
+SQL> 
+SQL> 
+SQL> 
+SQL> archive log list
+Database log mode	       Archive Mode
+Automatic archival	       Enabled
+Archive destination	       USE_DB_RECOVERY_FILE_DEST
+Oldest online log sequence     4
+Next log sequence to archive   6
+Current log sequence	       6
+SQL> 
+SQL> alter database force logging;
+
+Database altered.
+
+SQL> set lines 200 pages 200
+set colsep |
+col MEMBER for a80
+col thread# for a10
+col is_recovery_dest_file for a20
+select group#, status, type, member, con_id, is_recovery_dest_file from v$logfile order by group#;SQL> SQL> SQL> SQL> SQL> 
+
+    GROUP#|STATUS |TYPE   |MEMBER									   |	CON_ID|IS_RECOVERY_DEST_FIL
+----------|-------|-------|--------------------------------------------------------------------------------|----------|--------------------
+	 1|	  |ONLINE |/u01/app/oracle/oradata/VENDB/onlinelog/o1_mf_1_moxj9hxs_.log		   |	     0|NO
+	 1|	  |ONLINE |/u01/app/oracle/fast_recovery_area/VENDB/onlinelog/o1_mf_1_moxj9jb1_.log	   |	     0|YES
+	 2|	  |ONLINE |/u01/app/oracle/oradata/VENDB/onlinelog/o1_mf_2_moxj9j5y_.log		   |	     0|NO
+	 2|	  |ONLINE |/u01/app/oracle/fast_recovery_area/VENDB/onlinelog/o1_mf_2_moxj9l0t_.log	   |	     0|YES
+	 3|	  |ONLINE |/u01/app/oracle/oradata/VENDB/onlinelog/o1_mf_3_moxj9j61_.log		   |	     0|NO
+	 3|	  |ONLINE |/u01/app/oracle/fast_recovery_area/VENDB/onlinelog/o1_mf_3_moxj9l6l_.log	   |	     0|YES
+
+6 rows selected.
+
+SQL> ALTER DATABASE ADD STANDBY LOGFILE GROUP 8 ('/u01/app/oracle/oradata/TESTDB/onlinelog/redo08.log') SIZE 200M;
+ALTER DATABASE ADD STANDBY LOGFILE GROUP 8 ('/u01/app/oracle/oradata/TESTDB/onlinelog/redo08.log') SIZE 200M
+*
+ERROR at line 1:
+ORA-00301: error in adding log file '/u01/app/oracle/oradata/TESTDB/onlinelog/redo08.log' - file cannot be created
+ORA-27040: file create error, unable to create file
+Linux-x86_64 Error: 2: No such file or directory
+Additional information: 1
+
+
+SQL> ALTER DATABASE ADD STANDBY LOGFILE GROUP 8 ('/u01/app/oracle/oradata/VENDB/onlinelog/redo08.log') SIZE 200M;
+
+Database altered.
+
+SQL> ALTER DATABASE ADD STANDBY LOGFILE GROUP 9 ('/u01/app/oracle/oradata/VENDB/onlinelog/redo09.log') SIZE 200M;
+
+Database altered.
+
+SQL> ALTER DATABASE ADD STANDBY LOGFILE GROUP 10 ('/u01/app/oracle/oradata/VENDB/onlinelog/redo10.log') SIZE 200M;
+
+Database altered.
+
+SQL> set lines 200 pages 200
+set colsep |
+col MEMBER for a80
+col thread# for a10
+col is_recovery_dest_file for a20
+select group#, status, type, member, con_id, is_recovery_dest_file from v$logfile order by group#;SQL> SQL> SQL> SQL> SQL> 
+
+    GROUP#|STATUS |TYPE   |MEMBER									   |	CON_ID|IS_RECOVERY_DEST_FIL
+----------|-------|-------|--------------------------------------------------------------------------------|----------|--------------------
+	 1|	  |ONLINE |/u01/app/oracle/oradata/VENDB/onlinelog/o1_mf_1_moxj9hxs_.log		   |	     0|NO
+	 1|	  |ONLINE |/u01/app/oracle/fast_recovery_area/VENDB/onlinelog/o1_mf_1_moxj9jb1_.log	   |	     0|YES
+	 2|	  |ONLINE |/u01/app/oracle/oradata/VENDB/onlinelog/o1_mf_2_moxj9j5y_.log		   |	     0|NO
+	 2|	  |ONLINE |/u01/app/oracle/fast_recovery_area/VENDB/onlinelog/o1_mf_2_moxj9l0t_.log	   |	     0|YES
+	 3|	  |ONLINE |/u01/app/oracle/fast_recovery_area/VENDB/onlinelog/o1_mf_3_moxj9l6l_.log	   |	     0|YES
+	 3|	  |ONLINE |/u01/app/oracle/oradata/VENDB/onlinelog/o1_mf_3_moxj9j61_.log		   |	     0|NO
+	 8|	  |STANDBY|/u01/app/oracle/oradata/VENDB/onlinelog/redo08.log				   |	     0|NO
+	 9|	  |STANDBY|/u01/app/oracle/oradata/VENDB/onlinelog/redo09.log				   |	     0|NO
+	10|	  |STANDBY|/u01/app/oracle/oradata/VENDB/onlinelog/redo10.log				   |	     0|NO
+
+9 rows selected.
+
+SQL> alter system set db_unique_name='PRIMARY' scope=spfile;
+
+System altered.
+
+SQL> 
+
+
+
+
+desc V$STANDBY_LOG;
+
+SQL> col dbid for a12
+select GROUP#,DBID,THREAD#,SEQUENCE#,BYTES,BLOCKSIZE,USED,ARCHIVED,STATUS,FIRST_CHANGE#,FIRST_TIME,NEXT_CHANGE#,NEXT_TIME,LAST_CHANGE#,LAST_TIME,CON_ID from V$STANDBY_LOG;SQL> 
+
+    GROUP#|DBID        |   THREAD#| SEQUENCE#|	   BYTES| BLOCKSIZE|	  USED|ARC|STATUS    |FIRST_CHANGE#|FIRST_TIM|NEXT_CHANGE#|NEXT_TIME|LAST_CHANGE#|LAST_TIME|	CON_ID
+----------|------------|----------|----------|----------|----------|----------|---|----------|-------------|---------|------------|---------|------------|---------|----------
+	 8|UNASSIGNED  |	 0|	    0| 209715200|	512|	     0|YES|UNASSIGNED|		   |	     |		  |	    |		 |	   |	     0
+	 9|UNASSIGNED  |	 0|	    0| 209715200|	512|	     0|YES|UNASSIGNED|		   |	     |		  |	    |		 |	   |	     0
+	10|UNASSIGNED  |	 0|	    0| 209715200|	512|	     0|YES|UNASSIGNED|		   |	     |		  |	    |		 |	   |	     0
+
+desc V$STANDBY_EVENT_HISTOGRAM
+select name, time, unit, count, last_time_updated, con_id from V$STANDBY_EVENT_HISTOGRAM;
+
+desc V$REDO_DEST_RESP_HISTOGRAM
+select dest_id, time, duration, frequency, con_id from V$REDO_DEST_RESP_HISTOGRAM;
+
+   DEST_ID|TIME 	       |  DURATION| FREQUENCY|	  CON_ID
+----------|--------------------|----------|----------|----------
+		 1|		     	 		  |	     1|	        0|	       0
+		 
+desc V$MANAGED_STANDBY		 
+		 
+col client_pid for a8
+col pid for a8
+col client_dbid for a15
+col GROUP# for a10
+select process, pid,client_process, client_pid, client_dbid, group#,resetlog_id,thread#,sequence#,block#,blocks, delay_mins, known_agents, active_agents, con_id from V$MANAGED_STANDBY;SQL> SQL> SQL> SQL> 
+
+PROCESS  |PID	  |CLIENT_P|CLIENT_P|CLIENT_DBID    |GROUP#    |RESETLOG_ID|   THREAD#| SEQUENCE#|    BLOCK#|	 BLOCKS|DELAY_MINS|KNOWN_AGENTS|ACTIVE_AGENTS|	  CON_ID
+---------|--------|--------|--------|---------------|----------|-----------|----------|----------|----------|----------|----------|------------|-------------|----------
+DGRD	 |3554	  |N/A	   |N/A     |N/A	    |N/A       |	  0|	     0| 	0|	   0|	      0|	 0|	      0|	    0|	       0
+ARCH	 |3556	  |ARCH    |3556    |3867495045     |2	       | 1187802887|	     1|        59|	6144|	   1880|	 0|	      0|	    0|	       0
+DGRD	 |3558	  |N/A	   |N/A     |N/A	    |N/A       |	  0|	     0| 	0|	   0|	      0|	 0|	      0|	    0|	       0
+ARCH	 |3560	  |ARCH    |3560    |3867495045     |N/A       |	  0|	     0| 	0|	   0|	      0|	 0|	      0|	    0|	       0
+ARCH	 |3562	  |ARCH    |3562    |3867495045     |N/A       |	  0|	     0| 	0|	   0|	      0|	 0|	      0|	    0|	       0
+ARCH	 |3564	  |ARCH    |3564    |3867495045     |N/A       | 1187802887|	     1|        59|	   0|	      0|	 0|	      0|	    0|	       0
+LNS	 |3566	  |LNS	   |3566    |3867495045     |3	       | 1187802887|	     1|        60|	   0|	      0|	 0|	      0|	    0|	       0
+DGRD	 |3568	  |N/A	   |N/A     |N/A	    |N/A       |	  0|	     0| 	0|	   0|	      0|	 0|	      0|	    0|	       0
+LNS	 |3570	  |LNS	   |3570    |3867495045     |N/A       |	  0|	     0| 	0|	   0|	      0|	 0|	      0|	    0|	       0
+
+desc V$LOGSTDBY_TRANSACTION
+SQL> select PRIMARY_XIDUSN,PRIMARY_XIDSLT,PRIMARY_XIDSQN,PRIMARY_XID,PRIMARY_START_SCN,
+PRIMARY_START_TIME,PRIMARY_PARENT_XIDUSN,PRIMARY_PARENT_XIDSLT,PRIMARY_PARENT_XIDSQN,
+PRIMARY_PARENT_XID,TYPE,MINING_STATUS,SRC_CON_ID,APPLY_STATUS,SID,SERIAL#,CON_ID from V$LOGSTDBY_TRANSACTION;
+
+
+
+
+
+
+Ensure Synchronization Between Primary and Standby 
+desc v$archived_log
+SELECT DEST_ID, STATUS, THREAD#, SEQUENCE# FROM V$ARCHIVED_LOG;
+
+
+Configuring Oracle Data Guard involves setting up the primary database, standby database, 
+and enabling the necessary components to ensure synchronization between the two. 
+Here’s a step-by-step guide to configure Oracle Data Guard, from preparing the environment 
+to ensuring that the primary and standby databases are in sync.
+
+Prerequisites:
+Before beginning the configuration, ensure the following:
+
+Both the primary and standby databases must be on the same version of Oracle Database.
+Network connectivity between the primary and standby servers.
+Shared storage or an appropriate method to transfer archived redo logs.
+Oracle software installed on both the primary and standby servers.
+Step-by-Step Configuration for Oracle Data Guard:
+1. Configure the Primary Database:
+a. Enable Archivelog Mode (If not already enabled)
+The primary database must be in ARCHIVELOG mode for Data Guard to function, as redo logs need to be archived and shipped to the standby.
+
+Check current archive mode:
+
+SHOW PARAMETER log_archive_dest;
+Enable Archivelog mode (if not already enabled):
+
+Shutdown the database:
+
+SHUTDOWN IMMEDIATE;
+
+STARTUP MOUNT;
+ALTER DATABASE ARCHIVELOG;
+Open the database:
+sql
+Copy code
+ALTER DATABASE OPEN;
+b. Set Initialization Parameters
+Edit the spfile or pfile for the primary database to ensure the necessary parameters for Data Guard are set.
+
+Set parameters in the primary database:
+sql
+Copy code
+ALTER SYSTEM SET log_archive_config='DG_CONFIG=(PrimaryDB,StandbyDB)';
+ALTER SYSTEM SET log_archive_dest_2='SERVICE=standbyDB ASYNC VALID_FOR=(ONLINE_LOGFILES,PRIMARY_ROLE) DB_UNIQUE_NAME=standbyDB';
+ALTER SYSTEM SET log_archive_dest_state_2=ENABLE;
+ALTER SYSTEM SET fal_server=standbyDB;
+ALTER SYSTEM SET log_archive_format='%t_%s_%r.arc';
+c. Create a Password File for the Primary Database
+Oracle Data Guard requires that the primary and standby databases share the same password file for authentication.
+
+Create the password file:
+bash
+Copy code
+orapwd file=$ORACLE_HOME/dbs/orapwPRIMARYDB password=your_password entries=10
+2. Configure the Standby Database:
+a. Duplicate the Primary Database for the Standby
+You can either restore a backup from the primary database or use the RMAN utility to clone it.
+
+Create a backup of the primary database (on the primary server):
+
+bash
+Copy code
+RMAN> BACKUP DATABASE PLUS ARCHIVELOG;
+Transfer the backup to the standby server: Copy the backup files and archived redo logs to the standby server.
+
+Restore the backup on the standby database:
+
+bash
+Copy code
+RMAN> RESTORE DATABASE;
+RMAN> RECOVER DATABASE;
+b. Set Initialization Parameters
+Configure the necessary parameters for the standby database, ensuring it’s ready to receive redo logs.
+
+Set parameters in the standby database:
+sql
+Copy code
+ALTER SYSTEM SET log_archive_config='DG_CONFIG=(PrimaryDB,StandbyDB)';
+ALTER SYSTEM SET log_archive_dest_1='LOCATION=USE_DB_RECOVERY_FILE_DEST';
+ALTER SYSTEM SET log_archive_dest_2='SERVICE=primaryDB ASYNC VALID_FOR=(ONLINE_LOGFILES,STANDBY_ROLE) DB_UNIQUE_NAME=standbyDB';
+ALTER SYSTEM SET log_archive_dest_state_2=ENABLE;
+ALTER SYSTEM SET fal_client=primaryDB;
+ALTER SYSTEM SET standby_archive_dest='LOCATION=/standbyDB/archive';
+ALTER SYSTEM SET log_archive_format='%t_%s_%r.arc';
+c. Create a Password File for the Standby Database
+The standby database also needs its own password file, which should match the primary database’s password file.
+
+Create the password file for the standby database:
+bash
+Copy code
+orapwd file=$ORACLE_HOME/dbs/orapwSTANDBYDB password=your_password entries=10
+3. Enable and Start the Data Guard Services:
+a. Start the Managed Recovery Process (MRP) on the Standby Database
+To start applying redo logs, the standby database needs to be in MOUNT mode and the Managed Recovery Process (MRP) must be started.
+
+Start the recovery process on the standby:
+sql
+Copy code
+ALTER DATABASE MOUNT;
+ALTER DATABASE RECOVER MANAGED STANDBY DATABASE DISCONNECT FROM SESSION;
+b. Start Redo Transport and Apply Services
+Ensure the Log Transport Services are enabled on both databases to send and apply redo logs.
+
+On Primary Database:
+Ensure that redo logs are being shipped to the standby.
+Check that the log_archive_dest_2 is pointing to the standby service.
+On Standby Database:
+Ensure that the log_archive_dest_1 is set up to receive logs from the primary.
+4. Verify Data Guard Configuration:
+a. Check Data Guard Status
+To verify that the Data Guard configuration is set up correctly, use the following query on both the primary and standby databases:
+
+On the primary database:
+
+sql
+Copy code
+SELECT DEST_ID, STATUS, ERROR FROM V$ARCHIVE_DEST;
+On the standby database:
+
+sql
+Copy code
+SELECT DATABASE_ROLE, SWITCHOVER_STATUS FROM V$DATABASE;
+b. Check Log Shipping
+Verify that redo logs are being shipped and applied correctly.
+
+On the primary database:
+
+sql
+Copy code
+SELECT DEST_ID, STATUS, ERROR FROM V$ARCHIVE_DEST;
+On the standby database:
+
+sql
+Copy code
+SELECT PROCESS, STATUS FROM V$MANAGED_STANDBY;
+c. Test the Switchover/Failover
+Perform a switchover or failover operation to ensure everything works as expected:
+
+Switchover (Planned Role Change):
+
+sql
+Copy code
+ALTER DATABASE COMMIT TO SWITCHOVER TO STANDBY;
+Failover (Unplanned Role Change):
+
+sql
+Copy code
+ALTER DATABASE RECOVER MANAGED STANDBY DATABASE USING CURRENT LOGFILE;
+5. Configure Data Guard Broker (Optional but Recommended):
+The Data Guard Broker automates and simplifies the management of Data Guard configurations.
+
+Configure the Data Guard Broker: On both primary and standby:
+
+sql
+Copy code
+ALTER SYSTEM SET DG_BROKER_START=TRUE;
+Create a Data Guard configuration:
+
+sql
+Copy code
+DGMGRL> CREATE CONFIGURATION 'mydg' AS PRIMARY DATABASE IS primaryDB CONNECT IDENTIFIER IS primaryDB;
+DGMGRL> ADD DATABASE standbyDB AS CONNECT IDENTIFIER IS standbyDB;
+Enable the Data Guard configuration:
+
+sql
+Copy code
+DGMGRL> ENABLE CONFIGURATION;
+Conclusion:
+Once the Data Guard configuration is complete, the primary and standby databases will be synchronized through redo log shipping and application. The standby will be ready to take over in case of failover or switchover operations. The Data Guard Broker can be enabled for easier management of the Data Guard configuration, and regular monitoring of log shipping and application processes will ensure the system stays healthy and reliable.
+
+
+
+
+
+
+
+
+
+SQL> SELECT SEQUENCE#, APPLIED FROM V$ARCHIVED_LOG 
+WHERE THREAD# = 1 AND SEQUENCE# = 381;  2  
+
+ SEQUENCE# APPLIED
+---------- ---------
+       106 NO
+       106 NO
+
+SQL> SELECT PROCESS, STATUS, SEQUENCE# 
+FROM V$MANAGED_STANDBY;  2  
+
+PROCESS   STATUS	SEQUENCE#
+--------- ------------ ----------
+ARCH	  CONNECTED		0
+DGRD	  ALLOCATED		0
+DGRD	  ALLOCATED		0
+ARCH	  CONNECTED		0
+ARCH	  CONNECTED		0
+ARCH	  CONNECTED		0
+MRP0	  WAIT_FOR_LOG	      106
+
+7 rows selected.
+
+
+SQL> SELECT PROCESS, STATUS, SEQUENCE#, BLOCK# FROM V$MANAGED_STANDBY WHERE PROCESS = 'MRP0'; 
+
+PROCESS   STATUS	SEQUENCE#     BLOCK#
+--------- ------------ ---------- ----------
+MRP0	  WAIT_FOR_LOG	      106	   0
+
+
+SQL> SELECT GROUP#, THREAD#, STATUS FROM V$STANDBY_LOG;
+
+    GROUP#    THREAD# STATUS
+---------- ---------- ----------
+	 8	    1 ACTIVE
+	 9	    1 UNASSIGNED
+	10	    1 UNASSIGNED
+
+
+
+if you create pdb while installation users tablespace will automatically created
+SQL> select TABLESPACE_NAME from dba_tablespaces;
+
+TABLESPACE_NAME
+------------------------------
+SYSTEM
+SYSAUX
+UNDOTBS1
+TEMP
+USERS
+
+
+if you create pdb in cdbroot users Tablespace wont create
+SQL> select TABLESPACE_NAME from dba_tablespaces;
+
+TABLESPACE_NAME
+------------------------------
+SYSTEM
+SYSAUX
+UNDOTBS1
+TEMP
+
+
+
+SQL> SELECT process, status, client_process, sequence#, block# FROM v$managed_standby;
+
+PROCESS   STATUS       CLIENT_P  SEQUENCE#     BLOCK#
+--------- ------------ -------- ---------- ----------
+ARCH	  CLOSING      ARCH		81	    1
+DGRD	  ALLOCATED    N/A		 0	    0
+DGRD	  ALLOCATED    N/A		 0	    0
+ARCH	  CLOSING      ARCH		79	    1
+ARCH	  CLOSING      ARCH		80	    1
+ARCH	  CLOSING      ARCH		78	    1
+RFS	  IDLE	       Archival 	 0	    0
+RFS	  IDLE	       LGWR		82	 8762
+RFS	  IDLE	       UNKNOWN		 0	    0
+RFS	  IDLE	       UNKNOWN		 0	    0
+MRP0	  APPLYING_LOG N/A		82	 8762
+DGRD	  ALLOCATED    N/A		 0	    0
+

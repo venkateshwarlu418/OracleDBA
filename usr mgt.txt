@@ -1,0 +1,831 @@
+
+show parameter instance_name
+
+NAME				     TYPE	 VALUE
+------------------------------------ ----------- ------------------------------
+instance_name			     string	 vendb
+
+
+______________________________________________
+
+
+
+1. Creating User
+create user venkateshwarlu identified by VENKY;
+
+
+checking for available tablespaces
+SET LINESIZE 200
+set col sep |
+SELECT tablespace_name,
+       block_size,
+       extent_management,
+       segment_space_management,
+       status
+FROM   dba_tablespaces
+ORDER BY tablespace_name;
+TABLESPACE_NAME 	      |BLOCK_SIZE|EXTENT_MAN|SEGMEN|STATUS
+------------------------------|----------|----------|------|---------
+SYSAUX			      |      8192|LOCAL     |AUTO  |ONLINE
+SYSTEM			      |      8192|LOCAL     |MANUAL|ONLINE
+TEMP			      |      8192|LOCAL     |MANUAL|ONLINE
+UNDOTBS1		      |      8192|LOCAL     |MANUAL|ONLINE
+USERS			      |      8192|LOCAL     |AUTO  |ONLINE
+
+
+
+2. Allocating tablespace after creating the User
+
+alter user venkateshwarlu default tablespace tablespace_name
+quota <number m/g> / unlimited
+on tablespace_name;
+
+checking for quota of Tablespace
+set lines 60 pages 100
+set col sep |
+col name for a30
+desc DBA_TS_QUOTAS
+ Name			       Null?	Type
+ ----------------------------- -------- --------------------
+ TABLESPACE_NAME	    NOT NULL VARCHAR2(30)
+ USERNAME		        NOT NULL VARCHAR2(128)
+ BYTES					NUMBER
+ MAX_BYTES				NUMBER
+ BLOCKS 				NUMBER
+ MAX_BLOCKS				NUMBER
+ DROPPED				VARCHAR2(3)
+ 
+ 
+
+checking venkat quota details 
+set col sep |
+select TABLESPACE_NAME, BYTES, MAX_BYTES, BLOCKS, MAX_BLOCKS, DROPPED from DBA_TS_QUOTAS where username='VENKAT';
+
+TABLESPACE_NAME 	      |     BYTES| MAX_BYTES|	 BLOCKS|MAX_BLOCKS|DRO
+------------------------------|----------|----------|----------|----------|---
+USERS			      	  | 		0|  10485760|	      0|      1280|NO
+
+3. Allocating tablespace at the time of creating the User
+create user username
+identified by PASSWORD
+default Tablespace tablespace_name
+quota <number m/g> / unlimited
+on tablespace_name;
+
+
+
+
+4. Giving prilvileges to a user to create database objects
+
+
+grant create session to useshor_name; (for user logging)
+Grant create table to user_name; (for user table creation)
+grant create view to user_name; (for user insert values to Table)
+grant create synonym to user_name; (for user synonym)
+grant create sequence to user_name; (for user sequence)
+grant create procedure to user_name; (for user logging)
+grant create trigger to user_name; (for user logging)
+
+5. Creating a role
+Role: A set of privileges are packed together for the 
+ease of user administration. That pack is called a Role.
+A Role should have a user defined name.
+
+Create role role_name;
+
+role privileges
+
+grant create session to role_name;
+Grant create table to role_name;
+grant create view to urole_name;
+grant create synonym to role_name;
+grant create sequence to role_name;
+grant create procedure to role_name;
+grant create trigger to role_name;
+grant create cluster to role_name;
+grant create operator to role_name;
+grant create indextype to role_name;
+
+*select all the role name and granted role
+set lines 200 pages 200
+col ROLE for a30
+col GRANTED_ROLE for a30
+col ADM for a10
+col COM for a10
+col INH for a10
+col DATAPUMP_EXP_FULL_DATABASE for a30
+col EXP_FULL_DATABASE for a30
+col DATAPUMP_IMP_FULL_DATABASE for a30
+col IMP_FULL_DATABASE for a30
+select * from role_role_privs order by 1;
+
+
+6. Giving privileges to a User
+grant role_name to user-name;
+
+
+7. System defined roles
+Connect (creating session) 
+Resource (Requirements)
+DBA (creating user, grant privileges, drop user)
+
+
+8. System defined roles & user defined Roles
+grant connect to user_name;
+(Create table, Create view, Create synonym, Create sequence, Create session, etc.)
+
+grant resource to user_name;
+(Create Procedure, Create Sequence, Create Table, Create Trigger etc. 
+The primary usage of the Resource role is to restrict access to database objects.)
+grant dba to user_name;
+
+or
+
+grant connect, resource, dba to user_name;
+
+
+
+
+9. Dropping User
+
+drop user username;
+(A user will be dropeed, if the user has
+not created any object in the database)  & 
+ (A user will not be dropped by oracle, if the 
+ user has created objects in the database)
+ 
+ 
+ In this case use the command below
+ 
+ drop user username cascade;
+ 
+ (First the objects owned by the user will be dropped
+ and then the user will be droped)
+ 
+ 
+ 
+ 
+In this privs only system privs available
+ desc user_sys_privs	describes system privileges granted to the current user
+ Name						       Null?	Type
+ ----------------------------------------------------- -------- ------------------------------------
+ USERNAME							VARCHAR2(128)
+ PRIVILEGE							VARCHAR2(40)
+ ADMIN_OPTION							VARCHAR2(3)
+ COMMON 							VARCHAR2(3)
+ INHERITED							VARCHAR2(3)
+
+set lines 100
+set colsep |
+col username for a10
+col privilege for a30
+select username, privilege, admin_option, common, inherited from user_sys_privs;
+
+USERNAME  |PRIVILEGE			 |ADM|COM|INH
+----------|------------------------------|---|---|---
+SYS	  |ALTER ANY ANALYTIC VIEW	 |NO |YES|YES
+SYS	  |DROP ANY HIERARCHY		 |NO |YES|YES
+SYS	  |LOGMINING			 |NO |YES|YES
+SYS	  |DROP LOCKDOWN PROFILE	 |NO |YES|YES
+SYS	  |INHERIT ANY PRIVILEGES	 |NO |YES|YES
+SYS	  |CREATE ANY MEASURE FOLDER	 |NO |YES|YES
+SYS	  |DROP ANY CUBE		 |NO |YES|YES
+SYS	  |DROP ANY ASSEMBLY		 |NO |YES|YES
+SYS	  |MANAGE ANY FILE GROUP	 |NO |YES|YES
+SYS	  |DROP ANY SQL PROFILE 	 |NO |YES|YES
+SYS	  |ALTER ANY RULE		 |YES|YES|YES
+
+USERNAME  |PRIVILEGE			 |ADM|COM|INH
+----------|------------------------------|---|---|---
+SYS	  |CREATE RULE			 |YES|YES|YES
+SYS	  |EXECUTE ANY RULE SET 	 |YES|YES|YES
+SYS	  |CREATE ANY RULE SET		 |YES|YES|YES
+SYS	  |DEBUG CONNECT SESSION	 |NO |YES|YES
+SYS	  |ON COMMIT REFRESH		 |NO |YES|YES
+SYS	  |CREATE OPERATOR		 |NO |YES|YES
+SYS	  |DROP ANY VIEW		 |NO |YES|YES
+SYS	  |CREATE VIEW			 |NO |YES|YES
+SYS	  |CREATE PUBLIC SYNONYM	 |NO |YES|YES
+SYS	  |DROP ANY CLUSTER		 |NO |YES|YES
+SYS	  |ALTER USER			 |NO |YES|YES
+
+USERNAME  |PRIVILEGE			 |ADM|COM|INH
+----------|------------------------------|---|---|---
+SYS	  |SELECT ANY CUBE BUILD PROCESS |NO |YES|YES
+SYS	  |CREATE LOCKDOWN PROFILE	 |NO |YES|YES
+SYS	  |FLASHBACK ARCHIVE ADMINISTER  |NO |YES|YES
+SYS	  |DROP ANY CUBE BUILD PROCESS	 |NO |YES|YES
+SYS	  |CREATE CUBE BUILD PROCESS	 |NO |YES|YES
+SYS	  |DROP ANY MEASURE FOLDER	 |NO |YES|YES
+SYS	  |SELECT ANY CUBE DIMENSION	 |NO |YES|YES
+SYS	  |EXECUTE ASSEMBLY		 |NO |YES|YES
+SYS	  |ALTER ANY EDITION		 |NO |YES|YES
+SYS	  |SELECT ANY TRANSACTION	 |NO |YES|YES
+SYS	  |DROP ANY RULE		 |YES|YES|YES
+
+USERNAME  |PRIVILEGE			 |ADM|COM|INH
+----------|------------------------------|---|---|---
+SYS	  |FLASHBACK ANY TABLE		 |NO |YES|YES
+SYS	  |UNDER ANY VIEW		 |NO |YES|YES
+SYS	  |CREATE ANY INDEXTYPE 	 |NO |YES|YES
+SYS	  |CREATE ANY OPERATOR		 |NO |YES|YES
+SYS	  |EXECUTE ANY TYPE		 |NO |YES|YES
+SYS	  |CREATE PROFILE		 |NO |YES|YES
+SYS	  |DROP ANY TRIGGER		 |NO |YES|YES
+SYS	  |DROP PUBLIC DATABASE LINK	 |NO |YES|YES
+SYS	  |CREATE ANY VIEW		 |NO |YES|YES
+SYS	  |DROP PUBLIC SYNONYM		 |NO |YES|YES
+SYS	  |DROP ANY SYNONYM		 |NO |YES|YES
+
+USERNAME  |PRIVILEGE			 |ADM|COM|INH
+----------|------------------------------|---|---|---
+SYS	  |DROP ANY INDEX		 |NO |YES|YES
+SYS	  |CREATE CLUSTER		 |NO |YES|YES
+SYS	  |DROP USER			 |NO |YES|YES
+SYS	  |UNLIMITED TABLESPACE 	 |NO |YES|YES
+SYS	  |CREATE ANALYTIC VIEW 	 |NO |YES|YES
+SYS	  |DROP ANY ATTRIBUTE DIMENSION  |NO |YES|YES
+SYS	  |CREATE ANY CREDENTIAL	 |NO |YES|YES
+SYS	  |EM EXPRESS CONNECT		 |NO |YES|YES
+SYS	  |DELETE ANY MEASURE FOLDER	 |NO |YES|YES
+SYS	  |UPDATE ANY CUBE		 |NO |YES|YES
+SYS	  |DELETE ANY CUBE DIMENSION	 |NO |YES|YES
+
+USERNAME  |PRIVILEGE			 |ADM|COM|INH
+----------|------------------------------|---|---|---
+SYS	  |CREATE CUBE DIMENSION	 |NO |YES|YES
+SYS	  |CHANGE NOTIFICATION		 |NO |YES|YES
+SYS	  |ADMINISTER ANY SQL TUNING SET |NO |YES|YES
+SYS	  |CREATE JOB			 |NO |YES|YES
+SYS	  |IMPORT FULL DATABASE 	 |NO |YES|YES
+SYS	  |CREATE RULE SET		 |YES|YES|YES
+SYS	  |RESUMABLE			 |NO |YES|YES
+SYS	  |ALTER ANY OUTLINE		 |NO |YES|YES
+SYS	  |DROP ANY DIMENSION		 |NO |YES|YES
+SYS	  |CREATE ANY DIMENSION 	 |NO |YES|YES
+SYS	  |CREATE INDEXTYPE		 |NO |YES|YES
+
+USERNAME  |PRIVILEGE			 |ADM|COM|INH
+----------|------------------------------|---|---|---
+SYS	  |CREATE ANY LIBRARY		 |NO |YES|YES
+SYS	  |DROP ANY DIRECTORY		 |NO |YES|YES
+SYS	  |CREATE ANY DIRECTORY 	 |NO |YES|YES
+SYS	  |CREATE MATERIALIZED VIEW	 |NO |YES|YES
+SYS	  |ALTER DATABASE		 |NO |YES|YES
+SYS	  |GRANT ANY ROLE		 |NO |YES|YES
+SYS	  |DROP ANY ROLE		 |NO |YES|YES
+SYS	  |CREATE ANY SEQUENCE		 |NO |YES|YES
+SYS	  |DELETE ANY TABLE		 |YES|YES|YES
+SYS	  |DROP ANY ANALYTIC VIEW	 |NO |YES|YES
+SYS	  |USE ANY JOB RESOURCE 	 |NO |YES|YES
+
+USERNAME  |PRIVILEGE			 |ADM|COM|INH
+----------|------------------------------|---|---|---
+SYS	  |CREATE CREDENTIAL		 |NO |YES|YES
+SYS	  |ALTER LOCKDOWN PROFILE	 |NO |YES|YES
+SYS	  |SELECT ANY CUBE		 |NO |YES|YES
+SYS	  |CREATE CUBE			 |NO |YES|YES
+SYS	  |DROP ANY CUBE DIMENSION	 |NO |YES|YES
+SYS	  |CREATE ANY ASSEMBLY		 |NO |YES|YES
+SYS	  |CREATE ASSEMBLY		 |NO |YES|YES
+SYS	  |READ ANY FILE GROUP		 |NO |YES|YES
+SYS	  |MANAGE FILE GROUP		 |NO |YES|YES
+SYS	  |EXECUTE ANY RULE		 |YES|YES|YES
+SYS	  |CREATE ANY RULE		 |YES|YES|YES
+
+USERNAME  |PRIVILEGE			 |ADM|COM|INH
+----------|------------------------------|---|---|---
+SYS	  |EXPORT FULL DATABASE 	 |NO |YES|YES
+SYS	  |ALTER ANY EVALUATION CONTEXT  |YES|YES|YES
+SYS	  |CREATE ANY EVALUATION CONTEXT |YES|YES|YES
+SYS	  |GRANT ANY OBJECT PRIVILEGE	 |NO |YES|YES
+SYS	  |GLOBAL QUERY REWRITE 	 |NO |YES|YES
+SYS	  |ALTER ANY LIBRARY		 |NO |YES|YES
+SYS	  |CREATE TYPE			 |NO |YES|YES
+SYS	  |ALTER ANY MATERIALIZED VIEW	 |NO |YES|YES
+SYS	  |CREATE ANY TRIGGER		 |NO |YES|YES
+SYS	  |CREATE PROCEDURE		 |NO |YES|YES
+SYS	  |FORCE TRANSACTION		 |NO |YES|YES
+
+USERNAME  |PRIVILEGE			 |ADM|COM|INH
+----------|------------------------------|---|---|---
+SYS	  |CREATE SEQUENCE		 |NO |YES|YES
+SYS	  |CREATE SYNONYM		 |NO |YES|YES
+SYS	  |INSERT ANY TABLE		 |YES|YES|YES
+SYS	  |ALTER ANY TABLE		 |NO |YES|YES
+SYS	  |DROP ROLLBACK SEGMENT	 |NO |YES|YES
+SYS	  |DROP TABLESPACE		 |NO |YES|YES
+SYS	  |MANAGE TABLESPACE		 |NO |YES|YES
+SYS	  |ALTER SESSION		 |NO |YES|YES
+SYS	  |CREATE ATTRIBUTE DIMENSION	 |NO |YES|YES
+SYS	  |USE ANY SQL TRANSLATION PROFIL|NO |YES|YES
+	  |E				 |   |	 |
+
+USERNAME  |PRIVILEGE			 |ADM|COM|INH
+----------|------------------------------|---|---|---
+
+SYS	  |UPDATE ANY CUBE BUILD PROCESS |NO |YES|YES
+SYS	  |CREATE MEASURE FOLDER	 |NO |YES|YES
+SYS	  |ALTER ANY CUBE		 |NO |YES|YES
+SYS	  |MANAGE SCHEDULER		 |NO |YES|YES
+SYS	  |EXECUTE ANY PROGRAM		 |NO |YES|YES
+SYS	  |ALTER ANY RULE SET		 |YES|YES|YES
+SYS	  |ADMINISTER DATABASE TRIGGER	 |NO |YES|YES
+SYS	  |UNDER ANY TABLE		 |NO |YES|YES
+SYS	  |ALTER ANY INDEXTYPE		 |NO |YES|YES
+SYS	  |DROP ANY OPERATOR		 |NO |YES|YES
+
+USERNAME  |PRIVILEGE			 |ADM|COM|INH
+----------|------------------------------|---|---|---
+SYS	  |ALTER ANY OPERATOR		 |NO |YES|YES
+SYS	  |DROP ANY LIBRARY		 |NO |YES|YES
+SYS	  |CREATE LIBRARY		 |NO |YES|YES
+SYS	  |UNDER ANY TYPE		 |NO |YES|YES
+SYS	  |ALTER ANY TYPE		 |NO |YES|YES
+SYS	  |CREATE ANY TYPE		 |NO |YES|YES
+SYS	  |CREATE ANY MATERIALIZED VIEW  |NO |YES|YES
+SYS	  |ALTER ANY TRIGGER		 |NO |YES|YES
+SYS	  |CREATE TRIGGER		 |NO |YES|YES
+SYS	  |ALTER ANY PROCEDURE		 |NO |YES|YES
+SYS	  |CREATE ANY PROCEDURE 	 |NO |YES|YES
+
+USERNAME  |PRIVILEGE			 |ADM|COM|INH
+----------|------------------------------|---|---|---
+SYS	  |CREATE PUBLIC DATABASE LINK	 |NO |YES|YES
+SYS	  |SELECT ANY SEQUENCE		 |NO |YES|YES
+SYS	  |DROP ANY SEQUENCE		 |NO |YES|YES
+SYS	  |CREATE ANY SYNONYM		 |NO |YES|YES
+SYS	  |DROP ANY TABLE		 |NO |YES|YES
+SYS	  |ALTER ROLLBACK SEGMENT	 |NO |YES|YES
+SYS	  |CREATE USER			 |NO |YES|YES
+SYS	  |ALTER TABLESPACE		 |NO |YES|YES
+SYS	  |AUDIT SYSTEM 		 |NO |YES|YES
+SYS	  |ALTER SYSTEM 		 |NO |YES|YES
+SYS	  |ALTER ANY HIERARCHY		 |NO |YES|YES
+
+USERNAME  |PRIVILEGE			 |ADM|COM|INH
+----------|------------------------------|---|---|---
+SYS	  |CREATE HIERARCHY		 |NO |YES|YES
+SYS	  |ALTER ANY MEASURE FOLDER	 |NO |YES|YES
+SYS	  |CREATE ANY SQL TRANSLATION PRO|NO |YES|YES
+	  |FILE 			 |   |	 |
+
+SYS	  |CREATE ANY CUBE BUILD PROCESS |NO |YES|YES
+SYS	  |CREATE ANY CUBE		 |NO |YES|YES
+SYS	  |CREATE ANY MINING MODEL	 |NO |YES|YES
+SYS	  |EXECUTE ANY ASSEMBLY 	 |NO |YES|YES
+SYS	  |ALTER ANY ASSEMBLY		 |NO |YES|YES
+SYS	  |CREATE ANY EDITION		 |NO |YES|YES
+
+USERNAME  |PRIVILEGE			 |ADM|COM|INH
+----------|------------------------------|---|---|---
+SYS	  |CREATE EXTERNAL JOB		 |NO |YES|YES
+SYS	  |EXECUTE ANY CLASS		 |NO |YES|YES
+SYS	  |CREATE ANY JOB		 |NO |YES|YES
+SYS	  |DROP ANY EVALUATION CONTEXT	 |YES|YES|YES
+SYS	  |DEBUG ANY PROCEDURE		 |NO |YES|YES
+SYS	  |MERGE ANY VIEW		 |NO |YES|YES
+SYS	  |DROP ANY CONTEXT		 |NO |YES|YES
+SYS	  |ENQUEUE ANY QUEUE		 |YES|YES|YES
+SYS	  |EXECUTE ANY INDEXTYPE	 |NO |YES|YES
+SYS	  |ALTER RESOURCE COST		 |NO |YES|YES
+SYS	  |DROP PROFILE 		 |NO |YES|YES
+
+USERNAME  |PRIVILEGE			 |ADM|COM|INH
+----------|------------------------------|---|---|---
+SYS	  |ALTER PROFILE		 |NO |YES|YES
+SYS	  |EXECUTE ANY PROCEDURE	 |NO |YES|YES
+SYS	  |FORCE ANY TRANSACTION	 |NO |YES|YES
+SYS	  |AUDIT ANY			 |NO |YES|YES
+SYS	  |ALTER ANY ROLE		 |NO |YES|YES
+SYS	  |CREATE ANY CLUSTER		 |NO |YES|YES
+SYS	  |COMMENT ANY TABLE		 |NO |YES|YES
+SYS	  |CREATE ANY TABLE		 |NO |YES|YES
+SYS	  |CREATE TABLE 		 |NO |YES|YES
+SYS	  |CREATE TABLESPACE		 |NO |YES|YES
+SYS	  |CREATE ANY ANALYTIC VIEW	 |NO |YES|YES
+
+USERNAME  |PRIVILEGE			 |ADM|COM|INH
+----------|------------------------------|---|---|---
+SYS	  |CREATE ANY ATTRIBUTE DIMENSION|NO |YES|YES
+SYS	  |READ ANY TABLE		 |YES|YES|YES
+SYS	  |SELECT ANY MEASURE FOLDER	 |NO |YES|YES
+SYS	  |DROP ANY SQL TRANSLATION PROFI|NO |YES|YES
+	  |LE				 |   |	 |
+
+SYS	  |ALTER ANY SQL TRANSLATION PROF|NO |YES|YES
+	  |ILE				 |   |	 |
+
+SYS	  |UPDATE ANY CUBE DIMENSION	 |NO |YES|YES
+SYS	  |INSERT ANY MEASURE FOLDER	 |NO |YES|YES
+
+USERNAME  |PRIVILEGE			 |ADM|COM|INH
+----------|------------------------------|---|---|---
+SYS	  |CREATE ANY CUBE DIMENSION	 |NO |YES|YES
+SYS	  |ALTER ANY CUBE DIMENSION	 |NO |YES|YES
+SYS	  |ALTER ANY MINING MODEL	 |NO |YES|YES
+SYS	  |DROP ANY MINING MODEL	 |NO |YES|YES
+SYS	  |DROP ANY EDITION		 |NO |YES|YES
+SYS	  |ADMINISTER SQL TUNING SET	 |NO |YES|YES
+SYS	  |ALTER ANY SQL PROFILE	 |NO |YES|YES
+SYS	  |DROP ANY RULE SET		 |YES|YES|YES
+SYS	  |EXECUTE ANY EVALUATION CONTEXT|YES|YES|YES
+SYS	  |ADMINISTER RESOURCE MANAGER	 |NO |YES|YES
+SYS	  |DROP ANY OUTLINE		 |NO |YES|YES
+
+USERNAME  |PRIVILEGE			 |ADM|COM|INH
+----------|------------------------------|---|---|---
+SYS	  |DEQUEUE ANY QUEUE		 |YES|YES|YES
+SYS	  |ALTER ANY DIMENSION		 |NO |YES|YES
+SYS	  |CREATE DIMENSION		 |NO |YES|YES
+SYS	  |QUERY REWRITE		 |NO |YES|YES
+SYS	  |EXECUTE ANY LIBRARY		 |NO |YES|YES
+SYS	  |GRANT ANY PRIVILEGE		 |NO |YES|YES
+SYS	  |CREATE ROLE			 |NO |YES|YES
+SYS	  |ALTER ANY SEQUENCE		 |NO |YES|YES
+SYS	  |ALTER ANY CLUSTER		 |NO |YES|YES
+SYS	  |REDEFINE ANY TABLE		 |NO |YES|YES
+SYS	  |LOCK ANY TABLE		 |NO |YES|YES
+
+USERNAME  |PRIVILEGE			 |ADM|COM|INH
+----------|------------------------------|---|---|---
+SYS	  |BACKUP ANY TABLE		 |NO |YES|YES
+SYS	  |CREATE ANY HIERARCHY 	 |NO |YES|YES
+SYS	  |ALTER ANY ATTRIBUTE DIMENSION |NO |YES|YES
+SYS	  |ALTER ANY CUBE BUILD PROCESS  |NO |YES|YES
+SYS	  |SET CONTAINER		 |NO |YES|YES
+SYS	  |CREATE PLUGGABLE DATABASE	 |NO |YES|YES
+SYS	  |CREATE SQL TRANSLATION PROFILE|NO |YES|YES
+SYS	  |ADMINISTER SQL MANAGEMENT OBJE|NO |YES|YES
+	  |CT				 |   |	 |
+
+SYS	  |INSERT ANY CUBE DIMENSION	 |NO |YES|YES
+
+USERNAME  |PRIVILEGE			 |ADM|COM|INH
+----------|------------------------------|---|---|---
+SYS	  |COMMENT ANY MINING MODEL	 |NO |YES|YES
+SYS	  |SELECT ANY MINING MODEL	 |NO |YES|YES
+SYS	  |CREATE MINING MODEL		 |NO |YES|YES
+SYS	  |CREATE ANY SQL PROFILE	 |NO |YES|YES
+SYS	  |ADVISOR			 |NO |YES|YES
+SYS	  |CREATE EVALUATION CONTEXT	 |YES|YES|YES
+SYS	  |DEBUG CONNECT ANY		 |NO |YES|YES
+SYS	  |CREATE ANY OUTLINE		 |NO |YES|YES
+SYS	  |CREATE ANY CONTEXT		 |NO |YES|YES
+SYS	  |MANAGE ANY QUEUE		 |YES|YES|YES
+SYS	  |DROP ANY INDEXTYPE		 |NO |YES|YES
+
+USERNAME  |PRIVILEGE			 |ADM|COM|INH
+----------|------------------------------|---|---|---
+SYS	  |EXECUTE ANY OPERATOR 	 |NO |YES|YES
+SYS	  |DROP ANY TYPE		 |NO |YES|YES
+SYS	  |DROP ANY MATERIALIZED VIEW	 |NO |YES|YES
+SYS	  |ANALYZE ANY			 |NO |YES|YES
+SYS	  |DROP ANY PROCEDURE		 |NO |YES|YES
+SYS	  |CREATE DATABASE LINK 	 |NO |YES|YES
+SYS	  |ALTER ANY INDEX		 |NO |YES|YES
+SYS	  |CREATE ANY INDEX		 |NO |YES|YES
+SYS	  |UPDATE ANY TABLE		 |YES|YES|YES
+SYS	  |SELECT ANY TABLE		 |YES|YES|YES
+SYS	  |CREATE ROLLBACK SEGMENT	 |NO |YES|YES
+
+USERNAME  |PRIVILEGE			 |ADM|COM|INH
+----------|------------------------------|---|---|---
+SYS	  |BECOME USER			 |NO |YES|YES
+SYS	  |RESTRICTED SESSION		 |NO |YES|YES
+SYS	  |CREATE SESSION		 |NO |YES|YES
+
+235 rows selected.
+
+
+				********************
+
+This is for system  not for user
+desc user_tab_privs 
+(describes the object grants for which the current user 
+is the object owner, grantor, or grantee. Its columns are 
+the same as those in DBA_TAB_PRIVS . See Also: "DBA_TAB_PRIVS" 1 
+Changes in This Release for Oracle Database Reference.)
+ Name						       Null?	Type
+ ----------------------------------------------------- -------- ------------------------------------
+ GRANTEE							VARCHAR2(128)
+ OWNER								VARCHAR2(128)
+ TABLE_NAME							VARCHAR2(128)
+ GRANTOR							VARCHAR2(128)
+ PRIVILEGE							VARCHAR2(40)
+ GRANTABLE							VARCHAR2(3)
+ HIERARCHY							VARCHAR2(3)
+ COMMON 							VARCHAR2(3)
+ TYPE								VARCHAR2(24)
+ INHERITED							VARCHAR2(3)
+ 
+set lines 200
+set colsep |
+col grantee for a30
+col owner for a20
+col table_name for a20
+col grantor for a20
+col privilege for a20
+col grantable for a20
+col hierarchy for a20
+col type for a10
+col inherited for a20
+select grantee, owner, table_name, grantor, privilege, grantable, hierarchy, type inherited from user_tab_privs;
+
+GRANTEE |OWNER |TABLE_NAME	|GRANTOR	|PRIVILEGE 	  |GRANTABLE	|HIERARCHY	|INHERITED
+
+			**********************
+This is for system user
+			
+desc user_role_privs 
+describes the roles granted to the current user.
+ Name						       Null?	Type
+ ----------------------------------------------------- -------- ------------------------------------
+ USERNAME							VARCHAR2(128)
+ GRANTED_ROLE							VARCHAR2(128)
+ ADMIN_OPTION							VARCHAR2(3)
+ DELEGATE_OPTION						VARCHAR2(3)
+ DEFAULT_ROLE							VARCHAR2(3)
+ OS_GRANTED							VARCHAR2(3)
+ COMMON 							VARCHAR2(3)
+ INHERITED							VARCHAR2(3)
+
+select username, granted_role, admin_option, delegate_option, default_role, os_granted, common, inherited from user_role_privs;
+USERNAME  |GRANTED_ROLE |ADM|DEL|DEF|OS_|COM|INHERITED
+
+in SYS user
+
+select username, granted_role, admin_option, delegate_option, default_role, os_granted, common, inherited from user_role_privs where granted_role='VENKATROLE';
+
+USERNAME  |GRANTED_ROLE 		 |ADMIN_OPTI|DEL|DEF|OS_|COMMON    |INHERITED
+----------|------------------------------|----------|---|---|---|----------|--------------------
+SYS	  	  |VENKATROLE			 |YES	    |NO |YES|NO |NO	   |NO
+
+
+in venkat user
+select username, granted_role, admin_option, delegate_option, default_role, os_granted, common, inherited from user_role_privs where granted_role='VENKATROLE';
+
+USERNAME  |GRANTED_ROLE 		 |ADMIN_OPTI|DEL|DEF|OS_|COMMON    |INHERITED
+----------|------------------------------|----------|---|---|---|----------|--------------------
+VENKAT	  |VENKATROLE			 |NO	    |NO |YES|NO |NO	   |NO
+
+There are various scripts floating around that will do that depending 
+on how crazy you want to get. I would personally use 
+Pete Finnigan's find_all_privs script.
+
+If you want to write it yourself, the query gets rather challenging. 
+Users can be granted system privileges which are visible in DBA_SYS_PRIVS. 
+They can be granted object privileges which are visible in DBA_TAB_PRIVS. 
+And they can be granted roles which are visible in DBA_ROLE_PRIVS 
+(roles can be default or non-default and can require a password as well, 
+so just because a user has been granted a role doesn't mean that the user 
+can necessarily use the privileges he acquired through the role by default). 
+But those roles can, in turn, be granted system privileges, object privileges, 
+and additional roles which can be viewed by looking at ROLE_SYS_PRIVS, ROLE_TAB_PRIVS, 
+and ROLE_ROLE_PRIVS. Pete's script walks through those relationships to show all the 
+privileges that end up flowing to a user.
+
+
+
+
+			************************
+			
+Users can be granted system privileges which are visible in DBA_SYS_PRIVS
+desc DBA_SYS_PRIVS 
+ describes system privileges granted to users and roles. 
+ This view does not display the USERNAME column. 
+ Related View. USER_SYS_PRIVS describes system privileges 
+ granted to the current user. This view does not display the 
+ GRANTEE column, but instead displays the USERNAME column.
+ Name					   Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ GRANTEE					    VARCHAR2(128)
+ PRIVILEGE					    VARCHAR2(40)
+ ADMIN_OPTION					    VARCHAR2(3)
+ COMMON 					    VARCHAR2(3)
+ INHERITED					    VARCHAR2(3)
+set lines 150
+set colsep | 
+select grantee, privilege, admin_option, common, inherited from dba_sys_privs where grantee='VENKAT';
+
+GRANTEE 		      |PRIVILEGE	   |ADM|COM|INHERITED
+------------------------------|--------------------|---|---|--------------------
+VENKAT			      |UNLIMITED TABLESPACE|NO |NO |NO
+
+
+
+			********************************
+			
+They can be granted object privileges which are visible in DBA_TAB_PRIVS
+desc DBA_TAB_PRIVS 
+describes all object grants in the database. 
+Related View. USER_TAB_PRIVS describes the object 
+grants for which the current user is the object owner, 
+grantor, or grantee. Column. Datatype.
+ Name					   Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ GRANTEE					    VARCHAR2(128)
+ OWNER						    VARCHAR2(128)
+ TABLE_NAME					    VARCHAR2(128)
+ GRANTOR					    VARCHAR2(128)
+ PRIVILEGE					    VARCHAR2(40)
+ GRANTABLE					    VARCHAR2(3)
+ HIERARCHY					    VARCHAR2(3)
+ COMMON 					    VARCHAR2(3)
+ TYPE						    VARCHAR2(24)
+ INHERITED					    VARCHAR2(3)
+set lines 200
+set colsep |
+col grantee for a20
+col owner for a20
+col table_name for a20
+col grantor for a20
+col privilege for a20
+col grantable for a20
+col hierarchy for a20
+col common for a20
+col type for a20
+col inherited for a20
+select grantee, owner, table_name, grantor, privilege, grantable, hierarchy, common, type, inherited from DBA_TAB_PRIVS where grantee='VENKAT';
+select grantee, owner, table_name, grantor, privilege, grantable, hierarchy, common, type, inherited from DBA_TAB_PRIVS;
+
+And they can be granted roles which are visible in DBA_ROLE_PRIVS 
+(roles can be default or non-default and can require a password as well, 
+so just because a user has been granted a role doesn't 
+mean that the user can necessarily use the privileges 
+he acquired through the role by default).
+
+desc DBA_ROLE_PRIVS
+escribes the roles granted to all users and 
+roles in the database. Related View. 
+USER_ROLE_PRIVS describes the roles 
+granted to the current user. Column. Datatype.
+ Name					   Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ GRANTEE					    VARCHAR2(128)
+ GRANTED_ROLE					    VARCHAR2(128)
+ ADMIN_OPTION					    VARCHAR2(3)
+ DELEGATE_OPTION				    VARCHAR2(3)
+ DEFAULT_ROLE					    VARCHAR2(3)
+ COMMON 					    VARCHAR2(3)
+ INHERITED					    VARCHAR2(3)
+
+
+
+select GRANTEE, GRANTED_ROLE, ADMIN_OPTION, DELEGATE_OPTION, DEFAULT_ROLE, COMMON, INHERITED from DBA_ROLE_PRIVS where grantee='VENKAT';
+SQL> set lines 200
+set colsep |
+col grantee for a20
+col granted_role for a20
+col admin_option for a20
+col delegate_option for a20
+col default_role for a20
+col common for a20
+col inherited for a20
+select GRANTEE, GRANTED_ROLE, ADMIN_OPTION, DELEGATE_OPTION, DEFAULT_ROLE, COMMON, INHERITED from DBA_ROLE_PRIVS where grantee='VENKAT';SQL> SQL> SQL> SQL> SQL> SQL> SQL> SQL> SQL> 
+
+GRANTEE 	    |GRANTED_ROLE	 |ADMIN_OPTION	      |DELEGATE_OPTION	   |DEFAULT_ROLE	|COMMON 	     |INHERITED
+----------------|----------------|--------------------|--------------------|--------------------|--------------------|--------------------
+VENKAT		    |RESOURCE		 |NO		      |NO		   |YES 		|NO		     |NO
+VENKAT		    |DBA		 	 |NO		      |NO		   |YES 		|NO		     |NO
+VENKAT		    |CONNECT		 |NO		      |NO		   |YES 		|NO		     |NO
+
+But those roles can, in turn, be granted system privileges, 
+object privileges, and additional roles which can 
+be viewed by looking at ROLE_SYS_PRIVS
+desc ROLE_SYS_PRIVS (describes system privileges granted to roles.)
+Name					   Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ ROLE						    VARCHAR2(128)
+ PRIVILEGE					    VARCHAR2(40)
+ ADMIN_OPTION					    VARCHAR2(3)
+ COMMON 					    VARCHAR2(3)
+ INHERITED					    VARCHAR2(3)
+SQL> select ROLE, PRIVILEGE, ADMIN_OPTION, COMMON, INHERITED from ROLE_SYS_PRIVS where role='RESOURCE';
+
+ROLE		    |PRIVILEGE		 |ADMIN_OPTION	      |COMMON		   |INHERITED
+--------------------|--------------------|--------------------|--------------------|--------------------
+RESOURCE	    |CREATE SEQUENCE	 |NO		      |YES		   |YES
+RESOURCE	    |CREATE PROCEDURE	 |NO		      |YES		   |YES
+RESOURCE	    |CREATE CLUSTER	 	 |NO		      |YES		   |YES
+RESOURCE	    |CREATE INDEXTYPE	 |NO		      |YES		   |YES
+RESOURCE	    |CREATE OPERATOR	 |NO		      |YES		   |YES
+RESOURCE	    |CREATE TYPE	 	 |NO		      |YES		   |YES
+RESOURCE	    |CREATE TRIGGER	 	 |NO		      |YES		   |YES
+RESOURCE	    |CREATE TABLE	 	 |NO		      |YES		   |YES
+
+SQL> select ROLE, PRIVILEGE, ADMIN_OPTION, COMMON, INHERITED from ROLE_SYS_PRIVS where role='CONNECT';
+
+ROLE		    |PRIVILEGE		 |ADMIN_OPTION	      |COMMON		   |INHERITED
+--------------------|--------------------|--------------------|--------------------|--------------------
+CONNECT 	    |SET CONTAINER	 |NO		      |YES		   |YES
+CONNECT 	    |CREATE SESSION	 |NO		      |YES		   |YES
+
+
+desc ROLE_TAB_PRIVS
+describes table privileges granted to roles. 
+Information is provided only about roles to 
+which the user has access. Column. Datatype. NULL.
+
+Name					   Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ ROLE						    VARCHAR2(128)
+ OWNER						    VARCHAR2(128)
+ TABLE_NAME					    VARCHAR2(128)
+ COLUMN_NAME					VARCHAR2(128)
+ PRIVILEGE					    VARCHAR2(40)
+ GRANTABLE					    VARCHAR2(3)
+ COMMON 					    VARCHAR2(3)
+ INHERITED					    VARCHAR2(3)
+
+set lines 200
+set colsep |
+col role for a30
+col owner for a10
+col table_name for a30
+col column_name for a10
+col privilege for a10
+col grantable for a10
+col common for a10
+col inherited for a30
+select role, owner, table_name, column_name, privilege, grantable, common, inherited from ROLE_TAB_PRIVS where role ='RESOURCE';
+
+
+desc ROLE_ROLE_PRIVS
+describes the roles granted to other roles. 
+Information is provided only about roles to 
+which the user has access.
+ Name					   Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ ROLE						    VARCHAR2(128)
+ GRANTED_ROLE					    VARCHAR2(128)
+ ADMIN_OPTION					    VARCHAR2(3)
+ COMMON 					    VARCHAR2(3)
+ INHERITED					    VARCHAR2(3)
+
+
+set lines 200
+set colsep |
+col role for a30
+col granted_role for a30
+col ADMIN_OPTION for a30
+col COMMON for a30
+col INHERITED for a30
+select role, GRANTED_ROLE, ADMIN_OPTION, COMMON, INHERITED from ROLE_ROLE_PRIVS;
+
+
+
+Some TODOs for myself: 1. Add indicator if user can grant the privilege by granting a role to another user. 
+2. Figure out how to do this for current user without DBA privileges. 
+Probably involves USER_SYS_PRIVS (directly granted system privileges), 
+USER_TAB_PRIVS (directly granted object privs) USER_ROLE_PRIVS (user's directly granted roles), 
+ROLE_ROLE_PRIVS (for getting inherited roles), ROLE_SYS_PRIVS (system privs through roles) 
+and ROLE_TAB_PRIVS (object privs through roles). Ugh. Oracle is so complicated
+
+
+set lines 100 pages 100
+set col sep |
+col username for a10
+col privilege for a30
+col admin_option for a10
+col common for a10
+col INHERITED for a10
+select * from user_sys_privs;
+(describes system privileges granted to the current user.)
+
+
+USERNAME	    |PRIVILEGE		 |ADM|COM|INH
+
+
+
+
+set lines 200 pages 200
+set col sep |
+col grantee for a20
+col owner for a10
+col table_name for a30
+col grantor for a10
+col privilege for a10
+col type for a10
+select * from user_tab_privs;
+
+(describes the object grants for which the current user 
+is the object owner, grantor, or grantee. Its columns are 
+the same as those in DBA_TAB_PRIVS . See Also: "DBA_TAB_PRIVS" 
+1 Changes in This Release for Oracle Database Reference.)
+
+GRANTEE |OWNER     |TABLE_NAME	 |GRANTOR	 |PRIVILEGE |GRA|HIE|COM|TYPE	   |INH
+
+
+set lines 100 pages 100
+set col sep |
+col username for a10
+col granted_role for a30
+select * from user_role_privs;
+(describes the roles granted to the current user. Column. Datatype.)
+
+USERNAME  |GRANTED_ROLE 		 |ADM|DEL|DEF|OS_|COM|INH
+
+
+
+

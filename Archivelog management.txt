@@ -1,0 +1,71 @@
+										Archivelog Management
+										
+1. Check Current Log Mode
+
+SQL> SELECT LOG_MODE FROM V$DATABASE;
+
+LOG_MODE
+------------
+NOARCHIVELOG
+
+2. Enable ARCHIVELOG Mode:
+
+SQL> SHUTDOWN IMMEDIATE;
+SQL> exit
+[oracle@oraclept ~]$ sqlplus / as sysdba
+SQL> STARTUP MOUNT;
+SQL> ALTER DATABASE ARCHIVELOG;
+SQL> ALTER DATABASE OPEN;
+SQL> select log_mode from v$database;
+
+LOG_MODE
+------------
+ARCHIVELOG
+
+
+3. Check Archive Log Destination (which displays the Destination for logs 1....31 destinations)
+
+SQL> show parameter log_archive_dest;
+NAME				     TYPE	 VALUE
+------------------- ----------- ---------
+log_archive_dest	   string
+log_archive_dest_1	   string
+
+SQL> show parameter log_archive_format;
+
+NAME				     				TYPE		 VALUE
+------------------------------------ ----------- ------------------------------
+log_archive_format		     			string	 	%t_%s_%r.dbf
+
+
+SQL> archive log list
+
+Database log mode	       Archive Mode
+Automatic archival	       Enabled
+Archive destination	       USE_DB_RECOVERY_FILE_DEST
+Oldest online log sequence     27
+Next log sequence to archive   29
+Current log sequence	       29
+
+SQL> show parameter DB_RECOVERY_FILE_DEST   (this is the default destination (FRA))
+
+NAME				     				TYPE	 		VALUE
+------------------------------------ ----------- 	------------------------------
+db_recovery_file_dest		     		string	 		/u01/app/oracle/fast_recovery_area
+db_recovery_file_dest_size	     		big integer 	8256M
+
+-- First check for whether logs are generating in this location or NOT
+SQL> alter system switch logfile;
+/
+/
+-- Go to the location in OS LEVEL
+[oracle@oraclept ~]$ cd /u01/app/oracle/fast_recovery_area/PRODDB/archivelog/2025_05_15
+[oracle@oraclept 2025_05_15]$ ls -lrt
+total 6444
+-rw-r-----. 1 oracle oinstall 6574592 May 15 13:00 o1_mf_1_29_n2c61g5q_.arc
+-rw-r-----. 1 oracle oinstall    1024 May 15 13:01 o1_mf_1_30_n2c621ow_.arc
+-rw-r-----. 1 oracle oinstall   15872 May 15 13:01 o1_mf_1_31_n2c6254v_.arc
+
+-- we found that logs are generating
+
+4. Change Archive Log Destination (if needed)

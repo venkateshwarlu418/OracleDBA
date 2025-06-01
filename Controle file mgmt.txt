@@ -1,0 +1,109 @@
+
+=============================================================================================================
+next go to oracle home location
+[oracle@venky ~]$ sqlplus / as sysdba
+
+Connected to an idle instance.
+
+create spfile from pfile
+create pfile from spfile
+
+now startup the Database
+
+
+startup;
+
+Database mounted.
+Database opened.
+
+---- check for existed controlfiles
+
+SQL> show parameter control
+
+NAME				     TYPE	 VALUE
+------------------------------------ ----------- ------------------------------
+control_file_record_keep_time	     integer	 7
+control_files			     		 string	 /u01/app/oracle/oradata/VENDB/controlfile/
+												o1_mf_mlmhgbcp_.ctl, /u01/app/oracle/
+												fast_recovery_area/VENDB/controlfile/o1_m
+												f_mlmhgbf2_.ctl
+control_management_pack_access	     string	 DIAGNOSTIC+TUNING
+
+
+---- in another window create multiplex/control_file DIRECTORY
+oracle@venky ~]$ mkdir -p /u01/multiplex/control_file
+
+--- go to sql window and add multiplex controlfile to existed controlfiles
+
+
+SQL> alter SYSTEM set control_files = '/u01/app/oracle/oradata/VENDB/controlfile/o1_mf_mlmhgbcp_.ctl' , '/u01/app/oracle/fast_recovery_area/VENDB/controlfile/o1_mf_mlmhgbf2_.ctl', '/u01/multiplex/control_file/control003.ctl' scope = spfile;
+
+System altered.
+
+--- checking for multiplex controlfile added or NOT
+
+SQL> show parameter control
+
+NAME				     TYPE	 VALUE
+------------------------------------ ----------- ------------------------------
+control_file_record_keep_time	     integer	 7
+control_files			     		 string	 /u01/app/oracle/oradata/VENDB/
+											 controlfile/o1_mf_mlmhgbcp_.ct
+											 l, /u01/app/oracle/fast_recove
+											 ry_area/VENDB/controlfile/o1_m
+											 f_mlmhgbf2_.ctl
+control_management_pack_access	     string	 DIAGNOSTIC+TUNING
+
+--- multiplex controlfile not added so do shut down and exit
+
+
+SQL> shut immediate;
+SQL> exit
+
+--- in os level copy the existed controlfile details to multiplex controlfile,
+	for that we have to go to existed controlfile location and copy and multiplex controlfile and copy
+	
+[oracle@venky ~]$ cp /u01/app/oracle/oradata/VENDB/controlfile/o1_mf_mlmhgbcp_.ctl /u01/multiplex/control_file/control003.ctl
+
+[oracle@venky ~]$ cd u01
+[oracle@venky u01]$ ll
+total 0
+drwxr-xr-x. 3 oracle oinstall 26 Nov 18 15:13 multiplex
+[oracle@venky u01]$ cd multiplex
+[oracle@venky multiplex]$ ll
+total 0
+drwxr-xr-x. 2 oracle oinstall 6 Nov 18 15:13 control_file
+[oracle@venky multiplex]$ ls -lrt
+total 0
+drwxr-xr-x. 2 oracle oinstall 6 Nov 18 15:13 control_file
+[oracle@venky multiplex]$ cd
+
+---- connect to sql
+
+[oracle@venky ~]$ sqlplus / as sysdba
+
+Connected to an idle instance.
+
+SQL> startup;
+
+Database mounted.
+Database opened.
+
+-- checking for multiplex controlfile added or not
+SQL> show parameter control
+
+NAME				     TYPE	 VALUE
+------------------------------------ ----------- ------------------------------
+control_file_record_keep_time	     integer	 7
+control_files			     		 string	 /u01/app/oracle/oradata/VENDB/
+											 controlfile/o1_mf_mlmhgbcp_.ct
+											 l, /u01/app/oracle/fast_recove
+											 ry_area/VENDB/controlfile/o1_m
+											 f_mlmhgbf2_.ctl, /u01/multiple
+											 x/control_file/control003.ctl
+control_management_pack_access	     string	 DIAGNOSTIC+TUNING
+
+---- multiplex controlfile added and check in os level then there also available
+
+
+==================================================================================

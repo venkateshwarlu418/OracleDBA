@@ -1,0 +1,15 @@
+SQL> set lines 500 pages 500
+SQL> col BANNER for a80
+SQL> col BANNER_FULL for a110
+SQL> col BANNER_LEGACY for a80
+SQL> SELECT * FROM v$version;
+BANNER																				 BANNER_FULL													BANNER_LEGACY		     CON_ID
+-------------------------------------------------------------------------------- -------------------------------------------------------------------------------------------------------------- -------------------------------------------------------------------------------- ----------
+Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production		 Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production 					Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production			  0
+										 Version 19.3.0.0.0
+
+SQL> SELECT inst_id, host_name, status FROM gv$instance;
+
+   INST_ID HOST_NAME							    STATUS
+---------- ---------------------------------------------------------------- ------------
+	 1 rac1.com							    OPEN

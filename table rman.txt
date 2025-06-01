@@ -1,0 +1,231 @@
+through Rman:
+
+RECOVER TABLE "SCOTT"."SALGRADE" UNTIL TIME "TO_DATE('20-MAY-2022 10:30', 'DD-MON-YYYY HH24:MI')" AUXILIARY DESTINATION '/u01/aux' ;
+RECOVER TABLE "VEN"."VEN" UNTIL TIME "TO_DATE('10-DEC-2024 22:37', 'DD-MON-YYYY HH24:MI')" AUXILIARY DESTINATION '/u01/aux';
+
+recover table "ven"."ven" until time "to_date('10-dec-2024 22:37', 'dd-mon-yyy hh24:mi')" auxiliary destination '/u01/aux';
+RECOVER TABLE "SCOTT"."SALGRADE" OF PLUGGABLE DATABASE SBI_SAV
+  UNTIL TIME "TO_DATE('21-MAR-2024 9:12', 'DD-MON-YYYY HH24:MI')"
+  AUXILIARY DESTINATION '/u01/aux'
+  DATAPUMP DESTINATION '/u01/export';
+  
+recover table "ven"."ven" until time "to_date('10-DEC-2024 22:37:00','DD-MON-YYYY HH24:MI:SS')" auxiliary destination'/u01/aux'; 
+restore table "ven"."ven" until time "to_date('10-DEC-2024 22:37:00','DD-MON-YYYY HH24:MI:SS')" auxiliary destination'/u01/aux';
+run 
+{
+  until time "to_date('10-dec-2024 22:14', 'dd-mon-yyy hh24:mi')" auxiliary destination '/u01/aux';
+  restore table ven;
+  recover table ven;
+}
+
+
+
+go to sqlplus 
+if it is in startup mode do shut it down
+keep it in archive mode
+
+alter system swich logfile;
+
+set time on
+
+create a user and create table in that user and insert values into it
+mkdir -p /u01/aux
+rman target /
+recover table
+RECOVER TABLE "VEN"."VEN" UNTIL TIME "TO_DATE('10-DEC-2024 22:37', 'DD-MON-YYYY HH24:MI')" AUXILIARY DESTINATION '/u01/aux';
+
+recover table "bkp"."bkp" until time "to_date('12-
+
+RECOVER TABLE "BKP"."BKP" UNTIL TIME "TO_DATE('12-DEC-2024 14:06:33', 'DD-MON-YYYY HH24:MI:SS')" AUXILIARY DESTINATION '/u01/aux';
+
+
+
+
+
+
+
+
+[oracle@oraclept ~]$ . oraenv
+ORACLE_SID = [proddb] ? proddb
+The Oracle base remains unchanged with value /u01/app/oracle
+[oracle@oraclept ~]$ sqlplus / as sysdba
+
+SQL*Plus: Release 19.0.0.0.0 - Production on Thu Dec 12 14:01:00 2024
+Version 19.3.0.0.0
+
+Copyright (c) 1982, 2019, Oracle.  All rights reserved.
+
+
+Connected to:
+Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.3.0.0.0
+
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> create user bkp identified by bkp;  
+
+User created.
+
+SQL> grant connect, resource, create session to bkp;
+
+Grant succeeded.
+
+SQL> alter user bkp default tablespace users;
+
+User altered.
+
+SQL> alter user bkp quota unlimited on users;
+
+User altered.
+
+SQL> conn bkp/bkp
+Connected.
+SQL> create table bkp (slno number);
+
+Table created.
+
+SQL> insert into bkp values (10);
+
+1 row created.
+
+SQL> /
+
+1 row created.
+
+SQL> /
+
+1 row created.
+
+SQL> /
+
+1 row created.
+
+SQL> /
+
+1 row created.
+
+SQL> /
+
+1 row created.
+
+SQL> /
+
+1 row created.
+
+SQL> /
+
+1 row created.
+
+SQL> /
+
+1 row created.
+
+SQL> /
+
+1 row created.
+
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> commit;
+
+Commit complete.
+
+SQL> exit
+Disconnected from Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.3.0.0.0
+[oracle@oraclept ~]$ mkdir -p /u01/aux
+[oracle@oraclept ~]$ 
+[oracle@oraclept ~]$ 
+[oracle@oraclept ~]$ 
+[oracle@oraclept ~]$ 
+[oracle@oraclept ~]$ rman target /
+
+Recovery Manager: Release 19.0.0.0.0 - Production on Thu Dec 12 14:04:35 2024
+Version 19.3.0.0.0
+
+Copyright (c) 1982, 2019, Oracle and/or its affiliates.  All rights reserved.
+
+connected to target database: PRODDB (DBID=896617639)
+
+RMAN> backup database plus archivelog;
+RMAN> exit
+
+
+Recovery Manager complete.
+[oracle@oraclept ~]$ sqlplus / as sysdba
+SQL> drop table bkp.bkp
+  2  ;
+
+Table dropped.
+
+SQL> exit
+Disconnected from Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.3.0.0.0
+[oracle@oraclept ~]$ rman target /
+connected to target database: PRODDB (DBID=896617639)
+RMAN> RECOVER TABLE "BKP"."BKP" UNTIL TIME "TO_DATE('12-DEC-2024 14:06:33', 'DD-MON-YYYY HH24:MI:SS')" AUXILIARY DESTINATION '/u01/aux';
+
+Performing export of tables...
+   EXPDP> Starting "SYS"."TSPITR_EXP_imtb_axwD":  
+   EXPDP> Processing object type TABLE_EXPORT/TABLE/TABLE_DATA
+   EXPDP> Processing object type TABLE_EXPORT/TABLE/STATISTICS/TABLE_STATISTICS
+   EXPDP> Processing object type TABLE_EXPORT/TABLE/TABLE
+   EXPDP> . . exported "BKP"."BKP"                                 5.109 KB      10 rows
+   EXPDP> Master table "SYS"."TSPITR_EXP_imtb_axwD" successfully loaded/unloaded
+   EXPDP> ******************************************************************************
+   EXPDP> Dump file set for SYS.TSPITR_EXP_imtb_axwD is:
+   EXPDP>   /u01/aux/tspitr_imtb_78014.dmp
+   EXPDP> Job "SYS"."TSPITR_EXP_imtb_axwD" successfully completed at Thu Dec 12 14:26:29 2024 elapsed 0 00:00:17
+Export completed
+
+Performing import of tables...
+   IMPDP> Master table "SYS"."TSPITR_IMP_imtb_eBDc" successfully loaded/unloaded
+   IMPDP> Starting "SYS"."TSPITR_IMP_imtb_eBDc":  
+   IMPDP> Processing object type TABLE_EXPORT/TABLE/TABLE
+   IMPDP> Processing object type TABLE_EXPORT/TABLE/TABLE_DATA
+   IMPDP> . . imported "BKP"."BKP"                                 5.109 KB      10 rows
+   IMPDP> Processing object type TABLE_EXPORT/TABLE/STATISTICS/TABLE_STATISTICS
+   IMPDP> Job "SYS"."TSPITR_IMP_imtb_eBDc" successfully completed at Thu Dec 12 14:26:38 2024 elapsed 0 00:00:02
+Import completed
+
+
+RMAN> exit
+
+
+Recovery Manager complete.
+[oracle@oraclept ~]$ sqlplus / as sysdba
+
+SQL*Plus: Release 19.0.0.0.0 - Production on Thu Dec 12 14:30:22 2024
+Version 19.3.0.0.0
+
+Copyright (c) 1982, 2019, Oracle.  All rights reserved.
+
+
+Connected to:
+Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.3.0.0.0
+
+SQL> select * from bkp.bkp;
+
+      SLNO
+----------
+	10
+	10
+	10
+	10
+	10
+	10
+	10
+	10
+	10
+	10
+
+10 rows selected.
+

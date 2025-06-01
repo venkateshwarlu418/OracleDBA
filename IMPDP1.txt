@@ -1,0 +1,113 @@
+SQL> set lines 200 pages 200
+set colsep |
+col username for a15
+col DEFAULT_TABLESPACE for a25
+col TEMPORARY_TABLESPACE for a25 
+select username,DEFAULT_TABLESPACE,TEMPORARY_TABLESPACE,PROFILE from dba_users where username='SCOTT';
+
+USERNAME       |DEFAULT_TABLESPACE		 |TEMPORARY_TABLESPACE	   |PROFILE
+---------------|-------------------------|-------------------------|--------------------------------------------------------------------------------------------------------------------------------
+SCOTT	       |USERS					 |TEMP					   |DEFAULT
+
+
+SQL> set lines 200 pages 200
+set colsep |
+col username for a15
+col DEFAULT_TABLESPACE for a25
+col TEMPORARY_TABLESPACE for a25 
+select username,DEFAULT_TABLESPACE,TEMPORARY_TABLESPACE,PROFILE from dba_users where username='SOE';
+USERNAME       |DEFAULT_TABLESPACE		 |TEMPORARY_TABLESPACE	   |PROFILE
+---------------|-------------------------|-------------------------|--------------------------------------------------------------------------------------------------------------------------------
+SOE		       |SOETBS					 |TEMP					   |DEFAULT
+
+
+SQL> set lines 200 pages 200
+set colsep |
+col username for a15
+col DEFAULT_TABLESPACE for a25
+col TEMPORARY_TABLESPACE for a25 
+select username,DEFAULT_TABLESPACE,TEMPORARY_TABLESPACE,PROFILE from dba_users where username='VENKAT';
+USERNAME       |DEFAULT_TABLESPACE		 |TEMPORARY_TABLESPACE	   |PROFILE
+---------------|-------------------------|-------------------------|--------------------------------------------------------------------------------------------------------------------------------
+VENKAT	       |USERS					 |TEMP					   |TEST_PROFILE
+
+
+
+
+
+														============
+														    QUERY
+														============
+														
+														
+
+[oracle@oraclept ~]$ impdp directory=expdp_dir dumpfile=scott_emp_dept10.dmp logfile=impdp_scott remap_schema=scott:venkat EXCLUDE=CONSTRAINT
+
+
+		Username: / as sysdba
+		Password: 						--(press "ENTER")		
+
+. . imported "VENKAT"."EMP"                              8.328 KB       3 rows
+Processing object type TABLE_EXPORT/TABLE/STATISTICS/TABLE_STATISTICS
+
+[oracle@oraclept ~]$ sqlplus venkat/venkat
+SQL> set lines 200 pages 200;
+SQL> set colsep |
+SQL> select * from emp;
+
+     EMPNO|ENAME     |JOB      |       MGR|HIREDATE |	    SAL|      COMM|    DEPTNO
+----------|----------|---------|----------|---------|----------|----------|----------
+      7839|KING      |PRESIDENT|		  |17-NOV-81|	   5000|		  |	   10
+      7782|CLARK     |MANAGER  |      7839|09-JUN-81|	   2450|		  |	   10
+      7934|MILLER    |CLERK    |      7782|23-JAN-82|	   1300|		  |	   10
+
+
+-- We have successfully imported the deptno=10 of scott.emp to venkat user.
+
+
+
+											================================================
+											TABLE_EXISTS_ACTION=skip/truncate/append/replace
+											================================================
+SKIP:
+[oracle@oraclept ~]$ impdp directory=expdp_dir dumpfile=soe_tables_full.dmp logfile=import_soe_tables_full.log remap_tablespace=soetbs:users remap_schema=soe:test TABLE_EXISTS_ACTION=SKIP
+
+TRUNCATE:
+[oracle@oraclept ~]$ impdp directory=expdp_dir dumpfile=soe_tables_full.dmp logfile=import_soe_tables_full.log remap_tablespace=soetbs:users remap_schema=soe:test TABLE_EXISTS_ACTION=TRUNCATE
+
+APPEND:
+[oracle@oraclept ~]$ impdp directory=expdp_dir dumpfile=soe_tables_full.dmp logfile=import_soe_tables_full.log remap_tablespace=soetbs:users remap_schema=soe:test TABLE_EXISTS_ACTION=REPLACE
+
+REPLACE:
+[oracle@oraclept ~]$ impdp directory=expdp_dir dumpfile=soe_tables_full.dmp logfile=import_soe_tables_full.log remap_tablespace=soetbs:users remap_schema=soe:test TABLE_EXISTS_ACTION=APPEND
+
+
+
+
+impdp \"sys/oracle@to_hrms as sysdba\" directory=expdp_dir dumpfile=Full_oradb_2711_12C_%U.dmp logfile=impdp_soe.log schemas=soe remap_tablespace=soetbs:users remap_schema=soe:test  TABLE_EXISTS_ACTION=REPLACE
+[oracle@oraclept ~]$ impdp directory=expdp_dir dumpfile=Full_oradb_2711_12C_%U.dmp logfile=impdp_soe.log schemas=soe remap_tablespace=soetbs:users remap_schema=soe:test  TABLE_EXISTS_ACTION=REPLACE
+
+
+
+											==========================
+											DATA or METADATA_ONLY
+											==========================
+
+importing METADATA_ONLY with EXCLUDE=CONSTRAINT
+
+[oracle@oraclept ~]$ impdp directory=expdp_dir dumpfile=venkat_schema.dmp logfile=venkat_schema_metadata_import.log remap_schema=venkat:import EXCLUDE=CONSTRAINT content=METADATA_ONLY
+
+		Username: / as sysdba
+		Password: 						--(press "ENTER")		
+
+
+
+
+
+
+impdp \"sys/oracle@to_hrms as sysdba\" directory=datapump_dir dumpfile=ORADB_SOE_2711_12C.dmp logfile=impdp_ORADB_SOE_2711_01.dmp remap_tablespace=SOETBS:users
+
+impdp \"sys/oracle@to_hrms as sysdba\" directory=datapump_dir dumpfile=ORADB_SOE_2711_12C.dmp logfile=impdp_ORADB_SOE_2711_01.dmp remap_tablespace=SOETBS:users remap_schema=soe:scott
+
+
+

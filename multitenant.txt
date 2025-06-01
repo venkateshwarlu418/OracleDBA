@@ -1,0 +1,510 @@
+check your connection;
+
+select instance_name, con_id, version from v$instance;
+INSTANCE_NAME	     CON_ID VERSION
+---------------- ---------- -----------------
+prodb			  0 19.0.0.0.0
+
+
+
+set lines 200 pages 200
+col name for a30
+select dbid, con_id, name from v$pdbs;
+      DBID     CON_ID NAME
+---------- ---------- ------------------------------
+ 133996257	    2 PDB$SEED
+1577878895	    3 SBI
+1327494204	    4 HDFC
+4076654111	    5 HDFC_DUP
+
+
+select name, con_id, db_unique_name from v$database;
+NAME				   CON_ID DB_UNIQUE_NAME
+------------------------------ ---------- ------------------------------
+PRODB					0 prodb
+
+
+alter session set container = SBI;
+show con_name
+CON_NAME
+------------------------------
+SBI
+
+alter session set container = CDB$ROOT;
+show CON_NAME
+
+CON_NAME
+------------------------------
+CDB$ROOT
+
+select dbid, con_id, name from v$pdbs; 
+
+col CON_NAME for a32;
+col DB_NAME for a32;
+col CON_ID for a32;
+select sys_context('USERENV','CON_NAME') CON_NAME,
+            sys_context('USERENV','CON_ID') CON_ID,
+            sys_context('USERENV','DB_NAME') DB_NAME from DUAL;
+			
+CON_NAME			 CON_ID 			  DB_NAME
+-------------------------------- -------------------------------- --------------------------------
+CDB$ROOT			 1				  prodb
+
+			
+alter system set sga_target=300M scope=both;
+
+set linesize 120
+column pdb_name format a10
+column name format a30
+column value$ format a30
+select ps.db_uniq_name,
+       ps.pdb_uid,
+       p.name as pdb_name,
+       ps.name,
+       ps.value$
+from   pdb_spfile$ ps
+       join v$pdbs p on ps.pdb_uid = p.con_uid
+order by 1, 2, 3;
+
+
+show parameter open c
+NAME				     TYPE	 VALUE
+------------------------------------ ----------- ------------------------------
+open_cursors			     integer	 300
+open_links			     integer	 4
+open_links_per_instance 	     integer	 4
+read_only_open_delayed		     boolean	 FALSE
+session_max_open_files		     integer	 10
+
+ALTER system SET open_cursors= 150 sid='*' scope=spfile;
+
+
+alter pluggable database hdfc_dup close immediate;
+
+Pluggable database altered.
+
+SQL> show pdbs
+
+    CON_ID CON_NAME			  OPEN MODE  RESTRICTED
+---------- ------------------------------ ---------- ----------
+	 2 PDB$SEED			  READ ONLY  NO
+	 3 SBI				  READ WRITE NO
+	 4 HDFC 			  READ WRITE NO
+	 5 HDFC_DUP			  MOUNTED
+
+
+alter pluggable database hdfc_dup open;
+
+Pluggable database altered.
+
+SQL> show pdbs
+
+    CON_ID CON_NAME			  OPEN MODE  RESTRICTED
+---------- ------------------------------ ---------- ----------
+	 2 PDB$SEED			  READ ONLY  NO
+	 3 SBI				  READ WRITE NO
+	 4 HDFC 			  READ WRITE NO
+	 5 HDFC_DUP			  READ WRITE NO
+ 
+
+
+alter pluggable database all except hdfc open;
+show pdbs
+
+    CON_ID CON_NAME			  OPEN MODE  RESTRICTED
+---------- ------------------------------ ---------- ----------
+	 2 PDB$SEED			  READ ONLY  NO
+	 3 SBI				  READ WRITE NO
+	 4 HDFC 			  MOUNTED
+	 5 HDFC_DUP			  READ WRITE NO
+
+alter pluggable database all open;
+show pdbs
+
+    CON_ID CON_NAME			  OPEN MODE  RESTRICTED
+---------- ------------------------------ ---------- ----------
+	 2 PDB$SEED			  READ ONLY  NO
+	 3 SBI				  READ WRITE NO
+	 4 HDFC 			  READ WRITE NO
+	 5 HDFC_DUP			  READ WRITE NO
+
+alter pluggable database all except sbi close;
+
+Pluggable database altered.
+
+SQL> show pdbs 
+
+    CON_ID CON_NAME			  OPEN MODE  RESTRICTED
+---------- ------------------------------ ---------- ----------
+	 2 PDB$SEED			  READ ONLY  NO
+	 3 SBI				  READ WRITE NO
+	 4 HDFC 			  MOUNTED
+	 5 HDFC_DUP			  MOUNTED
+
+alter pluggable database all open;
+
+Pluggable database altered.
+
+SQL> show pdbs
+
+    CON_ID CON_NAME			  OPEN MODE  RESTRICTED
+---------- ------------------------------ ---------- ----------
+	 2 PDB$SEED			  READ ONLY  NO
+	 3 SBI				  READ WRITE NO
+	 4 HDFC 			  READ WRITE NO
+	 5 HDFC_DUP			  READ WRITE NO
+
+
+
+
+first close pluggable Database
+alter pluggable database HDFC close;
+
+	 6 HDFC 			  MOUNTED
+alter pluggable database hdfc unplug into '/u01/app/oracle/oradata/hdfc_001.xml';
+
+Pluggable database altered.
+
+SQL> show pdbs
+
+    CON_ID CON_NAME			  OPEN MODE  RESTRICTED
+---------- ------------------------------ ---------- ----------
+	 2 PDB$SEED			  READ ONLY  NO
+	 3 SBI				  READ WRITE NO
+	 5 HDFC_DUP			  READ WRITE NO
+	 6 HDFC 			  MOUNTED
+SQL> drop pluggable database hdfc;
+
+Pluggable database dropped.
+
+SQL> show pdbs
+
+    CON_ID CON_NAME			  OPEN MODE  RESTRICTED
+---------- ------------------------------ ---------- ----------
+	 2 PDB$SEED			  READ ONLY  NO
+	 3 SBI				  READ WRITE NO
+	 5 HDFC_DUP			  READ WRITE NO
+
+
+
+create pluggable database hrms using '/u01/app/oracle/oradata/HRMS.xml'
+NOCOPY
+TEMPFILE REUSE;
+
+alter pluggable database PROD_HRMS unplug into '/u01/pdb2.xml';
+
+
+ALTER PLUGGABLE DATABASE pdb5 CLOSE;
+ALTER PLUGGABLE DATABASE PROD_HRMS UNPLUG INTO '/u01/pdb5.xml';
+
+alter pluggable database HRMS save state;
+alter pluggable database PDB3 save state;
+alter pluggable database PDB4 save state;
+alter pluggable database PDB5 save state;
+alter pluggable database PDB6 save state;
+
+
+
+
+select CON_NAME ,STATE from dba_pdb_saved_states;
+alter pluggable database savings save state;
+CREATE PLUGGABLE DATABASE hrms ADMIN USER pdb_adm IDENTIFIED BY Password1;
+
+CREATE PLUGGABLE DATABASE pdb2 ADMIN USER pdb_adm IDENTIFIED BY Password1;
+
+drop pluggable database pdb2 including datafiles;
+CREATE PLUGGABLE DATABASE CURRENT_A ADMIN USER pdb_adm IDENTIFIED BY Password1;
+CREATE PLUGGABLE DATABASE loans ADMIN USER pdb_adm IDENTIFIED BY Password1;
+CREATE PLUGGABLE DATABASE demats ADMIN USER pdb_adm IDENTIFIED BY Password1;
+CREATE PLUGGABLE DATABASE pdb6 ADMIN USER pdb_adm IDENTIFIED BY Password1;
+
+
+CREATE PLUGGABLE DATABASE imps ADMIN USER pdb_adm IDENTIFIED BY Password1;
+
+set lines 200 pages 200
+col username for a30
+col CON_ID for a10
+select username,  con_id from cdb_users ORDER BY 2;
+
+SQL> desc cdb_users
+ Name														   Null?    Type
+ ----------------------------------------------------------------------------------------------------------------- -------- ----------------------------------------------------------------------------
+ USERNAME													   NOT NULL VARCHAR2(128)
+ USER_ID													   NOT NULL NUMBER
+ PASSWORD														    VARCHAR2(4000)
+ ACCOUNT_STATUS 												   NOT NULL VARCHAR2(32)
+ LOCK_DATE														    DATE
+ EXPIRY_DATE														    DATE
+ DEFAULT_TABLESPACE												   NOT NULL VARCHAR2(30)
+ TEMPORARY_TABLESPACE												   NOT NULL VARCHAR2(30)
+ LOCAL_TEMP_TABLESPACE													    VARCHAR2(30)
+ CREATED													   NOT NULL DATE
+ PROFILE													   NOT NULL VARCHAR2(128)
+ INITIAL_RSRC_CONSUMER_GROUP												    VARCHAR2(128)
+ EXTERNAL_NAME														    VARCHAR2(4000)
+ PASSWORD_VERSIONS													    VARCHAR2(17)
+ EDITIONS_ENABLED													    VARCHAR2(1)
+ AUTHENTICATION_TYPE													    VARCHAR2(8)
+ PROXY_ONLY_CONNECT													    VARCHAR2(1)
+ COMMON 														    VARCHAR2(3)
+ LAST_LOGIN														    TIMESTAMP(9) WITH TIME ZONE
+ ORACLE_MAINTAINED													    VARCHAR2(1)
+ INHERITED														    VARCHAR2(3)
+ DEFAULT_COLLATION													    VARCHAR2(100)
+ IMPLICIT														    VARCHAR2(3)
+ ALL_SHARD														    VARCHAR2(3)
+ PASSWORD_CHANGE_DATE													    DATE
+ CON_ID 														    NUMBER
+
+desc v$tablespace
+ Name														   Null?    Type
+ ----------------------------------------------------------------------------------------------------------------- -------- ----------------------------------------------------------------------------
+ TS#															    NUMBER
+ NAME															    VARCHAR2(30)
+ INCLUDED_IN_DATABASE_BACKUP												    VARCHAR2(3)
+ BIGFILE														    VARCHAR2(3)
+ FLASHBACK_ON														    VARCHAR2(3)
+ ENCRYPT_IN_BACKUP													    VARCHAR2(3)
+ CON_ID 														    NUMBER
+
+
+select name , con_id from v$tablespace order by 2;
+select TABLESPACE_NAME,con_id from cdb_tablespaces ORDER BY 2;
+
+
+select username,  con_id from cdb_users  WHERE USERNAME = 'VENK' ORDER BY 2;
+
+ALTER PLUGGABLE DATABASE loans UNPLUG INTO '/u01/loans.xml';
+
+create pluggable database loans using '/u01/loans.xml'
+
+alter pluggable database fd close;
+alter pluggable database fd open read only;
+
+
+!mkdir -p /home/oracle/oradata/FD_DUP
+
+CREATE PLUGGABLE DATABASE fd_dup FROM fd;
+--FILE_NAME_CONVERT=('/home/oracle/oradata/PDB1','/home/oracle/oradata/PDB2/');
+
+
+
+
+
+SQL> set lines 200 pages 200
+SQL> col name for a40
+SQL> select dbid, con_id, name v$pdbs;
+select dbid, con_id, name
+
+SQL> set lines 200 pages 200
+SQL> col name for a40
+SQL> select dbid, con_id, name from v$pdbs;
+
+      DBID     CON_ID NAME
+---------- ---------- ----------------------------------------
+########## ########## PDB$SEED
+########## ########## SBI
+########## ########## HDFC
+########## ########## HDFC_DUP
+
+SQL> select dbid, con_id, name from v$pdbs;
+
+      DBID     CON_ID NAME
+---------- ---------- ----------------------------------------
+########## ########## PDB$SEED
+########## ########## SBI
+########## ########## HDFC
+########## ########## HDFC_DUP
+
+SQL> !
+[oracle@venky ~]$ 
+[oracle@venky ~]$ 
+[oracle@venky ~]$ 
+[oracle@venky ~]$ 
+[oracle@venky ~]$ 
+[oracle@venky ~]$ cd $ORACLE_HOME
+[oracle@venky dbhome_1]$ cd network/admin
+[oracle@venky admin]$ ll
+total 12
+-rw-r--r--. 1 oracle oinstall    0 Nov 24 09:28 file1
+-rw-r--r--. 1 oracle oinstall  613 Nov 26 15:03 listener.ora
+-rw-r--r--. 1 oracle oinstall    0 Nov 24 09:29 sampath
+drwxr-xr-x. 2 oracle oinstall   64 Apr 17  2019 samples
+-rw-r--r--. 1 oracle oinstall 1536 Feb 14  2018 shrept.lst
+-rw-r--r--. 1 oracle oinstall  520 Nov 26 14:52 tnsnames.ora
+[oracle@venky admin]$ cat listener.ora 
+# listener.ora Network Configuration File: /u01/app/oracle/product/19.0.0.0/dbhome_1/network/admin/listener.ora
+# Generated by Oracle configuration tools.
+
+SID_LIST_LISTENER =
+  (SID_LIST =
+    (SID_DESC =
+      (GLOBAL_DBNAME = prodb)
+      (ORACLE_HOME = /u01/app/oracle/product/19.0.0.0/dbhome_1)
+      (SID_NAME = prodb)
+    )
+    (SID_DESC =
+      (GLOBAL_DBNAME = sbi)
+      (ORACLE_HOME = /u01/app/oracle/product/19.0.0.0/dbhome_1)
+      (SID_NAME = prodb)
+    )
+  )
+
+LISTENER =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = 192.168.0.144)(PORT = 1521))
+  )
+
+ADR_BASE_LISTENER = /u01/app/oracle
+
+[oracle@venky admin]$ 
+[oracle@venky admin]$ 
+[oracle@venky admin]$ 
+[oracle@venky admin]$ ll
+total 12
+-rw-r--r--. 1 oracle oinstall    0 Nov 24 09:28 file1
+-rw-r--r--. 1 oracle oinstall  613 Nov 26 15:03 listener.ora
+-rw-r--r--. 1 oracle oinstall    0 Nov 24 09:29 sampath
+drwxr-xr-x. 2 oracle oinstall   64 Apr 17  2019 samples
+-rw-r--r--. 1 oracle oinstall 1536 Feb 14  2018 shrept.lst
+-rw-r--r--. 1 oracle oinstall  520 Nov 26 14:52 tnsnames.ora
+[oracle@venky admin]$ !sq
+sqlplus / as sysdba
+
+SQL*Plus: Release 19.0.0.0.0 - Production on Tue Nov 26 16:45:42 2024
+Version 19.3.0.0.0
+
+Copyright (c) 1982, 2019, Oracle.  All rights reserved.
+
+
+Connected to:
+Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.3.0.0.0
+
+SQL> 
+SQL> 
+SQL> 
+SQL> select dbid, con_id, name from v$pdbs;
+
+      DBID     CON_ID
+---------- ----------
+NAME
+--------------------------------------------------------------------------------
+ 133996257	    2
+PDB$SEED
+
+1577878895	    3
+SBI
+
+1327494204	    4
+HDFC
+
+
+      DBID     CON_ID
+---------- ----------
+NAME
+--------------------------------------------------------------------------------
+4076654111	    5
+HDFC_DUP
+
+
+SQL> select name, dbid, con_id from v$pdbs;
+
+NAME
+--------------------------------------------------------------------------------
+      DBID     CON_ID
+---------- ----------
+PDB$SEED
+ 133996257	    2
+
+SBI
+1577878895	    3
+
+HDFC
+1327494204	    4
+
+
+NAME
+--------------------------------------------------------------------------------
+      DBID     CON_ID
+---------- ----------
+HDFC_DUP
+4076654111	    5
+
+
+SQL> set lines 200 pages 200
+SQL> col name for a30
+SQL> col DBID for a30
+SQL> col CON_ID for a30
+SQL> select name, dbid, con_id from v$pdbs;
+
+NAME				     DBID     CON_ID
+------------------------------ ---------- ----------
+PDB$SEED		       ########## ##########
+SBI			       ########## ##########
+HDFC			       ########## ##########
+HDFC_DUP		       ########## ##########
+
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> show pdbs
+
+    CON_ID CON_NAME			  OPEN MODE  RESTRICTED
+---------- ------------------------------ ---------- ----------
+	 2 PDB$SEED			  READ ONLY  NO
+	 3 SBI				  READ WRITE NO
+	 4 HDFC 			  READ WRITE NO
+	 5 HDFC_DUP			  READ WRITE NO
+SQL> conn venk/venk@to_sbi
+Connected.
+SQL> 
+SQL> 
+SQL> show pdb
+SP2-0158: unknown SHOW option "pdb"
+SQL> show pdbs
+SP2-0382: The SHOW PDBS command is not available
+SQL> show user
+USER is "VENK"
+SQL> show con_name
+
+CON_NAME
+------------------------------
+SBI
+SQL> conn / as sysdba
+Connected.
+SQL> select username from dba_users where username='SCOTT';
+
+no rows selected
+
+SQL> show user
+USER is "SYS"
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> show pdbs
+
+    CON_ID CON_NAME			  OPEN MODE  RESTRICTED
+---------- ------------------------------ ---------- ----------
+	 2 PDB$SEED			  READ ONLY  NO
+	 3 SBI				  READ WRITE NO
+	 4 HDFC 			  READ WRITE NO
+	 5 HDFC_DUP			  READ WRITE NO
+SQL> conn ven/ven@to_sbi
+Connected.
+SQL> conn ven/ven@to_hdfc
+ERROR:
+ORA-12154: TNS:could not resolve the connect identifier specified
+
+
+Warning: You are no longer connected to ORACLE.
+SQL> ex
+
+
+
+If we want to change the tablespace of a table 
+SQL> alter table venkytb move tablespace tgb_ts;
+
+Table altered.

@@ -1,0 +1,384 @@
+										User Management
+										
+										
+										
+										
+01. Creating User										
+--- CREATE A USER by two ways
+Method-01:
+SQL> create user venkat identified by venkat; 
+--This creates a user with default settings (no tablespace, no privileges).
+
+Method-02: Providing tablespace,temp tablespace and allocating STORAGE on tablespace
+
+SQL> create user mouse identified by mouse default tablespace users 
+temporary tablespace temp quota unlimited on users;
+
+
+
+
+02. GRANT SYSTEM PRIVILEGES TO USER
+
+SQL> grant create session to venkat;
+	---- CREATE SESSION is required to log in.
+	
+SQL> grant create table, create view to venkat;
+	---- CREATE TABLE – Allows the user to create new tables in their own schema.
+	---- CREATE VIEW – Allows the user to create views in their own schema.
+
+
+
+
+
+03. GRANT ROLES TO USER
+SQL> grant connect,resource to venkat;
+
+	---- In modern Oracle versions, CONNECT may only include CREATE SESSION
+	---- This role was meant for users who own schema objects(CREATE TABLE,CREATE CLUSTER,
+		CREATE SEQUENCE,CREATE PROCEDURE,CREATE TRIGGER,CREATE TYPE,CREATE OPERATOR,CREATE INDEXTYPE)
+		
+
+
+
+04. VIEW EXISTING USERS
+
+SQL> set lines 200 pages 200
+set colsep |
+col USERNAME for a25
+col ACCOUNT_STATUS for a20
+SELECT USERNAME, ACCOUNT_STATUS, DEFAULT_TABLESPACE FROM DBA_USERS;
+
+USERNAME				 |ACCOUNT_STATUS      |DEFAULT_TABLESPACE
+-------------------------|--------------------|-------------------------
+SYS						 |OPEN		  	      |SYSTEM
+SYSTEM					 |OPEN		  	      |SYSTEM
+XS$NULL 				 |EXPIRED & LOCKED    |SYSTEM
+OJVMSYS 				 |LOCKED	 	      |SYSTEM
+LBACSYS 				 |LOCKED	 	      |SYSTEM
+OUTLN					 |LOCKED	 	      |SYSTEM
+SYS$UMF 				 |LOCKED	 	      |SYSTEM
+DBSNMP					 |OPEN		 	      |SYSAUX
+APPQOSSYS				 |LOCKED	 	      |SYSAUX
+DBSFWUSER				 |LOCKED	 	      |SYSAUX
+GGSYS					 |LOCKED	 	      |SYSAUX
+ANONYMOUS				 |EXPIRED & LOCKED    |SYSAUX
+CTXSYS					 |EXPIRED & LOCKED    |SYSAUX
+DVSYS					 |LOCKED		      |SYSAUX
+DVF						 |LOCKED		      |SYSAUX
+GSMADMIN_INTERNAL		 |LOCKED		      |SYSAUX
+MDSYS					 |LOCKED		      |SYSAUX
+OLAPSYS 				 |LOCKED		      |SYSAUX
+XDB						 |LOCKED		      |SYSAUX
+WMSYS					 |LOCKED	 	      |SYSAUX
+GSMCATUSER				 |LOCKED	 	      |USERS
+MDDATA					 |LOCKED	 	      |USERS
+MOUSE					 |OPEN		 	      |USERS
+SYSBACKUP				 |LOCKED	 	      |USERS
+REMOTE_SCHEDULER_AGENT	 |LOCKED	 	      |USERS
+GSMUSER 				 |LOCKED		      |USERS
+VENKAT					 |OPEN			      |USERS
+SYSRAC					 |LOCKED		      |USERS
+GSMROOTUSER				 |LOCKED		      |USERS
+SI_INFORMTN_SCHEMA		 |LOCKED		      |USERS
+AUDSYS					 |LOCKED	 	      |USERS
+DIP						 |LOCKED		      |USERS
+ORDPLUGINS				 |LOCKED		      |USERS
+SYSKM					 |LOCKED		      |USERS
+ORDDATA 				 |LOCKED		      |USERS
+ORACLE_OCM				 |LOCKED		      |USERS
+SCOTT					 |OPEN			      |USERS
+SYSDG					 |LOCKED		      |USERS
+ORDSYS					 |LOCKED		      |USERS
+SOE						 |OPEN		 	      |SOETBS
+
+
+5. CHECK PRIVILEGES GRANTED TO A USER
+
+													(System privileges:)
+	
+SQL> set lines 200 pages 200
+set colsep |
+col GRANTEE for a10
+col PRIVILEGE for a15
+SELECT * FROM DBA_SYS_PRIVS WHERE GRANTEE = 'VENKAT';
+
+GRANTEE   |PRIVILEGE	  |ADM|COM|INH
+----------|---------------|---|---|---
+VENKAT	  |CREATE TABLE   |NO |NO |NO
+VENKAT	  |CREATE VIEW	  |NO |NO |NO
+VENKAT	  |CREATE SESSION |NO |NO |NO
+
+
+													(Object privileges:)
+
+SQL> SELECT * FROM DBA_TAB_PRIVS WHERE GRANTEE = 'VENKAT';
+
+
+
+													(Roles GRANTED)											
+
+SQL> col GRANTEE for a10
+col GRANTED_ROLE for a15
+SELECT * FROM DBA_ROLE_PRIVS WHERE GRANTEE = 'VENKAT';
+
+GRANTEE   |GRANTED_ROLE   |ADM|DEL|DEF|COM|INH
+----------|---------------|---|---|---|---|---
+VENKAT	  |RESOURCE	      |NO |NO |YES|NO |NO
+VENKAT	  |CONNECT	      |NO |NO |YES|NO |NO
+
+
+06. ALTER USER PASSWORD OR PROPERTIES
+											
+											Change password:
+											
+											
+SQL> alter user venkat identified by venkat;
+
+
+
+										  Lock or unlock user:
+
+SQL> alter user venkat account lock;
+SQL> select USERNAME,USER_ID,ACCOUNT_STATUS from dba_users where username = 'VENKAT';
+
+		USERNAME				 |   USER_ID|ACCOUNT_STATUS
+		-------------------------|----------|--------------------
+		VENKAT					 |		 109|LOCKED
+
+SQL> alter user venkat account unlock;
+SQL> select USERNAME,USER_ID,ACCOUNT_STATUS from dba_users where username = 'VENKAT';
+
+		USERNAME				 |   USER_ID|ACCOUNT_STATUS
+		-------------------------|----------|--------------------
+		VENKAT					 |		 109|OPEN
+
+
+
+
+									Expire password (forces change at next login):
+									
+									
+SQL> alter user venkat password expire;
+SQL> select username,user_id,account_status,lock_date,expiry_date,last_login from dba_users where username='VENKAT';
+
+	USERNAME				 |   USER_ID|ACCOUNT_STATUS		 |LOCK_DATE|EXPIRY_DA|LAST_LOGIN
+	-------------------------|----------|--------------------|---------|---------|---------------------------------------------------------------------------
+	VENKAT					 |		 109|EXPIRED			 |		   |19-MAY-25|19-MAY-25 03.24.27.000000000 PM +05:30
+
+
+SQL> alter user venkat identified by venkat;
+SQL> select username,user_id,account_status,lock_date,expiry_date,last_login from dba_users where username='VENKAT';
+
+USERNAME				 |   USER_ID|ACCOUNT_STATUS		 |LOCK_DATE|EXPIRY_DA|LAST_LOGIN
+-------------------------|----------|--------------------|---------|---------|---------------------------------------------------------------------------
+VENKAT					 |		 109|OPEN				 |		   |15-NOV-25|19-MAY-25 03.24.27.000000000 PM +05:30
+
+
+
+
+07. Create a profile:
+
+SQL> CREATE PROFILE test_profile LIMIT FAILED_LOGIN_ATTEMPTS 3 PASSWORD_LOCK_TIME 1; 
+
+---Assign profile to a user: 
+SQL> alter user venkat profile test_profile;
+
+
+----View assigned profile:
+
+SQL> set lines 200 pages 200
+col username for a15
+col account_status for a15
+col DEFAULT_TABLESPACE for a20
+col TEMPORARY_TABLESPACE for a20
+col profile for a15
+select username,user_id,account_status,default_tablespace,temporary_tablespace,created,
+profile from dba_users where username='VENKAT';
+
+USERNAME       |   USER_ID|ACCOUNT_STATUS |DEFAULT_TABLESPACE  |TEMPORARY_TABLESPACE|CREATED  |PROFILE
+---------------|----------|---------------|--------------------|--------------------|---------|---------------
+VENKAT	       |       109|OPEN 		  |USERS	  	       |TEMP			    |19-MAY-25|TEST_PROFILE
+
+
+---View profile limits:
+
+
+SQL> set lines 200 pages 200
+col profile for a15
+col RESOURCE_NAME for a30
+col limit for a10
+SELECT * FROM DBA_PROFILES WHERE PROFILE = 'TEST_PROFILE';
+
+PROFILE        |RESOURCE_NAME			      |RESOURCE|LIMIT	  |COM|INH|IMP
+---------------|------------------------------|--------|----------|---|---|---
+TEST_PROFILE   |COMPOSITE_LIMIT 		      |KERNEL  |DEFAULT   |NO |NO |NO
+TEST_PROFILE   |SESSIONS_PER_USER		      |KERNEL  |DEFAULT   |NO |NO |NO
+TEST_PROFILE   |CPU_PER_SESSION 		      |KERNEL  |DEFAULT   |NO |NO |NO
+TEST_PROFILE   |CPU_PER_CALL			      |KERNEL  |DEFAULT   |NO |NO |NO
+TEST_PROFILE   |LOGICAL_READS_PER_SESSION     |KERNEL  |DEFAULT   |NO |NO |NO
+TEST_PROFILE   |LOGICAL_READS_PER_CALL	      |KERNEL  |DEFAULT   |NO |NO |NO
+TEST_PROFILE   |IDLE_TIME				      |KERNEL  |DEFAULT   |NO |NO |NO
+TEST_PROFILE   |CONNECT_TIME			      |KERNEL  |DEFAULT   |NO |NO |NO
+TEST_PROFILE   |PRIVATE_SGA				      |KERNEL  |DEFAULT   |NO |NO |NO
+TEST_PROFILE   |FAILED_LOGIN_ATTEMPTS	      |PASSWORD|3		  |NO |NO |NO
+TEST_PROFILE   |PASSWORD_LIFE_TIME		      |PASSWORD|DEFAULT   |NO |NO |NO
+TEST_PROFILE   |PASSWORD_REUSE_TIME	 	      |PASSWORD|DEFAULT   |NO |NO |NO
+TEST_PROFILE   |PASSWORD_REUSE_MAX		      |PASSWORD|DEFAULT   |NO |NO |NO
+TEST_PROFILE   |PASSWORD_VERIFY_FUNCTION      |PASSWORD|DEFAULT   |NO |NO |NO
+TEST_PROFILE   |PASSWORD_LOCK_TIME	  	      |PASSWORD|1		  |NO |NO |NO
+TEST_PROFILE   |PASSWORD_GRACE_TIME	 	      |PASSWORD|DEFAULT   |NO |NO |NO
+TEST_PROFILE   |INACTIVE_ACCOUNT_TIME	      |PASSWORD|DEFAULT   |NO |NO |NO
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+										🧾 Summary Table
+										
+	Task							Query Example
+Create user				CREATE USER hr IDENTIFIED BY pass;
+Grant privilege			GRANT CREATE SESSION TO hr;
+Grant role				GRANT DBA TO hr;
+View users				SELECT * FROM DBA_USERS;
+Check privileges		SELECT * FROM DBA_SYS_PRIVS WHERE GRANTEE = 'HR';
+Lock/unlock user		ALTER USER hr ACCOUNT LOCK;
+Drop user				DROP USER hr CASCADE;
+Assign profile			ALTER USER hr PROFILE test_profile;
+Audit user sessions		SELECT * FROM DBA_AUDIT_SESSION;
+
+
+
+
+
+List all users and their status:
+
+SQL> set lines 200 pages 200
+set colsep |
+col username for a25
+col account_status for a20
+col default_tablespace for a20
+SELECT username, account_status, default_tablespace FROM dba_users;
+
+USERNAME				 |ACCOUNT_STATUS      |DEFAULT_TABLESPACE
+-------------------------|--------------------|--------------------
+SYS						 |OPEN			      |SYSTEM
+SYSTEM					 |OPEN			      |SYSTEM
+	
+
+
+
+
+
+Change user quota:
+
+SQL> ALTER USER venkat QUOTA 10M ON users;
+
+
+Assign or change user profile:
+
+SQL> ALTER USER scott PROFILE my_profile;
+
+
+Dropping Users
+Drop a user (without objects):
+
+SQL> DROP USER scott;
+
+Drop a user and all its objects:
+
+SQL> DROP USER scott CASCADE;
+
+
+
+
+
+Granting and Revoking Privileges
+
+Grant basic privilege (login):
+SQL> GRANT CREATE SESSION TO usr1;
+
+Grant object privileges:
+SQL> GRANT INSERT, UPDATE ON scott.emp TO usr1;
+
+Revoke privilege:
+SQL> REVOKE INSERT ON scott.emp FROM usr1;
+
+
+
+
+
+											Roles Management
+Create a role:
+SQL> CREATE ROLE sales_manager;
+
+Grant privileges to a role:
+SQL> GRANT INSERT ON scott.emp TO sales_manager;
+SQL> GRANT UPDATE ON scott.dept TO sales_manager;
+
+
+Grant role to a user:
+SQL> GRANT sales_manager TO usr1;
+
+Set default role for a user:
+SQL> ALTER USER usr1 DEFAULT ROLE sales_manager;
+
+
+List all users with their roles and status:
+SQL> SELECT granted_role FROM dba_role_privs WHERE grantee='VENKAT';
+
+GRANTED_ROLE
+--------------------------------------------------------------------------------------------------------------------------------
+RESOURCE
+CONNECT

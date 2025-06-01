@@ -1,0 +1,256 @@
+[oracle@ramya ~]$ export $ORACLE_HOME=//u01/app/oracle/product/19.0.0.0/dbhome_1
+bash: export: `/u01/app/oracle/product/19.0.0.0/dbhome_1=//u01/app/oracle/product/19.0.0.0/dbhome_1': not a valid identifier
+[oracle@ramya ~]$ export ORACLE_HOME=/u01/app/oracle/product/19.0.0.0/dbhome_1
+[oracle@ramya ~]$ export ORACLE_SID=ramyadb
+[oracle@ramya ~]$ export PATH=$PATH:$ORACLE_HOME/bin
+[oracle@ramya ~]$ sqlplus / as sysdba
+
+SQL*Plus: Release 19.0.0.0.0 - Production on Mon Mar 17 10:39:33 2025
+Version 19.3.0.0.0
+
+Copyright (c) 1982, 2019, Oracle.  All rights reserved.
+
+Connected to an idle instance.
+
+SQL> startup;
+ORACLE instance started.
+
+Total System Global Area 1543500144 bytes
+Fixed Size		    8896880 bytes
+Variable Size		  905969664 bytes
+Database Buffers	  620756992 bytes
+Redo Buffers		    7876608 bytes
+Database mounted.
+Database opened.
+SQL> SHOW PARAMETER UNDO_TABLESPACE;   
+
+NAME				     TYPE	 VALUE
+------------------------------------ ----------- ------------------------------
+undo_tablespace 		     string	 UNDOTBS1
+SQL> select VALUE from v$parameter where NAME='undo_tablespace';
+
+VALUE
+--------------------------------------------------------------------------------
+UNDOTBS1
+
+SQL> SET UNDO_RETENTION value at any time using:
+SP2-0735: unknown SET option beginning "UNDO_RETEN..."
+SQL> SET UNDO_RETENTION value at any time using:
+SP2-0735: unknown SET option beginning "UNDO_RETEN..."
+SQL> ALTER SYSTEM SET UNDO_RETENTION = 2400;
+
+System altered.
+
+SQL> set lines 200 pages 200
+set col sep |
+show parameter undo;
+SQL> SP2-0158: unknown SET option "col"
+SQL> 
+NAME				     TYPE	 VALUE
+------------------------------------ ----------- ------------------------------
+temp_undo_enabled		     boolean	 FALSE
+undo_management 		     string	 AUTO
+undo_retention			     integer	 2400
+undo_tablespace 		     string	 UNDOTBS1
+SQL> CREATE UNDO TABLESPACE undotbs_02 DATAFILE '/u01/undo02.dbf' size 2M REUSE AUTOEXTEND ON RETENTION NOGUARANTEE;
+
+Tablespace created.
+
+SQL> ALTER SYSTEM SET UNDO_TABLESPACE = 02;
+ALTER SYSTEM SET UNDO_TABLESPACE = 02
+*
+ERROR at line 1:
+ORA-02097: parameter cannot be modified because specified value is invalid
+ORA-30012: undo tablespace '2' does not exist or of wrong type
+
+
+SQL> ALTER SYSTEM SET UNDO _TABLESPACE = undotbs_02;
+ALTER SYSTEM SET UNDO _TABLESPACE = undotbs_02
+                      *
+ERROR at line 1:
+ORA-00911: invalid character
+
+
+SQL> ALTER SYSTEM SET UNDO_TABLESPACE = undotbs_02;
+
+System altered.
+
+SQL> show parameter undo;
+
+NAME				     TYPE	 VALUE
+------------------------------------ ----------- ------------------------------
+temp_undo_enabled		     boolean	 FALSE
+undo_management 		     string	 AUTO
+undo_retention			     integer	 2400
+undo_tablespace 		     string	 UNDOTBS_02
+SQL> 
+SQL> alter tablespace undotbs1 retention guarantee;
+
+Tablespace altered.
+
+SQL> select tablespace_name ,retention from  dba_tablespace where contents = 'UNDO' ;
+select tablespace_name ,retention from	dba_tablespace where contents = 'UNDO'
+                                        *
+ERROR at line 1:
+ORA-00942: table or view does not exist
+
+
+SQL> select tablespace_name ,retention from dba_tablespaces where contents = 'UNDO';
+
+TABLESPACE_NAME 	       RETENTION
+------------------------------ -----------
+UNDOTBS1		       GUARANTEE
+UNDOTBS_02		       NOGUARANTEE
+
+SQL> alter tablespace undotbs1 retention noguarantee;
+
+Tablespace altered.
+
+SQL> select tablespace_name ,retention from dba_tablespaces where contents = 'UNDO';
+
+TABLESPACE_NAME 	       RETENTION
+------------------------------ -----------
+UNDOTBS1		       NOGUARANTEE
+UNDOTBS_02		       NOGUARANTEE
+
+SQL> select tablespace_name ,retention from dba_tablespaces where contents = 'UNDO';
+
+TABLESPACE_NAME 	       RETENTION
+------------------------------ -----------
+UNDOTBS1		       NOGUARANTEE
+UNDOTBS_02		       NOGUARANTEE
+
+SQL> set lines 200 pages 200
+set col sep |
+SELECT tablespace_name, retention FROM dba_tablespaces;SQL> SP2-0158: unknown SET option "col"
+SQL> 
+
+TABLESPACE_NAME 	       RETENTION
+------------------------------ -----------
+SYSTEM			       NOT APPLY
+SYSAUX			       NOT APPLY
+UNDOTBS1		       NOGUARANTEE
+TEMP			       NOT APPLY
+USERS			       NOT APPLY
+VVTS			       NOT APPLY
+RAMYATS 		       NOT APPLY
+HRMS_TS 		       NOT APPLY
+PADMATS 		       NOT APPLY
+HDFC_TS 		       NOT APPLY
+RAMYA_TS		       NOT APPLY
+UNDOTBS_02		       NOGUARANTEE
+
+12 rows selected.
+
+SQL> SELECT * FROM DBA_TABLESPACES WHERE CONTENTS = 'UNDO'; 
+
+TABLESPACE_NAME 	       BLOCK_SIZE INITIAL_EXTENT NEXT_EXTENT MIN_EXTENTS MAX_EXTENTS   MAX_SIZE PCT_INCREASE MIN_EXTLEN STATUS	  CONTENTS		LOGGING   FOR EXTENT_MAN ALLOCATIO PLU
+------------------------------ ---------- -------------- ----------- ----------- ----------- ---------- ------------ ---------- --------- --------------------- --------- --- ---------- --------- ---
+SEGMEN DEF_TAB_ RETENTION   BIG PREDICA ENC COMPRESS_FOR		   DEF_INME DEF_INME DEF_INMEMORY_DI DEF_INMEMORY_COMP DEF_INMEMORY_ SHARED	   DEF_INDE INDEX_COMPRES DEF_CELLMEMORY
+------ -------- ----------- --- ------- --- ------------------------------ -------- -------- --------------- ----------------- ------------- ------------- -------- ------------- --------------
+DEF_INMEMORY
+------------
+DEF_INMEMORY_SERVICE_NAME
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+LOST_WR C
+------- -
+UNDOTBS1			     8192	   65536		       1  2147483645 2147483645 		  65536 ONLINE	  UNDO			LOGGING   NO  LOCAL	 SYSTEM    NO
+MANUAL DISABLED NOGUARANTEE NO	HOST	NO				   DISABLED	     SHARED	   DISABLED
+
+
+OFF	N
+
+UNDOTBS_02			     8192	   65536		       1  2147483645 2147483645 		  65536 ONLINE	  UNDO			LOGGING   NO  LOCAL	 SYSTEM    NO
+MANUAL DISABLED NOGUARANTEE NO	HOST	NO				   DISABLED	     SHARED	   DISABLED
+
+
+OFF	N
+
+
+SQL> SELECT * FROM V$PARAMETER WHERE NAME = 'undo_tablespace';
+
+       NUM NAME 									  TYPE
+---------- -------------------------------------------------------------------------------- ----------
+VALUE
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+DISPLAY_VALUE
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+DEFAULT_VALUE
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ISDEFAULT ISSES ISSYS_MOD ISPDB ISINS ISMODIFIED ISADJ ISDEP ISBAS
+--------- ----- --------- ----- ----- ---------- ----- ----- -----
+DESCRIPTION
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+UPDATE_COMMENT
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+      HASH     CON_ID
+---------- ----------
+      2589 undo_tablespace								     2
+UNDOTBS_02
+UNDOTBS_02
+NONE
+FALSE	  FALSE IMMEDIATE TRUE	TRUE  SYSTEM_MOD FALSE FALSE TRUE
+use/switch undo tablespace
+
+2692150816	    0
+
+
+SQL> SELECT * FROM V$ROLLSTAT; 
+
+       USN	LATCH	 EXTENTS     RSSIZE	WRITES	    XACTS	GETS	  WAITS    OPTSIZE    HWMSIZE	 SHRINKS      WRAPS    EXTENDS	AVESHRINK  AVEACTIVE STATUS	 CUREXT
+---------- ---------- ---------- ---------- ---------- ---------- ---------- ---------- ---------- ---------- ---------- ---------- ---------- ---------- ---------- --------------- ----------
+    CURBLK     CON_ID
+---------- ----------
+	 0	    0	       7     450560	 28040		0	 269	      0 	       450560	       0	  2	     0		0      12451 ONLINE	      0
+	 1	    0
+
+	11	    2	       2     122880	  7782		0	  54	      0 	       122880	       0	  0	     0		0	   0 ONLINE	      0
+	 1	    0
+
+	12	    0	       2     122880	 12208		0	  75	      0 	       122880	       0	  0	     0		0	   0 ONLINE	      0
+	 2	    0
+
+	13	    1	       2     122880	 12300		0	  73	      0 	       122880	       0	  0	     0		0	   0 ONLINE	      0
+	 2	    0
+
+	14	    2	       2     122880	 10268		0	  54	      0 	       122880	       0	  0	     0		0	   0 ONLINE	      0
+	 2	    0
+
+	15	    0	       2     122880	 12038		0	  75	      0 	       122880	       0	  0	     0		0	   0 ONLINE	      0
+	 2	    0
+
+	16	    1	       2     122880	 14752		0	  74	      0 	       122880	       0	  0	     0		0	   0 ONLINE	      0
+	 2	    0
+
+	17	    2	       2     122880	  6498		0	  54	      0 	       122880	       0	  0	     0		0	   0 ONLINE	      0
+	 1	    0
+
+	18	    0	       2     122880	 12144		0	  75	      0 	       122880	       0	  0	     0		0	   0 ONLINE	      0
+	 2	    0
+
+	19	    1	       2     122880	 12136		0	  76	      0 	       122880	       0	  0	     0		0	   0 ONLINE	      0
+	 3	    0
+
+	20	    2	       2     122880	  7370		0	  54	      0 	       122880	       0	  0	     0		0	   0 ONLINE	      0
+	 1	    0
+
+
+11 rows selected.
+
+SQL> SELECT * FROM V$UNDOSTAT;
+
+BEGIN_TIM END_TIME     UNDOTSN	 UNDOBLKS   TXNCOUNT MAXQUERYLEN MAXQUERYID    MAXCONCURRENCY UNXPSTEALCNT UNXPBLKRELCNT UNXPBLKREUCNT EXPSTEALCNT EXPBLKRELCNT EXPBLKREUCNT SSOLDERRCNT NOSPACEERRCNT
+--------- --------- ---------- ---------- ---------- ----------- ------------- -------------- ------------ ------------- ------------- ----------- ------------ ------------ ----------- -------------
+ACTIVEBLKS UNEXPIREDBLKS EXPIREDBLKS TUNED_UNDORETENTION     CON_ID
+---------- ------------- ----------- ------------------- ----------
+17-MAR-25 17-MAR-25	    12	       18	 314	     373 f3yfg50ga0r8n		    2		 0	       0	     0		 0	      0 	   0	       0	     0
+       160	       0	   0		    2400	  0
+
+17-MAR-25 17-MAR-25	     2	      951	2518	       0			    5		 0	       0	     0		 0	      0 	   0	       0	     0
+       160	    1792       21536		    2400	  0
+
+17-MAR-25 17-MAR-25	     2	       95	 575	       0			    3		 0	       0	     0		 0	      0 	   0	       0	     0
+       160	       0       23328		     900	  0
+
+
+SQL> 

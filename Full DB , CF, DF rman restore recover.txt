@@ -1,0 +1,1233 @@
+If full database lost
+
+first keep the database in archivelog mode
+startup mount;
+alter database archivelog;
+alter database open;
+
+check for archivemode
+archive log list;
+
+
+create rman bkp DIRECTORY
+[Oracle] mkdir /u01/rman_bkp/
+
+connect to 
+
+[Oracle] rman target /
+EXECUTE parameters below(CONFIGURE parameters)
+
+CONFIGURE RETENTION POLICY TO REDUNDANCY 1 # default
+CONFIGURE BACKUP OPTIMIZATION OFF; # default
+CONFIGURE DEFAULT DEVICE TYPE TO DISK; # default
+CONFIGURE CONTROLFILE AUTOBACKUP ON; # default
+CONFIGURE CONTROLFILE AUTOBACKUP FORMAT FOR DEVICE TYPE DISK TO '/u01/rman_bkp/%F'; # default
+CONFIGURE DEVICE TYPE DISK PARALLELISM 2 BACKUP TYPE TO BACKUPSET; # default
+CONFIGURE DATAFILE BACKUP COPIES FOR DEVICE TYPE DISK TO 1; # default
+CONFIGURE ARCHIVELOG BACKUP COPIES FOR DEVICE TYPE DISK TO 1; # default
+CONFIGURE MAXSETSIZE TO UNLIMITED; # default
+CONFIGURE ENCRYPTION FOR DATABASE OFF; # default
+CONFIGURE ENCRYPTION ALGORITHM 'AES128'; # default
+CONFIGURE COMPRESSION ALGORITHM 'BASIC' AS OF RELEASE 'DEFAULT' OPTIMIZE FOR LOAD TRUE ; # default
+CONFIGURE RMAN OUTPUT TO KEEP FOR 7 DAYS; # default
+CONFIGURE ARCHIVELOG DELETION POLICY TO NONE; # default
+CONFIGURE SNAPSHOT CONTROLFILE NAME TO '/u01/rman_bkp/snapcf_DB.f'; # default
+CONFIGURE CHANNEL 1 DEVICE TYPE DISK FORMAT '/u01/rman_bkp/%U';
+CONFIGURE CHANNEL 2 DEVICE TYPE DISK FORMAT '/u01/rman_bkp/%U';
+
+rman> backup database plus archivelog;
+
+rman>exit
+[oracle] ll
+checking for the backuped files
+[oracle] cd /u01/rman_bkp/
+
+list of the archivelogs snapcf_DB and controlfile (c-896617639-20241206-00) appears
+
+[oracle] sqlplus / as sysdba
+
+
+sql> create table venky (sl number, name varchar2(20));
+sql> insert into venky values (10, 'venky');
+sql> archive log list;
+sql> alter system switch logfile;
+sql>/
+sql>/
+sql>/
+sql>/
+sql> archive log list;
+
+
+check for the files
+
+select name from v$datafile;
+select name from $controlfile;
+select member from v$logfile;
+
+make all three together by  UNION to remove all the files at a TIME
+
+select  'rm '|| name from v$datafile        
+union
+select  'rm '|| name from v$controlfile
+union         
+select  'rm '|| member from v$logfile;
+
+
+copy all the datafiles from v$datafile,v$controlfile & v$logfile and make it copy into 
+note pad
+
+rm /u01/app/oracle/fast_recovery_area/PRODDB/controlfile/o1_mf_lrn5lhlr_.ctl
+rm /u01/app/oracle/fast_recovery_area/PRODDB/onlinelog/o1_mf_1_mo63cccy_.log
+rm /u01/app/oracle/fast_recovery_area/PRODDB/onlinelog/o1_mf_2_mo63cc9x_.log
+rm /u01/app/oracle/fast_recovery_area/PRODDB/onlinelog/o1_mf_3_mo63cdtn_.log
+rm /u01/app/oracle/oradata/PRODDB/controlfile/o1_mf_lrn5lhl8_.ctl
+rm /u01/app/oracle/oradata/PRODDB/datafile/o1_mf_soetbs_mo62qpgd_.dbf
+rm /u01/app/oracle/oradata/PRODDB/datafile/o1_mf_sysaux_mo62qpgw_.dbf
+rm /u01/app/oracle/oradata/PRODDB/datafile/o1_mf_system_mo62qpgf_.dbf
+rm /u01/app/oracle/oradata/PRODDB/datafile/o1_mf_undotbs1_mo62qpgx_.dbf
+rm /u01/app/oracle/oradata/PRODDB/datafile/o1_mf_users_mo62qph2_.dbf
+rm /u01/app/oracle/oradata/PRODDB/onlinelog/o1_mf_1_mo63cbpv_.log
+rm /u01/app/oracle/oradata/PRODDB/onlinelog/o1_mf_2_mo63cbr5_.log
+rm /u01/app/oracle/oradata/PRODDB/onlinelog/o1_mf_3_mo63cdj5_.log
+
+[oracle] now paste all the files above and execute in os level
+all the files were deleted 
+[Oracle]exit
+
+
+
+
+[oracle@oraclept ~]$ sqlplus / as SYSDBA
+
+you will find that the db lost 
+
+sql> shut abort;
+
+sql> startup nomount;
+
+sql> exit
+[oracle@oraclept ~]$ rman target /
+
+
+rman> restore controlfile from '/u01/rman_bkp/c-896617639-20241206-00';
+
+rman> alter database mount;
+
+rman> restore database;
+
+rman> recover database;
+
+if any error appears about media recovery then just do ***** alter database open resetlogs ******
+
+rman> alter database open;
+
+rman> alter database open resetlogs;
+RMAN> exit
+[oracle@oraclept ~]$ sqlplus / as sysdba
+check for the users restored or not if the users created after the backup taken
+
+SQL> select username, user_id from dba_users where oracle_maintained='N';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+practical lost of database
+
+RMAN> backup incremental level 0 database;
+
+
+
+RMAN> list backup summary;
+
+
+List of Backups
+===============
+Key     TY LV S Device Type Completion Time      #Pieces #Copies Compressed Tag
+------- -- -- - ----------- -------------------- ------- ------- ---------- ---
+10      B  F  A DISK        06-DEC-2024 19:47:03 1       1       NO         TAG20241206T194658
+11      B  F  A DISK        06-DEC-2024 19:47:06 1       1       NO         TAG20241206T194658
+12      B  F  A DISK        06-DEC-2024 20:12:58 1       1       NO         TAG20241206T201258
+13      B  F  A DISK        06-DEC-2024 21:22:47 1       1       NO         TAG20241206T212240
+14      B  F  A DISK        06-DEC-2024 21:22:49 1       1       NO         TAG20241206T212240
+15      B  F  A DISK        06-DEC-2024 21:22:56 1       1       NO         TAG20241206T212256
+19      B  0  A DISK        06-DEC-2024 22:16:17 1       1       NO         TAG20241206T221611
+20      B  0  A DISK        06-DEC-2024 22:16:18 1       1       NO         TAG20241206T221611
+21      B  F  A DISK        06-DEC-2024 22:16:19 1       1       NO         TAG20241206T221619
+
+RMAN> exit
+
+
+Recovery Manager complete.
+[oracle@oraclept ~]$ sqlplus / as sysdba
+
+
+SQL> select name from v$controlfile;
+
+NAME
+--------------------------------------------------------------------------------
+/u01/app/oracle/oradata/PRODDB/controlfile/o1_mf_lrn5lhl8_.ctl
+/u01/app/oracle/fast_recovery_area/PRODDB/controlfile/o1_mf_lrn5lhlr_.ctl
+
+SQL> select name from v$datafile;
+
+NAME
+--------------------------------------------------------------------------------
+/u01/app/oracle/oradata/PRODDB/datafile/o1_mf_system_mo694d73_.dbf
+/u01/app/oracle/oradata/PRODDB/datafile/o1_mf_sysaux_mo694d78_.dbf
+/u01/app/oracle/oradata/PRODDB/datafile/o1_mf_undotbs1_mo694d7m_.dbf
+/u01/app/oracle/oradata/PRODDB/datafile/o1_mf_soetbs_mo694d72_.dbf
+/u01/app/oracle/oradata/PRODDB/datafile/o1_mf_users_mo694d88_.dbf
+
+SQL> select member from v$logfile;
+
+MEMBER
+--------------------------------------------------------------------------------
+/u01/app/oracle/oradata/PRODDB/onlinelog/o1_mf_3_mo698ktt_.log
+/u01/app/oracle/fast_recovery_area/PRODDB/onlinelog/o1_mf_3_mo698lf4_.log
+/u01/app/oracle/oradata/PRODDB/onlinelog/o1_mf_2_mo698jrg_.log
+/u01/app/oracle/fast_recovery_area/PRODDB/onlinelog/o1_mf_2_mo698khf_.log
+/u01/app/oracle/oradata/PRODDB/onlinelog/o1_mf_1_mo698jjm_.log
+/u01/app/oracle/fast_recovery_area/PRODDB/onlinelog/o1_mf_1_mo698jyc_.log
+
+
+SQL> select 'rm '||name from v$controlfile
+  2  union
+  3  select 'rm '||name from v$datafile
+  4  union  
+  5  select 'rm '||member from v$logfile;
+
+'RM'||NAME
+--------------------------------------------------------------------------------
+rm /u01/app/oracle/fast_recovery_area/PRODDB/controlfile/o1_mf_lrn5lhlr_.ctl
+rm /u01/app/oracle/fast_recovery_area/PRODDB/onlinelog/o1_mf_1_mo698jyc_.log
+rm /u01/app/oracle/fast_recovery_area/PRODDB/onlinelog/o1_mf_2_mo698khf_.log
+rm /u01/app/oracle/fast_recovery_area/PRODDB/onlinelog/o1_mf_3_mo698lf4_.log
+rm /u01/app/oracle/oradata/PRODDB/controlfile/o1_mf_lrn5lhl8_.ctl
+rm /u01/app/oracle/oradata/PRODDB/datafile/o1_mf_soetbs_mo694d72_.dbf
+rm /u01/app/oracle/oradata/PRODDB/datafile/o1_mf_sysaux_mo694d78_.dbf
+rm /u01/app/oracle/oradata/PRODDB/datafile/o1_mf_system_mo694d73_.dbf
+rm /u01/app/oracle/oradata/PRODDB/datafile/o1_mf_undotbs1_mo694d7m_.dbf
+rm /u01/app/oracle/oradata/PRODDB/datafile/o1_mf_users_mo694d88_.dbf
+rm /u01/app/oracle/oradata/PRODDB/onlinelog/o1_mf_1_mo698jjm_.log
+
+'RM'||NAME
+--------------------------------------------------------------------------------
+rm /u01/app/oracle/oradata/PRODDB/onlinelog/o1_mf_2_mo698jrg_.log
+rm /u01/app/oracle/oradata/PRODDB/onlinelog/o1_mf_3_mo698ktt_.log
+
+13 rows selected.
+
+SQL> create user venky identified by venky;
+
+User created.
+
+SQL> grant connect, resource to venky;
+
+Grant succeeded.
+
+SQL> grant create session to venky;
+
+Grant succeeded.
+
+SQL> CREATE PROFILE VENKY_PROFILE
+				LIMIT
+				COMPOSITE_LIMIT UNLIMITED
+				SESSIONS_PER_USER 2
+				CPU_PER_SESSION UNLIMITED
+				CPU_PER_CALL UNLIMITED
+				LOGICAL_READS_PER_SESSION UNLIMITED
+				LOGICAL_READS_PER_CALL UNLIMITED
+				IDLE_TIME 1
+				CONNECT_TIME 5
+				PRIVATE_SGA UNLIMITED
+				FAILED_LOGIN_ATTEMPTS 10
+				PASSWORD_LIFE_TIME 180
+				PASSWORD_REUSE_TIME UNLIMITED
+				PASSWORD_REUSE_MAX UNLIMITED
+				PASSWORD_VERIFY_FUNCTION NULL
+				PASSWORD_LOCK_TIME UNLIMITED
+				PASSWORD_GRACE_TIME UNLIMITED;  2    3    4    5    6    7    8    9   10   11   12   13   14   15   16   17   18  
+
+Profile created.
+
+
+SQL> alter user venky PROFILE VENKY_PROFILE;
+
+User altered.
+
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> grant create job to venky;
+
+Grant succeeded.
+
+SQL> GRANT EXP_FULL_DATABASE TO venky;
+
+Grant succeeded.
+
+SQL> grant imp_full_database to venky;
+
+Grant succeeded.
+
+SQL> grant create tablespace to venky;
+
+Grant succeeded.
+
+SQL> create tablespace venkyts;
+
+Tablespace created.
+
+SQL> alter user venky default tablespace venkyts;
+
+User altered.
+
+SQL> drop tablespace venkyts;
+
+Tablespace dropped.
+
+SQL> create tablespace venkyts size 100M;
+create tablespace venkyts size 100M
+                          *
+ERROR at line 1:
+ORA-02180: invalid option for CREATE TABLESPACE
+
+
+SQL> create tablespace venkyts datafile '/u01/app/oracle/datafile_venkyts_001.dbf' size 200M;             
+
+Tablespace created.
+
+SQL> alter user venky default tablespace venkyts;
+
+User altered.
+
+SQL> alter user venky quota unlimited on venkyts;
+
+User altered.
+
+SQL> conn venky/venky
+Connected.
+SQL> create table venky (NO number, NAME varchar2(20));
+
+Table created.
+
+SQL> insert into venky values (10,'VENKY');
+
+1 row created.
+
+SQL> /
+
+1 row created.
+
+SQL> /
+
+1 row created.
+
+SQL> /
+
+1 row created.
+
+SQL> /
+
+1 row created.
+
+SQL> /
+
+1 row created.
+
+SQL> /
+
+1 row created.
+
+SQL> /
+
+1 row created.
+
+SQL> /
+
+1 row created.
+
+SQL> commit;
+
+Commit complete.
+
+SQL> select * from venky;
+
+	NO NAME
+---------- --------------------
+	10 VENKY
+	10 VENKY
+	10 VENKY
+	10 VENKY
+	10 VENKY
+	10 VENKY
+	10 VENKY
+	10 VENKY
+	10 VENKY
+
+9 rows selected.
+
+SQL> archive log list;
+ORA-01031: insufficient privileges
+SQL> archive log list
+ORA-01031: insufficient privileges
+SQL> conn / as sysdba
+Connected.
+SQL> archive log list
+Database log mode	       Archive Mode
+Automatic archival	       Enabled
+Archive destination	       USE_DB_RECOVERY_FILE_DEST
+Oldest online log sequence     1
+Next log sequence to archive   1
+Current log sequence	       1
+SQL> alter system switch logfile;
+
+System altered.
+
+SQL> /
+
+System altered.
+
+SQL> /
+/
+/
+/
+/
+
+System altered.
+
+SQL> 
+System altered.
+
+SQL> /
+
+System altered.
+
+SQL> 
+System altered.
+
+SQL> /
+/
+System altered.
+
+SQL> 
+System altered.
+
+SQL> /
+
+System altered.
+
+SQL> 
+System altered.
+
+SQL> /
+
+System altered.
+
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> archive log list
+Database log mode	       Archive Mode
+Automatic archival	       Enabled
+Archive destination	       USE_DB_RECOVERY_FILE_DEST
+
+Oldest online log sequence     10
+Next log sequence to archive   12
+Current log sequence	       12
+
+
+
+
+SQL> shut abort;
+ORACLE instance shut down.
+SQL> 
+SQL> 
+SQL> 
+SQL> startup nomount;
+ 
+ORACLE instance started.
+
+Total System Global Area 1325399808 bytes
+Fixed Size		    8896256 bytes
+Variable Size		  620756992 bytes
+Database Buffers	  687865856 bytes
+Redo Buffers		    7880704 bytes
+SQL> SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> exit
+Disconnected from Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.3.0.0.0
+[oracle@oraclept ~]$ rman target /
+
+
+connected to target database: PRODDB (not mounted)
+
+RMAN> restore controlfile from '/u01/rman_bkp/c-896617639-20241206-08';
+
+
+RMAN> alter database mount;
+
+released channel: ORA_DISK_1
+Statement processed
+
+
+RMAN> restore database;
+
+
+RMAN> recover database;
+
+Starting recover at 06-DEC-2024 22:39:50
+using channel ORA_DISK_1
+using channel ORA_DISK_2
+
+starting media recovery
+
+
+RMAN> alter database open;
+
+RMAN-00571: ===========================================================
+RMAN-00569: =============== ERROR MESSAGE STACK FOLLOWS ===============
+RMAN-00571: ===========================================================
+RMAN-03002: failure of sql statement command at 12/06/2024 22:40:37
+ORA-01589: must use RESETLOGS or NORESETLOGS option for database open
+
+RMAN> alter database open resetlogs;
+
+RMAN-00571: ===========================================================
+RMAN-00569: =============== ERROR MESSAGE STACK FOLLOWS ===============
+RMAN-00571: ===========================================================
+RMAN-03002: failure of sql statement command at 12/06/2024 22:40:51
+ORA-01152: file 2 was not restored from a sufficiently old backup 
+ORA-01110: data file 2: '/u01/app/oracle/datafile_venkyts_001.dbf'
+
+RMAN> recover datafile 2;
+
+
+
+SQL> archive log list
+Database log mode	       Archive Mode
+Automatic archival	       Enabled
+Archive destination	       USE_DB_RECOVERY_FILE_DEST
+Oldest online log sequence     1
+Next log sequence to archive   1
+Current log sequence	       1
+SQL> exit
+Disconnected from Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.3.0.0.0
+[oracle@oraclept ~]$ rman target /
+
+
+RMAN> recover database from logseq 10 until logseq 12;
+
+RMAN-00571: ===========================================================
+RMAN-00569: =============== ERROR MESSAGE STACK FOLLOWS ===============
+RMAN-00571: ===========================================================
+RMAN-00558: error encountered while parsing input commands
+RMAN-01009: syntax error: found "logseq": expecting one of: "backupset, datafilecopy, nonsparse, platform, sparse, tag"
+RMAN-01007: at line 1 column 23 file: standard input
+
+RMAN> alter database open resetlogs;
+
+using target database control file instead of recovery catalog
+RMAN-00571: ===========================================================
+RMAN-00569: =============== ERROR MESSAGE STACK FOLLOWS ===============
+RMAN-00571: ===========================================================
+RMAN-03002: failure of sql statement command at 12/06/2024 22:45:47
+ORA-01152: file 2 was not restored from a sufficiently old backup 
+ORA-01110: data file 2: '/u01/app/oracle/datafile_venkyts_001.dbf'
+
+RMAN> restore datafile 2;
+
+Starting restore at 06-DEC-2024 22:46:00
+allocated channel: ORA_DISK_1
+channel ORA_DISK_1: SID=36 device type=DISK
+allocated channel: ORA_DISK_2
+channel ORA_DISK_2: SID=39 device type=DISK
+
+creating datafile file number=2 name=/u01/app/oracle/datafile_venkyts_001.dbf
+restore not done; all files read only, offline, excluded, or already restored
+Finished restore at 06-DEC-2024 22:46:01
+
+RMAN> recover data file 2;
+
+RMAN-00571: ===========================================================
+RMAN-00569: =============== ERROR MESSAGE STACK FOLLOWS ===============
+RMAN-00571: ===========================================================
+RMAN-00558: error encountered while parsing input commands
+RMAN-01009: syntax error: found "identifier": expecting one of: "allow, application, archivelog, auxiliary, check, clear, copy, corruption, database, database root, datafilecopy, datafile, datapump, delete, device, dump, exclude, file_name_convert, foreign, from, frompreplugin, from service, nonlogged, noparallel, noredo, notableimport, parallel, pfile, pluggable, preview, remap, restore, section, skipoffline, skip readonly, standby, standbydatabase, table, tablespace, test, undo, using, validate"
+RMAN-01008: the bad identifier was: data
+RMAN-01007: at line 1 column 9 file: standard input
+
+RMAN> recover datafile 2;
+
+Starting recover at 06-DEC-2024 22:46:28
+using channel ORA_DISK_1
+using channel ORA_DISK_2
+
+RMAN-00571: ===========================================================
+RMAN-00569: =============== ERROR MESSAGE STACK FOLLOWS ===============
+RMAN-00571: ===========================================================
+RMAN-03002: failure of recover command at 12/06/2024 22:46:29
+RMAN-06067: RECOVER DATABASE required with a backup or created control file
+
+RMAN> recover database;
+
+Starting recover at 06-DEC-2024 22:46:37
+using channel ORA_DISK_1
+using channel ORA_DISK_2
+
+starting media recovery
+
+
+
+
+RMAN> alter databse open resetlogs;
+
+RMAN-00571: ===========================================================
+RMAN-00569: =============== ERROR MESSAGE STACK FOLLOWS ===============
+RMAN-00571: ===========================================================
+RMAN-03002: failure of sql statement command at 12/06/2024 22:46:53
+ORA-00940: invalid ALTER command
+
+RMAN> alter database open resetlogs;
+
+Statement processed
+
+RMAN> 
+
+RMAN> 
+
+RMAN> 
+
+RMAN> 
+
+RMAN> 
+
+RMAN> 
+
+RMAN> list backup summary;
+
+
+List of Backups
+===============
+Key     TY LV S Device Type Completion Time      #Pieces #Copies Compressed Tag
+------- -- -- - ----------- -------------------- ------- ------- ---------- ---
+10      B  F  X DISK        06-DEC-2024 19:47:03 1       1       NO         TAG20241206T194658
+11      B  F  X DISK        06-DEC-2024 19:47:06 1       1       NO         TAG20241206T194658
+12      B  F  X DISK        06-DEC-2024 20:12:58 1       1       NO         TAG20241206T201258
+13      B  F  X DISK        06-DEC-2024 21:22:47 1       1       NO         TAG20241206T212240
+14      B  F  X DISK        06-DEC-2024 21:22:49 1       1       NO         TAG20241206T212240
+15      B  F  X DISK        06-DEC-2024 21:22:56 1       1       NO         TAG20241206T212256
+19      B  0  A DISK        06-DEC-2024 22:16:17 1       1       NO         TAG20241206T221611
+20      B  0  A DISK        06-DEC-2024 22:16:18 1       1       NO         TAG20241206T221611
+21      B  F  A DISK        06-DEC-2024 22:47:23 1       1       NO         TAG20241206T224723
+
+RMAN> exit
+
+
+Recovery Manager complete.
+[oracle@oraclept ~]$ sqlplus / as sysdba
+
+SQL*Plus: Release 19.0.0.0.0 - Production on Fri Dec 6 22:47:45 2024
+Version 19.3.0.0.0
+
+Copyright (c) 1982, 2019, Oracle.  All rights reserved.
+
+
+Connected to:
+Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.3.0.0.0
+
+SQL> show user
+USER is "SYS"
+SQL> conn venky/venky
+Connected.
+SQL> select * from tab;
+
+TNAME
+--------------------------------------------------------------------------------
+TABTYPE        CLUSTERID
+------------- ----------
+VENKY
+TABLE
+
+
+SQL> select owner, table_name, column_name from dba_tab_columns where owner='VENKY';
+
+OWNER
+--------------------------------------------------------------------------------
+TABLE_NAME
+--------------------------------------------------------------------------------
+COLUMN_NAME
+--------------------------------------------------------------------------------
+VENKY
+VENKY
+NO
+
+VENKY
+VENKY
+NAME
+
+OWNER
+--------------------------------------------------------------------------------
+TABLE_NAME
+--------------------------------------------------------------------------------
+COLUMN_NAME
+--------------------------------------------------------------------------------
+
+
+SQL> set lines 100
+SQL> set colsep |
+SQL> select owner, table_name, column_name from dba_tab_columns where owner='VENKY';
+
+OWNER
+----------------------------------------------------------------------------------------------------
+TABLE_NAME
+----------------------------------------------------------------------------------------------------
+COLUMN_NAME
+----------------------------------------------------------------------------------------------------
+VENKY
+VENKY
+NO
+
+VENKY
+VENKY
+NAME
+
+OWNER
+----------------------------------------------------------------------------------------------------
+TABLE_NAME
+----------------------------------------------------------------------------------------------------
+COLUMN_NAME
+----------------------------------------------------------------------------------------------------
+
+
+SQL> ^C
+
+
+
+
+
+
+
+**********************************************
+  #recover a datafile which is not in rman backup;
+
+
+1) Know the defination of that datafile like location of that datafile.
+select name from v$datafile where file# = 36;
+
+2)connect to rman (make sure you connect to the specific pdb incase the datafile belongs to a pdb)
+list backup of datafile 36;
+
+
+##########################
+if datafile exists the
+rman > restore datafile 36;
+recover datafile 36;
+
+stop;
+######################
+if the datafile is not in rman backup
+######################
+
+3) offline the datafile;
+
+alter database datafile 'path' offline;
+
+4) recreate datafile using alter database ;
+alter database create datafile '<path>' as '<path> size 32G reuse;
+
+5 ) recover the datafile , as you have the datafile in existance
+rman > recover datafile 36;
+
+6 ) online the datafile
+alter database datafile 36 online;
+
+
+
+
+
+**********
+
+
+
+loss of system datafile:
+
+
+connect to sqlplus / as sysdba
+[oracle@oraclept ~]$ sqlplus / as sysdba
+
+SQL> select name from v$datafile;
+
+NAME
+--------------------------------------------------------------------------------
+/u01/app/oracle/oradata/PRODDB/datafile/o1_mf_system_mom4czvb_.dbf
+/u01/app/oracle/oradata/PRODDB/datafile/o1_mf_sysaux_mom4czx1_.dbf
+/u01/app/oracle/oradata/PRODDB/datafile/o1_mf_undotbs1_mom4czvn_.dbf
+/u01/app/oracle/oradata/PRODDB/datafile/o1_mf_soetbs_mom4czvw_.dbf
+/u01/app/oracle/oradata/PRODDB/datafile/o1_mf_users_mom4czym_.dbf
+
+select * from v$datafile;
+select the datafile to delete copy that datafile
+
+sql> exit
+[oracle] rm 'selected datafile'
+[oracle@oraclept ~]$ rm /u01/app/oracle/oradata/PRODDB/datafile/o1_mf_users_mom4czym_.dbf
+
+connect to sqlplus / as sysdba
+
+alter system switch logfile;
+again do the above for two more times (here the datafile existed or not we get the information)
+SQL> alter system switch logfile;
+
+System altered.
+
+SQL> /
+
+System altered.
+
+SQL> /
+alter system switch logfile
+*
+ERROR at line 1:
+ORA-03113: end-of-file on communication channel
+Process ID: 6617
+Session ID: 1 Serial number: 49199
+
+check for datafile in the list
+
+sql>select * from v$recover_file;
+deleted datafile avilable here with number
+ERROR:
+ORA-03114: not connected to ORACLE
+
+
+
+ 
+
+sql> shut abort;
+
+sql> startup mount;
+
+SQL> alter database open;
+alter database open
+*
+ERROR at line 1:
+ORA-01157: cannot identify/lock data file 7 - see DBWR trace file
+ORA-01110: data file 7:
+'/u01/app/oracle/oradata/PRODDB/datafile/o1_mf_users_mom4czym_.dbf'
+
+
+SQL> exit
+
+[oracle@oraclept ~]$ rman target /
+
+
+connected to target database: PRODDB (DBID=896617639, not open)
+
+rman> restore datafile 7;
+Starting restore at 11-DEC-2024 19:12:35
+using target database control file instead of recovery catalog
+allocated channel: ORA_DISK_1
+channel ORA_DISK_1: SID=44 device type=DISK
+allocated channel: ORA_DISK_2
+channel ORA_DISK_2: SID=45 device type=DISK
+
+channel ORA_DISK_1: starting datafile backup set restore
+channel ORA_DISK_1: specifying datafile(s) to restore from backup set
+channel ORA_DISK_1: restoring datafile 00007 to /u01/app/oracle/oradata/PRODDB/datafile/o1_mf_users_mom4czym_.dbf
+channel ORA_DISK_1: reading from backup piece /u01/rman_bkp/0c3cecl4_1_1
+channel ORA_DISK_1: piece handle=/u01/rman_bkp/0c3cecl4_1_1 tag=TAG20241211T175548
+channel ORA_DISK_1: restored backup piece 1
+channel ORA_DISK_1: restore complete, elapsed time: 00:00:01
+Finished restore at 11-DEC-2024 19:12:37
+
+rman> recover datafile 7;
+Starting recover at 11-DEC-2024 19:12:44
+using channel ORA_DISK_1
+using channel ORA_DISK_2
+
+starting media recovery
+
+archived log for thread 1 with sequence 39 is already on disk as file /u01/app/oracle/fast_recovery_area/PRODDB/archivelog/2024_12_11/o1_mf_1_39_mom16wc5_.arc
+archived log for thread 1 with sequence 40 is already on disk as file /u01/app/oracle/fast_recovery_area/PRODDB/archivelog/2024_12_11/o1_mf_1_40_mom43f78_.arc
+archived log for thread 1 with sequence 1 is already on disk as file /u01/app/oracle/fast_recovery_area/PRODDB/archivelog/2024_12_11/o1_mf_1_1_mom58st5_.arc
+archived log for thread 1 with sequence 2 is already on disk as file /u01/app/oracle/fast_recovery_area/PRODDB/archivelog/2024_12_11/o1_mf_1_2_mom58w72_.arc
+archived log file name=/u01/app/oracle/fast_recovery_area/PRODDB/archivelog/2024_12_11/o1_mf_1_39_mom16wc5_.arc thread=1 sequence=39
+archived log file name=/u01/app/oracle/fast_recovery_area/PRODDB/archivelog/2024_12_11/o1_mf_1_40_mom43f78_.arc thread=1 sequence=40
+media recovery complete, elapsed time: 00:00:01
+Finished recover at 11-DEC-2024 19:12:45
+
+
+rman>alter database open;
+Statement processed
+
+rman> exit
+[oracle] sqlplus / as sysdba
+
+
+SQL> select * from v$recover_file;
+
+no rows selected
+
+SQL> select name from v$datafile;
+
+NAME
+--------------------------------------------------------------------------------
+/u01/app/oracle/oradata/PRODDB/datafile/o1_mf_system_mom4czvb_.dbf
+/u01/app/oracle/oradata/PRODDB/datafile/o1_mf_sysaux_mom4czx1_.dbf
+/u01/app/oracle/oradata/PRODDB/datafile/o1_mf_undotbs1_mom4czvn_.dbf
+/u01/app/oracle/oradata/PRODDB/datafile/o1_mf_soetbs_mom4czvw_.dbf
+/u01/app/oracle/oradata/PRODDB/datafile/o1_mf_users_mom5pdw8_.dbf
+
+
+*****************************
+
+
+
+
+
+### Lost of controlfile
+
+
+[oracle] sqlplus / as sysdba
+
+sql> select name from v$controlfile;
+NAME
+--------------------------------------------------------------------------------
+/u01/app/oracle/oradata/PRODDB/controlfile/o1_mf_lrn5lhl8_.ctl
+/u01/app/oracle/fast_recovery_area/PRODDB/controlfile/o1_mf_lrn5lhlr_.ctl
+
+copy the controle file to delete from os level
+sql> exit
+[oracle] rm 'controlfile'
+[oracle@oraclept ~]$ rm /u01/app/oracle/oradata/PRODDB/controlfile/o1_mf_lrn5lhl8_.ctl
+
+[oracle] sqlplus / as sysdba
+
+sql> alter system switch log file;
+do above two more times if error appears controlfile deleted 
+now check in 
+SQL> alter system switch logfile;
+
+System altered.
+
+sql> select * from v$recover_file;
+deleted controlfile info available here if not avilable check in alert log file
+SQL> select * from v$recover_file;
+select * from v$recover_file
+*
+ERROR at line 1:
+ORA-00210: cannot open the specified control file
+ORA-00202: control file:
+'/u01/app/oracle/oradata/PRODDB/controlfile/o1_mf_lrn5lhl8_.ctl'
+ORA-27041: unable to open file
+Linux-x86_64 Error: 2: No such file or directory
+Additional information: 3
+
+sql> shutdown abort;
+sql> startup nomount 
+sql> exit
+[oracle] rman target /
+connected to target database: PRODDB (not mounted)
+
+RESTORE CONTROL FROM 'BACK UP LOACTION'
+rman> restore controlfile from '/u01/rman_bkp/c-896617639-20241206-00';
+
+
+rman> Startup mount; 
+rman> recover database.
+rman> alter database open resetlogs;
+
+
+
+
+
+
+
+*******************
+
+
+
+
+SYSAUX/NON SYSTEM
+
+sql> ‘alter database <datafile number offline>’;
+RMAN>restore datafile <datafile number>;
+RMAN>recover datafile <datafile number>;
+RMAN>sql ‘alter database <datafile number online>’;
+
+
+
+
+
+1.  
+  #recover a datafile which is not in rman backup;
+
+
+1) Know the definition of that datafile like location of that datafile.
+select name from v$datafile where file# = 36;
+
+2)connect to rman (make sure you connect to the specific pdb incase the datafile belongs to a pdb)
+list backup of datafile 36;
+
+
+##########################
+if datafile exists the
+rman > restore datafile 36;
+recover datafile 36;
+
+stop;
+######################
+if the datafile is not in rman backup
+######################
+
+3) offline the datafile;
+
+alter database datafile 'path' offline;
+
+4) recreate datafile using alter database ;
+alter database create datafile '<path>' as '<path> size 32G reuse;
+
+5 ) recover the datafile , as you have the datafile in existance
+rman > recover datafile 36;
+
+6 ) online the datafile
+alter database datafile 36 online;
+
+
+datafile backup if it is not in backup.
+
+	• Login to RMAN
+	• And offline that table space.
+	RMAN> alter tablespace <tablespace_name>  offline;
+	SQL> desc dba_tablespaces
+ Name					   Null?    Type
+SQL> select TABLESPACE_NAME,TABLESPACE_NAME,STATUS from dba_tablespaces where tablespace_name='VENKYTS';
+
+TABLESPACE_NAME 	      |TABLESPACE_NAME		     |STATUS
+------------------------------|------------------------------|---------
+VENKYTS 		      |VENKYTS			     |OFFLINE
+
+	• Restore that table space
+	RMAN> restore tablespace <tablespace_name>
+	• Recover that table space.
+	RMAN> recover table space <table space name>
+	• And online that table space.
+	• RMAN> alter tablespace <tablespace_name>  online;
+	SQL> alter tablespace venkyts offline;
+
+Tablespace altered.
+
+SQL> alter tablespace venkyts online;
+
+Tablespace altered.
+
+SQL> alter tablespace venkyts drop datafile '/u01/app/oracle/oradata/PRODDB/datafile/data_file_001.dbf';
+
+Tablespace altered.
+
+SQL> select TABLESPACE_NAME,TABLESPACE_NAME,STATUS from dba_tablespaces where tablespace_name='VENKYTS';
+
+TABLESPACE_NAME 	      |TABLESPACE_NAME		     |STATUS
+------------------------------|------------------------------|---------
+VENKYTS 		      |VENKYTS			     |ONLINE
+
+SQL> alter tablespace venkyts offline;
+
+Tablespace altered.
+
+SQL> select TABLESPACE_NAME,TABLESPACE_NAME,STATUS from dba_tablespaces where tablespace_name='VENKYTS';
+
+TABLESPACE_NAME 	      |TABLESPACE_NAME		     |STATUS
+------------------------------|------------------------------|---------
+VENKYTS 		      |VENKYTS			     |OFFLINE
+
+SQL> exit
+Disconnected from Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.3.0.0.0
+[oracle@oraclept ~]$ rman target /
+
+connected to target database: PRODDB (DBID=896617639)
+
+RMAN> restore tablespace venkyts;
+
+Starting restore at 11-DEC-2024 20:40:35
+using target database control file instead of recovery catalog
+allocated channel: ORA_DISK_1
+channel ORA_DISK_1: SID=70 device type=DISK
+allocated channel: ORA_DISK_2
+channel ORA_DISK_2: SID=75 device type=DISK
+
+creating datafile file number=2 name=/u01/app/oracle/oradata/PRODDB/datafile/o1_mf_venkyts_mom7cs04_.dbf
+restore not done; all files read only, offline, excluded, or already restored
+Finished restore at 11-DEC-2024 20:40:36
+
+RMAN> recover tablespace venkyts;
+
+Starting recover at 11-DEC-2024 20:40:51
+using channel ORA_DISK_1
+using channel ORA_DISK_2
+
+starting media recovery
+media recovery complete, elapsed time: 00:00:00
+
+Finished recover at 11-DEC-2024 20:40:53
+
+RMAN> alter tablespace venkyts online;
+
+Statement processed
+
+RMAN> exit
+SQL> select TABLESPACE_NAME,TABLESPACE_NAME,STATUS from dba_tablespaces where tablespace_name='VENKYTS';
+
+TABLESPACE_NAME 	       TABLESPACE_NAME		      STATUS
+------------------------------ ------------------------------ ---------
+VENKYTS 		       VENKYTS			      ONLINE
+desc v$datafile
+desc dba_data_files
+SQL> set lines 200
+SQL> set pages 200
+SQL> set colsep |
+SQL> col FILE_NAME for a80  
+SQL> col TABLESPACE_NAME for a20
+SQL> col STATUS for a10
+SQL> select FILE_NAME,TABLESPACE_NAME,STATUS from dba_data_files where tablespace_name='VENKYTS';
+
+FILE_NAME									|TABLESPACE_NAME     |STATUS
+--------------------------------------------------------------------------------|--------------------|----------
+/u01/app/oracle/oradata/PRODDB/datafile/o1_mf_venkyts_mom7cs04_.dbf		|VENKYTS	     |AVAILABLE
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+SQL> select tablespace_name, status, bigfile,lost_write_protect, max_size from dba_tablespaces;
+
+TABLESPACE_NAME 	       STATUS	 BIG LOST_WR   MAX_SIZE
+------------------------------ --------- --- ------- ----------
+SYSTEM			       ONLINE	 NO  OFF     2147483645
+SYSAUX			       ONLINE	 NO  OFF     2147483645
+UNDOTBS1		       ONLINE	 NO  OFF     2147483645
+TEMP			       ONLINE	 NO  OFF     2147483645
+USERS			       ONLINE	 NO  OFF     2147483645
+SOETBS			       ONLINE	 NO  OFF     2147483645
+VENKYTS 		       OFFLINE	 NO  OFF     2147483645
+SQL> select * from venky; 
+select * from venky
+              *
+ERROR at line 1:
+ORA-00376: file 2 cannot be read at this time
+ORA-01110: data file 2: '/u01/app/oracle/datafile_venkyts_001.dbf'
+
+
+SQL> alter tablespace venkyts online;
+
+Tablespace altered.
+SQL> select * from venky;
+
+	NO|NAME
+----------|--------------------
+	10|VENKY
+	10|VENKY
+	10|VENKY
+	10|VENKY
+	10|VENKY
+	10|VENKY
+	10|VENKY
+	10|VENKY
+	10|VENKY
+
+9 rows selected.
+SQL> alter tablespace venkyts offline;
+
+Tablespace altered.
+
+SQL> insert into venky values (10,'venky');
+insert into venky values (10,'venky')
+            *
+ERROR at line 1:
+ORA-00376: file 2 cannot be read at this time
+ORA-01110: data file 2: '/u01/app/oracle/datafile_venkyts_001.dbf'
+
+
+SQL> alter tablespace venkyts online;
+
+Tablespace altered.
+
+SQL> insert into venky values (10,'venky');
+
+1 row created.
+
+SQL> commit;
+
+Commit complete.
+
+
+SELECT THREAD#, SEQUENCE#, FIRST_TIME, NEXT_TIME, ARCHIVED
+FROM V$ARCHIVED_LOG
+ORDER BY THREAD#, SEQUENCE#;
+  THREAD#| SEQUENCE#|FIRST_TIM|NEXT_TIME|ARC
+----------|----------|---------|---------|---
+	 1|	   24|08-DEC-24|08-DEC-24|YES
+	 
+	 RECOVER DATABASE UNTIL SEQUENCE 101 THREAD 1;
+
+
+
+
+If the primary database got any error by datafiles then get the scn number from standby and do the following in RMAN
+RUN {
+  SET UNTIL SCN 4082492;
+  RESTORE DATABASE;
+  RECOVER DATABASE;
+}
+
+
+
+logfilename converting in standby
+
+ALTER SYSTEM SET LOG_FILE_NAME_CONVERT =
+  ('/u01/app/oracle/oradata/VENDB/', '/u01/app/oracle/oradata/LATDB/')
+  SCOPE=SPFILE;

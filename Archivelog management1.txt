@@ -1,0 +1,223 @@
+										Archivelog Management
+										
+-- Check Current Log Mode
+
+SQL> SELECT LOG_MODE FROM V$DATABASE;
+
+LOG_MODE
+------------
+NOARCHIVELOG
+
+---Enable ARCHIVELOG Mode:
+
+SQL> SHUTDOWN IMMEDIATE;
+SQL> exit
+[oracle@oraclept ~]$ sqlplus / as sysdba
+SQL> STARTUP MOUNT;
+SQL> ALTER DATABASE ARCHIVELOG;
+SQL> ALTER DATABASE OPEN;
+SQL> select log_mode from v$database;
+
+LOG_MODE
+------------
+ARCHIVELOG
+
+
+---Check Archive Log Destination (which displays the Destination for logs 1....31 destinations)
+
+SQL> show parameter log_archive_dest;
+NAME				     TYPE	 VALUE
+------------------- ----------- ---------
+log_archive_dest	   string
+log_archive_dest_1	   string
+
+SQL> show parameter log_archive_format;
+
+NAME				     				TYPE		 VALUE
+------------------------------------ ----------- ------------------------------
+log_archive_format		     			string	 	%t_%s_%r.dbf
+
+
+SQL> archive log list
+
+Database log mode	       Archive Mode
+Automatic archival	       Enabled
+Archive destination	       USE_DB_RECOVERY_FILE_DEST
+Oldest online log sequence     27
+Next log sequence to archive   29
+Current log sequence	       29
+
+SQL> show parameter DB_RECOVERY_FILE_DEST   (this is the default destination (FRA))
+
+NAME				     				TYPE	 		VALUE
+------------------------------------ ----------- 	------------------------------
+db_recovery_file_dest		     		string	 		/u01/app/oracle/fast_recovery_area
+db_recovery_file_dest_size	     		big integer 	8256M
+
+-- First check for whether logs are generating in this location or NOT
+SQL> alter system switch logfile;
+/
+/
+-- Go to the location in OS LEVEL
+[oracle@oraclept ~]$ cd /u01/app/oracle/fast_recovery_area/PRODDB/archivelog/2025_05_15
+[oracle@oraclept 2025_05_15]$ ls -lrt
+total 6444
+-rw-r-----. 1 oracle oinstall 6574592 May 15 13:00 o1_mf_1_29_n2c61g5q_.arc
+-rw-r-----. 1 oracle oinstall    1024 May 15 13:01 o1_mf_1_30_n2c621ow_.arc
+-rw-r-----. 1 oracle oinstall   15872 May 15 13:01 o1_mf_1_31_n2c6254v_.arc
+
+-- we found that logs are generating
+
+---Listing out archivelogs
+
+SQL> set lines 200 pages 200
+SQL> col name for a100
+SQL> SELECT SEQUENCE#, NAME, APPLIED, COMPLETION_TIME FROM V$ARCHIVED_LOG ORDER BY SEQUENCE#;
+ SEQUENCE# NAME 												APPLIED   COMPLETIO
+---------- ---------------------------------------------------------------------------------------------------- --------- ---------
+	29 /u01/app/oracle/fast_recovery_area/PRODDB/archivelog/2025_05_15/o1_mf_1_29_n2c61g5q_.arc		NO	  15-MAY-25
+	30 /u01/app/oracle/fast_recovery_area/PRODDB/archivelog/2025_05_15/o1_mf_1_30_n2c621ow_.arc		NO	  15-MAY-25
+	31 /u01/app/oracle/fast_recovery_area/PRODDB/archivelog/2025_05_15/o1_mf_1_31_n2c6254v_.arc		NO	  15-MAY-25
+	32 /u01/app/oracle/fast_recovery_area/PRODDB/archivelog/2025_05_15/o1_mf_1_32_n2covzqp_.arc		NO	  15-MAY-25
+
+SQL> SELECT MAX(SEQUENCE#) FROM V$ARCHIVED_LOG;
+
+MAX(SEQUENCE#)
+--------------
+	    32
+--Force archiving current log
+SQL> ALTER SYSTEM ARCHIVE LOG CURRENT;
+
+--Use Cases:
+
+Backup and Recovery: Ensures that all redo data is saved, which is crucial before taking a backup.
+
+Standby Database (Data Guard): Forces redo to be archived so it can be shipped to a standby database.
+
+Manual Archiving: Useful when automatic archiving is set, but you need to manually archive the latest changes for some reason.
+Example Scenario:
+Suppose you've just done some critical transactions and want to make sure everything is safely archived so you can do a 
+backup or ship it to a standby system
+
+
+--- Check destination status (important for troubleshooting)
+
+SQL> SELECT DEST_ID, STATUS, ERROR, DESTINATION FROM V$ARCHIVE_DEST WHERE STATUS != 'INACTIVE'; 
+SQL> col error for a15
+SQL> col destination for a30
+
+   DEST_ID STATUS    		ERROR	     		DESTINATION
+---------- --------- --------------- ------------------------------
+	 1 VALID		    				 USE_DB_RECOVERY_FILE_DEST
+
+
+
+Check database role and open mode
+4. Change Archive Log Destination (if needed)
+--check for available destination
+SQL> archive log list
+Database log mode	       Archive Mode
+Automatic archival	       Enabled
+Archive destination	       USE_DB_RECOVERY_FILE_DEST
+Oldest online log sequence     31
+Next log sequence to archive   33
+Current log sequence	       33
+SQL> show parameter DB_RECOVERY_FILE_DEST
+
+NAME				     TYPE	 VALUE
+------------------------------------ ----------- ------------------------------
+db_recovery_file_dest		     string	 /u01/app/oracle/fast_recovery_area
+
+
+--if you want to change the archive location
+SQL> alter system set db_recovery_file_dest='/u01/app/oracle/archives' scope=both;
+
+System altered.
+SQL> show parameter DB_RECOVERY_FILE_DEST
+
+NAME				     TYPE	 VALUE
+------------------------------------ ----------- ------------------------------
+db_recovery_file_dest		     string	 /u01/app/oracle/archives
+db_recovery_file_dest_size	     big integer 8256M
+
+SQL> alter system switch logfile;
+
+[oracle@oraclept ~]$ cd /u01/app/oracle/archives/PRODDB/archivelog/2025_05_15
+[oracle@oraclept 2025_05_15]$ ls -lrt
+total 4704
+-rw-r-----. 1 oracle oinstall 4816384 May 15 17:53 o1_mf_1_33_n2cq5l12_.arc
+
+SQL> alter system switch logfile;
+[oracle@oraclept 2025_05_15]$ ls -lrt
+total 4712
+-rw-r-----. 1 oracle oinstall 4816384 May 15 17:53 o1_mf_1_33_n2cq5l12_.arc
+-rw-r-----. 1 oracle oinstall    7680 May 15 17:56 o1_mf_1_34_n2cqc3bp_.arc
+SQL> alter system switch logfile;
+[oracle@oraclept 2025_05_15]$ ls -lrt
+total 4716
+-rw-r-----. 1 oracle oinstall 4816384 May 15 17:53 o1_mf_1_33_n2cq5l12_.arc
+-rw-r-----. 1 oracle oinstall    7680 May 15 17:56 o1_mf_1_34_n2cqc3bp_.arc
+-rw-r-----. 1 oracle oinstall    1536 May 15 17:56 o1_mf_1_35_n2cqcv6s_.arc
+
+
+-- if you want to check STORAGE
+[oracle@oraclept ~]$ df -h
+Filesystem           Size 	 Used		Avail 		Use% 	Mounted on
+devtmpfs             1.8G 	    0		 1.8G 		  0% 	/dev
+tmpfs                1.8G 	    0		 1.8G 		  0% 	/dev/shm
+tmpfs                1.8G 	 9.5M		 1.8G 		  1% 	/run
+tmpfs                1.8G 	    0		 1.8G 		  0% 	/sys/fs/cgroup
+/dev/mapper/ol-root   15G 	 7.4G		 7.4G 		 50% 	/
+/dev/mapper/ol-u01    88G 	  17G		  71G 		 20% 	/u01
+/dev/sda2            2.0G 	 233M		 1.8G 		 12% 	/boot
+tmpfs                365M 	  24K		 365M 		  1% 	/run/user/1001
+
+
+
+Check archive destination usage and space:
+
+
+SQL> set lines 200 pages 200
+set colsep |
+col name for a35
+SELECT * FROM V$RECOVERY_FILE_DEST;
+
+NAME							   |SPACE_LIMIT|SPACE_USED|SPACE_RECLAIMABLE|NUMBER_OF_FILES|	 CON_ID
+-----------------------------------|-----------|----------|-----------------|---------------|----------
+/u01/app/oracle/fast_recovery_area | 8657043456| 651476992|				   0|		   5|	      0
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+📘 Helpful Views
+View	Purpose
+V$ARCHIVED_LOG			Archive log history
+V$MANAGED_STANDBY		Real-time process status on standby
+V$DATABASE				Role (PRIMARY/STANDBY), open mode
+V$ARCHIVE_DEST			Archive destinations and error status
+V$ARCHIVE_GAP			Archive logs missing from standby

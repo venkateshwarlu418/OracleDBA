@@ -1,0 +1,78 @@
+
+Standalone database
+
+Using parameter settings in server-side spfile /u01/app/oracle/product/19.0.0.0/dbhome_1/dbs/spfilevendb.ora
+System parameters with non-default values:
+  processes                = 300
+  memory_target            = 1472M
+  control_files            = "/u01/app/oracle/oradata/VENDB/controlfile/o1_mf_mlmhgbcp_.ctl"
+  control_files            = "/u01/app/oracle/fast_recovery_area/VENDB/controlfile/o1_mf_mlmhgbf2_.ctl"
+  db_block_size            = 8192
+  compatible               = "19.0.0"
+  log_archive_dest_1       = "LOCATION=/USE_DB_RECOVERY_FILE_DEST"
+  db_create_file_dest      = "/u01/app/oracle/oradata"
+  db_recovery_file_dest    = "/u01/app/oracle/fast_recovery_area"
+  db_recovery_file_dest_size= 8G
+  undo_tablespace          = "UNDOTBS1"
+  remote_login_passwordfile= "EXCLUSIVE"
+  dispatchers              = "(PROTOCOL=TCP) (SERVICE=vendbXDB)"
+  audit_file_dest          = "/u01/app/oracle/admin/vendb/adump"
+  audit_trail              = "DB"
+  db_name                  = "vendb"
+  open_cursors             = 300
+  diagnostic_dest          = "/u01/app/oracle"
+
+
+Using parameter settings in server-side spfile /u01/app/oracle/product/19.0.0.0/dbhome_1/dbs/spfilevendb.ora
+System parameters with non-default values:
+  processes                = 300
+  memory_target            = 1472M
+  control_files            = "/u01/app/oracle/oradata/VENDB/controlfile/o1_mf_mlmhgbcp_.ctl"
+  control_files            = "/u01/app/oracle/fast_recovery_area/VENDB/controlfile/o1_mf_mlmhgbf2_.ctl"
+  db_block_size            = 8192
+  compatible               = "19.0.0"
+  log_archive_dest_1       = "LOCATION=USE_DB_RECOVERY_FILE_DEST"
+  db_create_file_dest      = "/u01/app/oracle/oradata"
+  db_recovery_file_dest    = "/u01/app/oracle/fast_recovery_area"
+  db_recovery_file_dest_size= 8256M
+  undo_tablespace          = "UNDOTBS1"
+  undo_retention           = 2400
+  remote_login_passwordfile= "EXCLUSIVE"
+  dispatchers              = "(PROTOCOL=TCP) (SERVICE=vendbXDB)"
+  audit_file_dest          = "/u01/app/oracle/admin/vendb/adump"
+  audit_trail              = "DB"
+  db_name                  = "vendb"
+  open_cursors             = 300
+  diagnostic_dest          = "/u01/app/oracle"
+
+
+
+
+
+
+RAC database spfile
+Using parameter settings in server-side spfile +DATA/ORADB/PARAMETERFILE/spfile.272.1199461979
+System parameters with non-default values:
+  processes                = 300
+  sga_target               = 1696M
+  control_files            = "+DATA/ORADB/CONTROLFILE/current.261.1199459605"
+  control_files            = "+OCR/ORADB/CONTROLFILE/current.258.1199459605"
+  db_block_size            = 8192
+  compatible               = "19.0.0"
+  cluster_database         = TRUE
+  db_create_file_dest      = "+DATA"
+  db_recovery_file_dest    = "+OCR"
+  db_recovery_file_dest_size= 14007M
+  thread                   = 1
+  undo_tablespace          = "UNDOTBS1"
+  instance_number          = 1
+  remote_login_passwordfile= "EXCLUSIVE"
+  dispatchers              = "(PROTOCOL=TCP) (SERVICE=oradbXDB)"
+  local_listener           = "-oraagent-dummy-"
+  audit_file_dest          = "/u02/app/oracle/admin/oradb/adump"
+  audit_trail              = "DB"
+  db_name                  = "oradb"
+  open_cursors             = 300
+  pga_aggregate_target     = 566M
+  diagnostic_dest          = "/u02/app/oracle"
+  enable_pluggable_database= TRUE

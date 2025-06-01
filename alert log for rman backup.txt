@@ -1,0 +1,1313 @@
+[oracle@oraclept ~]$ cd /u01/app/oracle/diag/rdbms/proddb/proddb/trace
+[oracle@oraclept trace]$ ls -lrt|grep alert*
+-rw-r-----. 1 oracle oinstall 643865 Dec  6 19:17 alert_proddb.log
+[oracle@oraclept trace]$ tail -f alert_proddb.log
+29294753,29299830,29307090,29307109,29311336,29329675,29330791,29339299,
+29357821,29360467,29360775,29367971,29368725,29379299,29379381,29380527,
+29381000,29382296,29391301,29393649,29402110,29411931,29413360,29457319,
+29465047
+===========================================================
+2024-12-06T19:17:42.716459+05:30
+db_recovery_file_dest_size of 8256 MB is 7.53% used. This is a
+user-specified limit on the amount of space that will be used by this
+database for recovery-related files, and does not reflect the amount of
+space available in the underlying filesystem or ASM diskgroup.
+
+
+Shut immediate;
+
+2024-12-06T19:19:59.790113+05:30
+Shutting down ORACLE instance (immediate) (OS id: 4426)
+2024-12-06T19:20:02.808422+05:30
+Stopping background process SMCO
+2024-12-06T19:20:03.882898+05:30
+Shutting down instance: further logons disabled
+2024-12-06T19:20:04.880335+05:30
+Stopping background process CJQ0
+2024-12-06T19:20:05.005482+05:30
+Killed process oracle@oraclept.com (Q00I) with pid is 81, OS pid 4088
+Stopping background process MMNL
+2024-12-06T19:20:05.017125+05:30
+Process termination requested for pid 4088 [source = rdbms], [info = 2] [request issued by pid: 4426, uid: 1001]
+2024-12-06T19:20:06.040931+05:30
+Stopping background process MMON
+2024-12-06T19:20:08.089270+05:30
+License high water mark = 15
+2024-12-06T19:20:08.185065+05:30
+Dispatchers and shared servers shutdown
+
+Data Pump shutdown on PDB: 0 in progress
+ALTER DATABASE CLOSE NORMAL
+Stopping Emon pool
+2024-12-06T19:20:09.318276+05:30
+
+IM on ADG: Start of Empty Journal 
+
+IM on ADG: End of Empty Journal 
+Stopping Emon pool
+stopping change tracking
+2024-12-06T19:20:09.468309+05:30
+Shutting down archive processes
+2024-12-06T19:20:09.468465+05:30
+TT00 (PID:2856): Gap Manager exiting
+2024-12-06T19:20:10.468642+05:30
+Archiving is disabled
+2024-12-06T19:20:10.469152+05:30
+Thread 1 closed at log sequence 23
+Successful close of redo thread 1
+2024-12-06T19:20:10.482260+05:30
+Buffer Cache invalidation for all PDBs started
+Buffer Cache invalidation for all PDBs complete
+Completed: ALTER DATABASE CLOSE NORMAL
+ALTER DATABASE DISMOUNT
+Shutting down archive processes
+Archiving is disabled
+Completed: ALTER DATABASE DISMOUNT
+2024-12-06T19:20:11.673266+05:30
+.... (PID:4426): Archival disabled due to shutdown: 1089
+Shutting down archive processes
+Archiving is disabled
+JIT: pid 4426 requesting stop
+.... (PID:4426): Archival disabled due to shutdown: 1089
+Shutting down archive processes
+Archiving is disabled
+2024-12-06T19:20:11.732921+05:30
+Stopping background process VKTM
+2024-12-06T19:20:11.767499+05:30
+JIT: pid 4426 requesting stop
+2024-12-06T19:20:25.372501+05:30
+Instance shutdown complete (OS id: 4426)
+
+
+
+Startup nomount;
+
+
+2024-12-06T19:20:43.143117+05:30
+Starting ORACLE instance (normal) (OS id: 4502)
+2024-12-06T19:20:43.155951+05:30
+************************************************************
+Instance SGA_TARGET = 1200 MB and SGA_MAX_SIZE = 1250 MB
+************************************************************
+2024-12-06T19:20:43.156084+05:30
+****************************************************
+ Sys-V shared memory will be used for creating SGA 
+ ****************************************************
+2024-12-06T19:20:43.156810+05:30
+**********************************************************************
+2024-12-06T19:20:43.156844+05:30
+Dump of system resources acquired for SHARED GLOBAL AREA (SGA) 
+
+2024-12-06T19:20:43.156914+05:30
+ Per process system memlock (soft) limit = 64K
+2024-12-06T19:20:43.156945+05:30
+ Expected per process system memlock (soft) limit to lock
+ instance MAX SHARED GLOBAL AREA (SGA) into memory: 1266M
+2024-12-06T19:20:43.157005+05:30
+ Available system pagesizes:
+  4K, 2048K 
+2024-12-06T19:20:43.157063+05:30
+ Supported system pagesize(s):
+2024-12-06T19:20:43.157093+05:30
+  PAGESIZE  AVAILABLE_PAGES  EXPECTED_PAGES  ALLOCATED_PAGES  ERROR(s)
+2024-12-06T19:20:43.157125+05:30
+        4K       Configured               3          323587        NONE
+2024-12-06T19:20:43.157198+05:30
+     2048K                0             633               0        NONE
+2024-12-06T19:20:43.157229+05:30
+RECOMMENDATION:
+2024-12-06T19:20:43.157260+05:30
+ 1. For optimal performance, configure system with expected number 
+ of pages for every supported system pagesize prior to the next 
+ instance restart operation.
+2024-12-06T19:20:43.206305+05:30
+ 2. Increase per process memlock (soft) limit to at least 1266MB
+ to lock 100% of SHARED GLOBAL AREA (SGA) pages into physical memory
+2024-12-06T19:20:43.206377+05:30
+**********************************************************************
+2024-12-06T19:20:46.276856+05:30
+LICENSE_MAX_SESSION = 0
+LICENSE_SESSIONS_WARNING = 0
+2024-12-06T19:20:46.334605+05:30
+Initial number of CPU is 1
+Number of processor cores in the system is 1
+Number of processor sockets in the system is 1
+Capability Type : Network 
+capabilities requested : 7 detected : 0 Simulated : 0
+Capability Type : Runtime Environment 
+capabilities requested : 400000FF detected : 40000000 Simulated : 0
+Capability Type : Engineered Systems 
+capabilities requested : 7 detected : 0 Simulated : 0
+Capability Type : Database Test 
+capabilities requested : 3 detected : 0 Simulated : 0
+Using LOG_ARCHIVE_DEST_1 parameter default value as USE_DB_RECOVERY_FILE_DEST
+Autotune of undo retention is turned on. 
+IMODE=BR
+ILAT =55
+LICENSE_MAX_USERS = 0
+SYS auditing is enabled
+NOTE: remote asm mode is local (mode 0x1; from cluster type)
+NOTE: Using default ASM root directory ASM
+NOTE: remote asm mode is local (mode 0x1; from cluster type)
+NOTE: Cluster configuration type = NONE [2]
+Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.3.0.0.0.
+ORACLE_HOME:    /u01/app/oracle/product/19.0.0.0/dbhome_1
+System name:	Linux
+Node name:	oraclept.com
+Release:	5.4.17-2102.201.3.el7uek.x86_64
+Version:	#2 SMP Fri Apr 23 09:05:55 PDT 2021
+Machine:	x86_64
+Using parameter settings in server-side spfile /u01/app/oracle/product/19.0.0.0/dbhome_1/dbs/spfileproddb.ora
+System parameters with non-default values:
+  processes                = 320
+  sga_max_size             = 1264M
+  sga_target               = 1200M
+  control_files            = "/u01/app/oracle/oradata/PRODDB/controlfile/o1_mf_lrn5lhl8_.ctl"
+  control_files            = "/u01/app/oracle/fast_recovery_area/PRODDB/controlfile/o1_mf_lrn5lhlr_.ctl"
+  db_block_size            = 8192
+  compatible               = "19.0.0"
+  db_create_file_dest      = "/u01/app/oracle/oradata"
+  db_recovery_file_dest    = "/u01/app/oracle/fast_recovery_area"
+  db_recovery_file_dest_size= 8256M
+  undo_tablespace          = "UNDOTBS1"
+  remote_login_passwordfile= "EXCLUSIVE"
+  dispatchers              = "(PROTOCOL=TCP) (SERVICE=proddbXDB)"
+  audit_file_dest          = "/u01/app/oracle/admin/proddb/adump"
+  audit_trail              = "DB"
+  db_name                  = "proddb"
+  open_cursors             = 300
+  pga_aggregate_target     = 767M
+  diagnostic_dest          = "/u01/app/oracle"
+2024-12-06T19:20:47.004215+05:30
+============================================================
+NOTE: PatchLevel of this instance 0
+============================================================
+Starting background process PMON
+2024-12-06T19:20:47.061794+05:30
+PMON started with pid=2, OS id=4550 
+Starting background process CLMN
+2024-12-06T19:20:47.093786+05:30
+CLMN started with pid=3, OS id=4552 
+Starting background process PSP0
+Starting background process VKTM
+2024-12-06T19:20:47.125254+05:30
+PSP0 started with pid=4, OS id=4554 
+2024-12-06T19:20:48.186911+05:30
+VKTM started with pid=5, OS id=4557 at elevated (RT) priority
+2024-12-06T19:20:48.187928+05:30
+VKTM running at (1)millisec precision with DBRM quantum (100)ms
+2024-12-06T19:20:48.188051+05:30
+Starting background process GEN0
+2024-12-06T19:20:48.206828+05:30
+GEN0 started with pid=6, OS id=4561 
+Starting background process MMAN
+2024-12-06T19:20:48.322461+05:30
+MMAN started with pid=8, OS id=4565 
+Starting background process GEN1
+2024-12-06T19:20:48.381599+05:30
+GEN1 started with pid=9, OS id=4567_4568 
+Starting background process DIAG
+2024-12-06T19:20:48.457823+05:30
+DIAG started with pid=11, OS id=4570 
+Starting background process OFSD
+2024-12-06T19:20:48.551480+05:30
+OFSD started with pid=12, OS id=4572_4573 
+2024-12-06T19:20:48.552081+05:30
+Oracle running with ofslib:'Oracle File Server Library' version=2
+Starting background process DBRM
+2024-12-06T19:20:48.624769+05:30
+DBRM started with pid=14, OS id=4575 
+Starting background process VKRM
+2024-12-06T19:20:48.715872+05:30
+VKRM started with pid=15, OS id=4577 
+Starting background process SVCB
+2024-12-06T19:20:48.818534+05:30
+SVCB started with pid=16, OS id=4579 
+Starting background process PMAN
+2024-12-06T19:20:48.891750+05:30
+PMAN started with pid=17, OS id=4581 
+Starting background process DIA0
+2024-12-06T19:20:48.976567+05:30
+DIA0 started with pid=18, OS id=4584 
+Starting background process DBW0
+2024-12-06T19:20:49.048412+05:30
+DBW0 started with pid=19, OS id=4586 
+Starting background process LGWR
+2024-12-06T19:20:49.110765+05:30
+LGWR started with pid=20, OS id=4588 
+Starting background process CKPT
+2024-12-06T19:20:49.173363+05:30
+CKPT started with pid=21, OS id=4590 
+Starting background process SMON
+2024-12-06T19:20:49.227939+05:30
+SMON started with pid=22, OS id=4592 
+2024-12-06T19:20:49.228763+05:30
+Starting background process SMCO
+2024-12-06T19:20:49.284478+05:30
+SMCO started with pid=23, OS id=4594 
+Starting background process RECO
+2024-12-06T19:20:49.326583+05:30
+RECO started with pid=24, OS id=4598 
+Starting background process LREG
+2024-12-06T19:20:49.368863+05:30
+LREG started with pid=26, OS id=4602 
+Starting background process PXMN
+2024-12-06T19:20:49.402351+05:30
+PXMN started with pid=27, OS id=4604 
+Starting background process FENC
+2024-12-06T19:20:49.429951+05:30
+FENC started with pid=28, OS id=4606 
+Starting background process MMON
+2024-12-06T19:20:49.464319+05:30
+MMON started with pid=29, OS id=4608 
+Starting background process MMNL
+2024-12-06T19:20:49.491536+05:30
+MMNL started with pid=28, OS id=4610 
+2024-12-06T19:20:49.492219+05:30
+starting up 1 dispatcher(s) for network address '(ADDRESS=(PARTIAL=YES)(PROTOCOL=TCP))'...
+starting up 1 shared server(s) ...
+Starting background process TMON
+2024-12-06T19:20:49.566655+05:30
+TMON started with pid=32, OS id=4616 
+Setting CPU count to 1
+ORACLE_BASE from environment = /u01/app/oracle
+2024-12-06T19:20:49.638064+05:30
+ALTER DATABASE   MOUNT
+2024-12-06T19:20:51.698409+05:30
+PGA_AGGREGATE_LIMIT specified is high
+2024-12-06T19:20:51.699994+05:30
+WARNING: pga_aggregate_limit value is too high for the
+amount of physical memory on the system
+  PGA_AGGREGATE_LIMIT is 2048 MB
+  PGA_AGGREGATE_TARGET is 767 MB.
+  physical memory size is 3647 MB
+  limit based on physical memory and SGA usage is 2018 MB
+  SGA_TARGET is 1200 MB
+Using default pga_aggregate_limit of 2048 MB
+2024-12-06T19:20:53.778991+05:30
+.... (PID:4617): Redo network throttle feature is disabled at mount time
+2024-12-06T19:20:53.863311+05:30
+Successful mount of redo thread 1, with mount id 927049105
+2024-12-06T19:20:53.863607+05:30
+Database mounted in Exclusive Mode
+Lost write protection disabled
+.... (PID:4617): Using STANDBY_ARCHIVE_DEST parameter default value as USE_DB_RECOVERY_FILE_DEST [krsd.c:18157]
+Completed: ALTER DATABASE   MOUNT
+2024-12-06T19:21:35.136679+05:30
+
+
+alter database archivelog;
+
+
+alter database archivelog
+Completed: alter database archivelog
+2024-12-06T19:21:52.921021+05:30
+TMON (PID:4616): STARTING ARCH PROCESSES
+Starting background process ARC0
+2024-12-06T19:21:52.936495+05:30
+ARC0 started with pid=35, OS id=4769 
+Starting background process ARC1
+2024-12-06T19:21:52.959935+05:30
+ARC1 started with pid=36, OS id=4771 
+Starting background process ARC2
+2024-12-06T19:21:53.002513+05:30
+ARC2 started with pid=37, OS id=4773 
+Starting background process ARC3
+2024-12-06T19:21:53.036553+05:30
+ARC3 started with pid=38, OS id=4775 
+TMON (PID:4616): ARC0: Archival started
+TMON (PID:4616): ARC1: Archival started
+TMON (PID:4616): ARC2: Archival started
+TMON (PID:4616): ARC3: Archival started
+TMON (PID:4616): STARTING ARCH PROCESSES COMPLETE
+2024-12-06T19:21:53.037969+05:30
+ARC0 (PID:4769): Becoming a 'no FAL' ARCH
+ARC0 (PID:4769): Becoming the 'no SRL' ARCH
+2024-12-06T19:21:53.105337+05:30
+TT00 (PID:4777): Gap Manager starting
+2024-12-06T19:21:53.782473+05:30
+alter database open
+2024-12-06T19:21:53.795815+05:30
+Ping without log force is disabled:
+  instance mounted in exclusive mode.
+Endian type of dictionary set to little
+2024-12-06T19:21:53.923070+05:30
+Redo log for group 2, sequence 23 is not located on DAX storage
+Thread 1 opened at log sequence 23
+  Current log# 2 seq# 23 mem# 0: /u01/app/oracle/oradata/PRODDB/onlinelog/o1_mf_2_lrn5lkwd_.log
+  Current log# 2 seq# 23 mem# 1: /u01/app/oracle/fast_recovery_area/PRODDB/onlinelog/o1_mf_2_lrn5ll7j_.log
+Successful open of redo thread 1
+2024-12-06T19:21:53.985073+05:30
+MTTR advisory is disabled because FAST_START_MTTR_TARGET is not set
+stopping change tracking
+Undo initialization recovery: err:0 start: 316937 end: 316939 diff: 2 ms (0.0 seconds)
+[4630] Successfully onlined Undo Tablespace 2.
+Undo initialization online undo segments: err:0 start: 316939 end: 317046 diff: 107 ms (0.1 seconds)
+Undo initialization finished serial:0 start:316937 end:317056 diff:119 ms (0.1 seconds)
+Verifying minimum file header compatibility for tablespace encryption..
+Verifying file header compatibility for tablespace encryption completed for pdb 0
+Database Characterset is AL32UTF8
+No Resource Manager plan active
+joxcsys_required_dirobj_exists: directory object exists with required path /u01/app/oracle/product/19.0.0.0/dbhome_1/javavm/admin/, pid 4630 cid 0
+replication_dependency_tracking turned off (no async multimaster replication found)
+2024-12-06T19:21:55.082939+05:30
+Starting background process AQPC
+2024-12-06T19:21:55.111556+05:30
+AQPC started with pid=42, OS id=4785 
+Starting background process CJQ0
+2024-12-06T19:21:55.773616+05:30
+CJQ0 started with pid=48, OS id=4797 
+Completed: alter database open
+2024-12-06T19:21:57.376911+05:30
+QPI: opatch file present, opatch
+QPI: qopiprep.bat file present
+2024-12-06T19:22:00.382403+05:30
+===========================================================
+Dumping current patch information
+===========================================================
+Patch Id: 29517242
+Patch Description: Database Release Update : 19.3.0.0.190416 (29517242)
+Patch Apply Time: 2019-04-18T12:51:17+05:30
+Bugs Fixed: 14735102,19697993,20313356,21965541,25806201,25883179,25986062,
+26476244,26611353,26872233,27369515,27423500,27666312,27710072,27846298,
+27957203,28064977,28072567,28129791,28181021,28210681,28279456,28313275,
+28350595,28371123,28379065,28431445,28463226,28489419,28502773,28513333,
+28534475,28561704,28569897,28572533,28572544,28587723,28593682,28594086,
+28597221,28601957,28605066,28606598,28625862,28627033,28636532,28643718,
+28644549,28645570,28646200,28646939,28649388,28655209,28663782,28673945,
+28692275,28694872,28696373,28705231,28710385,28710734,28714461,28718469,
+28730079,28740708,28760206,28772390,28774416,28777214,28789531,28791852,
+28795551,28802734,28804517,28810381,28811560,28815123,28815355,28819640,
+28824482,28833912,28835937,28862532,28863432,28873575,28876253,28876639,
+28884931,28888327,28892794,28897512,28899663,28901126,28905457,28907196,
+28912691,28915561,28917080,28918429,28919145,28922227,28922532,28922608,
+28925634,28925880,28933158,28936114,28937717,28938698,28940179,28940281,
+28941901,28942455,28945421,28945994,28951533,28952168,28954762,28955606,
+28957292,28957723,28962775,28965231,28966444,28974083,28977322,28983095,
+28983486,28986326,28986481,28988482,28989306,28993295,28994307,28996376,
+29000000,29001888,29002927,29003738,29006318,29006621,29007321,29007775,
+29008035,29011936,29013475,29014076,29015118,29017265,29018655,29019121,
+29021063,29021352,29024552,29026582,29026606,29027456,29027694,29027940,
+29031575,29031600,29032234,29032457,29032607,29033052,29033145,29033200,
+29033280,29034587,29037290,29038528,29039089,29039510,29043554,29043651,
+29043725,29044763,29044954,29047850,29048289,29048498,29048605,29050560,
+29050765,29051702,29052726,29053783,29056024,29056270,29056560,29059011,
+29061959,29062692,29062848,29062860,29062868,29110526,29110783,29110790,
+29110797,29110802,29110805,29111598,29113282,29113305,29117526,29117642,
+29119077,29120223,29122224,29122254,29123297,29123432,29123482,29124368,
+29125380,29126345,29127957,29128935,29129450,29129497,29129712,29130219,
+29131539,29132938,29134447,29136111,29138641,29141316,29141341,29141685,
+29142667,29144995,29145214,29145730,29149829,29150338,29151520,29152357,
+29155099,29157389,29158680,29158899,29159909,29159936,29160174,29162095,
+29163415,29163437,29163524,29163567,29167111,29167342,29167374,29167940,
+29168219,29168433,29169073,29169215,29171942,29172618,29172826,29173140,
+29173373,29173817,29174004,29176318,29177466,29177543,29177886,29178385,
+29180313,29180455,29180559,29180893,29181153,29181231,29181620,29181743,
+29181923,29182019,29183912,29184297,29184666,29185193,29186456,29189302,
+29189307,29189889,29190235,29190474,29190740,29191541,29192419,29192468,
+29192685,29193207,29194205,29194367,29194493,29194827,29195279,29195337,
+29195758,29196725,29199635,29199733,29200316,29200700,29201494,29201539,
+29202104,29202850,29203122,29203166,29203425,29203443,29203604,29205281,
+29205323,29205419,29205463,29205767,29205918,29206109,29206605,29207073,
+29208260,29208732,29211457,29211724,29212012,29212433,29212611,29213351,
+29213775,29213850,29213879,29214561,29214960,29216746,29216984,29217294,
+29217472,29217828,29217848,29218570,29219205,29219273,29220079,29221248,
+29221891,29222031,29222784,29223833,29223859,29223967,29224065,29224605,
+29225076,29227602,29228869,29229164,29229754,29229844,29229955,29230252,
+29230565,29231133,29232117,29232154,29234123,29237538,29240307,29241345,
+29242017,29242884,29243958,29245137,29245160,29246163,29247415,29247712,
+29247906,29248552,29248835,29248858,29249991,29250059,29251259,29253184,
+29253871,29254031,29254930,29255178,29255273,29255431,29255435,29256426,
+29259119,29259320,29261906,29262512,29262887,29265448,29266248,29266899,
+29267292,29268412,29269171,29270585,29273539,29273735,29273847,29274428,
+29274564,29274627,29275461,29278218,29279658,29279751,29279854,29282898,
+29285503,29285788,29285956,29286037,29287130,29287705,29292837,29293072,
+29297863,29297915,29298220,29299049,29299082,29299844,29301566,29302963,
+29303918,29304781,29311588,29312310,29312734,29312753,29313347,29313417,
+29313525,29314539,29318410,29319441,29321489,29323946,29324568,29325087,
+29325105,29325257,29325993,29327044,29329087,29331209,29331380,29331493,
+29332771,29333500,29337310,29338315,29338453,29338780,29338913,29339155,
+29341209,29343086,29346943,29347620,29348176,29350052,29351386,29351716,
+29351749,29352867,29353271,29355654,29356547,29356752,29358828,29360672,
+29361801,29363151,29364171,29364177,29367019,29367561,29368253,29373418,
+29373588,29374179,29377986,29378029,29379978,29382784,29385652,29386502,
+29386635,29386660,29387274,29388094,29388524,29388830,29389889,29390435,
+29394140,29394749,29397954,29398863,29399100,29399121,29405012,29405651,
+29412066,29412269,29417884,29423826,29429264,29429566,29431485,29435652,
+29438736,29439522,29450421,29451386,29452576,29452953,29457807,29460252,
+29462957,29486181,29507616,29515240,29521748,29530812,29531654,29557336,
+29558975,29601461
+
+Patch Id: 29585399
+Patch Description: OCW RELEASE UPDATE 19.3.0.0.0 (29585399)
+Patch Apply Time: 2019-04-18T12:51:33+05:30
+Bugs Fixed: 3,27222128,27572040,27604329,27760043,27877830,28302580,28470673,
+28621543,28642469,28699321,28710663,28755846,28772816,28785321,28800508,
+28808652,28815557,28847541,28847572,28870496,28871040,28874416,28877252,
+28881191,28881848,28888083,28911140,28925250,28925460,28935956,28940472,
+28942694,28951332,28963036,28968779,28980448,28995287,29003207,29003617,
+29016294,29018680,29024876,29026154,29027933,29047127,29052850,29058476,
+29111631,29112455,29117337,29123444,29125708,29125786,29129476,29131772,
+29132456,29139727,29146157,29147849,29149170,29152603,29152752,29154631,
+29154636,29154829,29159216,29159661,29160462,29161923,29169540,29169739,
+29170717,29173618,29181568,29182920,29183298,29186091,29191827,29201143,
+29201695,29209545,29210577,29210610,29210624,29210683,29213641,29219627,
+29224294,29225861,29229839,29235934,29242906,29243749,29244495,29244766,
+29244968,29248723,29249583,29251564,29255616,29260224,29261695,29271019,
+29273360,29282090,29282666,29285453,29285621,29290235,29292232,29293806,
+29294753,29299830,29307090,29307109,29311336,29329675,29330791,29339299,
+29357821,29360467,29360775,29367971,29368725,29379299,29379381,29380527,
+29381000,29382296,29391301,29393649,29402110,29411931,29413360,29457319,
+29465047
+===========================================================
+2024-12-06T19:22:00.802327+05:30
+db_recovery_file_dest_size of 8256 MB is 7.53% used. This is a
+user-specified limit on the amount of space that will be used by this
+database for recovery-related files, and does not reflect the amount of
+space available in the underlying filesystem or ASM diskgroup.
+
+
+
+
+
+2024-12-06T19:34:04.586434+05:30
+Control autobackup written to DISK device
+
+handle '/u01/app/oracle/fast_recovery_area/PRODDB/autobackup/2024_12_06/o1_mf_s_1187033644_mo612njh_.bkp'
+
+
+
+
+
+2024-12-06T19:40:35.109410+05:30
+TABLE AUDSYS.AUD$UNIFIED: ADDED INTERVAL PARTITION SYS_P373 (126) VALUES LESS THAN (TIMESTAMP' 2025-01-01 00:00:00')
+2024-12-06T19:41:41.026738+05:30
+Control autobackup written to DISK device
+
+handle '/u01/app/oracle/fast_recovery_area/PRODDB/autobackup/2024_12_06/o1_mf_s_1187034100_mo61jws3_.bkp'
+
+2024-12-06T19:47:14.213112+05:30
+Control autobackup written to DISK device
+
+handle '/u01/rman_bkp/c-896617639-20241206-02'
+
+2024-12-06T19:47:43.523596+05:30
+ALTER SYSTEM ARCHIVE LOG
+2024-12-06T19:47:43.599790+05:30
+Thread 1 advanced to log sequence 24 (LGWR switch)
+  Current log# 3 seq# 24 mem# 0: /u01/app/oracle/oradata/PRODDB/onlinelog/o1_mf_3_lrn5lkwn_.log
+  Current log# 3 seq# 24 mem# 1: /u01/app/oracle/fast_recovery_area/PRODDB/onlinelog/o1_mf_3_lrn5ll37_.log
+2024-12-06T19:47:43.786912+05:30
+NET  (PID:8018): Archived Log entry 1 added for T-1.S-23 ID 0x3570b9a7 LAD:1
+2024-12-06T19:47:45.117615+05:30
+Control autobackup written to DISK device
+
+handle '/u01/rman_bkp/c-896617639-20241206-03'
+
+2024-12-06T19:56:44.063327+05:30
+Errors in file /u01/app/oracle/diag/rdbms/proddb/proddb/trace/proddb_mz00_9291.trc:
+ORA-00202: control file: '/u01/app/oracle/oradata/PRODDB/controlfile/o1_mf_lrn5lhl8_.ctl'
+ORA-27041: unable to open file
+Linux-x86_64 Error: 2: No such file or directory
+Additional information: 3
+2024-12-06T19:56:44.205079+05:30
+Errors in file /u01/app/oracle/diag/rdbms/proddb/proddb/trace/proddb_mz00_9291.trc:
+ORA-00210: cannot open the specified control file
+ORA-00202: control file: '/u01/app/oracle/oradata/PRODDB/controlfile/o1_mf_lrn5lhl8_.ctl'
+ORA-27041: unable to open file
+Linux-x86_64 Error: 2: No such file or directory
+Additional information: 3
+2024-12-06T19:57:51.502633+05:30
+Shutting down ORACLE instance (abort) (OS id: 9382)
+License high water mark = 6
+2024-12-06T19:57:51.507207+05:30
+USER (ospid: 9382): terminating the instance
+2024-12-06T19:57:52.569525+05:30
+Instance terminated by USER, pid = 9382
+2024-12-06T19:57:52.633053+05:30
+Instance shutdown complete (OS id: 9382)
+
+
+
+
+
+
+
+
+
+
+
+2024-12-06T19:58:44.118823+05:30
+Starting ORACLE instance (normal) (OS id: 9390)
+2024-12-06T19:58:44.134907+05:30
+************************************************************
+Instance SGA_TARGET = 1200 MB and SGA_MAX_SIZE = 1250 MB
+************************************************************
+2024-12-06T19:58:44.135016+05:30
+****************************************************
+ Sys-V shared memory will be used for creating SGA 
+ ****************************************************
+2024-12-06T19:58:44.135430+05:30
+**********************************************************************
+2024-12-06T19:58:44.135458+05:30
+Dump of system resources acquired for SHARED GLOBAL AREA (SGA) 
+
+2024-12-06T19:58:44.135512+05:30
+ Per process system memlock (soft) limit = 64K
+2024-12-06T19:58:44.135537+05:30
+ Expected per process system memlock (soft) limit to lock
+ instance MAX SHARED GLOBAL AREA (SGA) into memory: 1266M
+2024-12-06T19:58:44.135586+05:30
+ Available system pagesizes:
+  4K, 2048K 
+2024-12-06T19:58:44.135634+05:30
+ Supported system pagesize(s):
+2024-12-06T19:58:44.135665+05:30
+  PAGESIZE  AVAILABLE_PAGES  EXPECTED_PAGES  ALLOCATED_PAGES  ERROR(s)
+2024-12-06T19:58:44.135691+05:30
+        4K       Configured               3          323587        NONE
+2024-12-06T19:58:44.135772+05:30
+     2048K                0             633               0        NONE
+2024-12-06T19:58:44.135802+05:30
+RECOMMENDATION:
+2024-12-06T19:58:44.135827+05:30
+ 1. For optimal performance, configure system with expected number 
+ of pages for every supported system pagesize prior to the next 
+ instance restart operation.
+2024-12-06T19:58:44.143144+05:30
+ 2. Increase per process memlock (soft) limit to at least 1266MB
+ to lock 100% of SHARED GLOBAL AREA (SGA) pages into physical memory
+2024-12-06T19:58:44.143202+05:30
+**********************************************************************
+2024-12-06T19:58:47.207049+05:30
+LICENSE_MAX_SESSION = 0
+LICENSE_SESSIONS_WARNING = 0
+2024-12-06T19:58:47.242988+05:30
+Initial number of CPU is 1
+Number of processor cores in the system is 1
+Number of processor sockets in the system is 1
+Capability Type : Network 
+capabilities requested : 7 detected : 0 Simulated : 0
+Capability Type : Runtime Environment 
+capabilities requested : 400000FF detected : 40000000 Simulated : 0
+Capability Type : Engineered Systems 
+capabilities requested : 7 detected : 0 Simulated : 0
+Capability Type : Database Test 
+capabilities requested : 3 detected : 0 Simulated : 0
+Using LOG_ARCHIVE_DEST_1 parameter default value as USE_DB_RECOVERY_FILE_DEST
+Autotune of undo retention is turned on. 
+IMODE=BR
+ILAT =55
+LICENSE_MAX_USERS = 0
+SYS auditing is enabled
+NOTE: remote asm mode is local (mode 0x1; from cluster type)
+NOTE: Using default ASM root directory ASM
+NOTE: remote asm mode is local (mode 0x1; from cluster type)
+NOTE: Cluster configuration type = NONE [2]
+Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.3.0.0.0.
+ORACLE_HOME:    /u01/app/oracle/product/19.0.0.0/dbhome_1
+System name:	Linux
+Node name:	oraclept.com
+Release:	5.4.17-2102.201.3.el7uek.x86_64
+Version:	#2 SMP Fri Apr 23 09:05:55 PDT 2021
+Machine:	x86_64
+Using parameter settings in server-side spfile /u01/app/oracle/product/19.0.0.0/dbhome_1/dbs/spfileproddb.ora
+System parameters with non-default values:
+  processes                = 320
+  sga_max_size             = 1264M
+  sga_target               = 1200M
+  control_files            = "/u01/app/oracle/oradata/PRODDB/controlfile/o1_mf_lrn5lhl8_.ctl"
+  control_files            = "/u01/app/oracle/fast_recovery_area/PRODDB/controlfile/o1_mf_lrn5lhlr_.ctl"
+  db_block_size            = 8192
+  compatible               = "19.0.0"
+  db_create_file_dest      = "/u01/app/oracle/oradata"
+  db_recovery_file_dest    = "/u01/app/oracle/fast_recovery_area"
+  db_recovery_file_dest_size= 8256M
+  undo_tablespace          = "UNDOTBS1"
+  remote_login_passwordfile= "EXCLUSIVE"
+  dispatchers              = "(PROTOCOL=TCP) (SERVICE=proddbXDB)"
+  audit_file_dest          = "/u01/app/oracle/admin/proddb/adump"
+  audit_trail              = "DB"
+  db_name                  = "proddb"
+  open_cursors             = 300
+  pga_aggregate_target     = 767M
+  diagnostic_dest          = "/u01/app/oracle"
+2024-12-06T19:58:47.434625+05:30
+============================================================
+NOTE: PatchLevel of this instance 0
+============================================================
+Starting background process PMON
+2024-12-06T19:58:47.477247+05:30
+PMON started with pid=2, OS id=9444 
+Starting background process CLMN
+2024-12-06T19:58:47.486678+05:30
+CLMN started with pid=3, OS id=9446 
+Starting background process PSP0
+2024-12-06T19:58:47.496782+05:30
+PSP0 started with pid=4, OS id=9448 
+Starting background process VKTM
+2024-12-06T19:58:47.536456+05:30
+VKTM started with pid=5, OS id=9450 at elevated (RT) priority
+2024-12-06T19:58:47.537442+05:30
+VKTM running at (1)millisec precision with DBRM quantum (100)ms
+Starting background process GEN0
+2024-12-06T19:58:47.547535+05:30
+GEN0 started with pid=6, OS id=9454 
+Starting background process MMAN
+2024-12-06T19:58:47.625592+05:30
+MMAN started with pid=8, OS id=9458 
+Starting background process GEN1
+2024-12-06T19:58:47.705768+05:30
+GEN1 started with pid=9, OS id=9460_9461 
+Starting background process DIAG
+2024-12-06T19:58:47.751536+05:30
+DIAG started with pid=11, OS id=9463 
+Starting background process OFSD
+2024-12-06T19:58:47.820671+05:30
+OFSD started with pid=12, OS id=9465_9466 
+2024-12-06T19:58:47.821090+05:30
+Oracle running with ofslib:'Oracle File Server Library' version=2
+Starting background process DBRM
+2024-12-06T19:58:47.873662+05:30
+DBRM started with pid=14, OS id=9468 
+Starting background process VKRM
+2024-12-06T19:58:47.935856+05:30
+VKRM started with pid=15, OS id=9471 
+Starting background process SVCB
+2024-12-06T19:58:47.983298+05:30
+SVCB started with pid=16, OS id=9473 
+Starting background process PMAN
+2024-12-06T19:58:48.040292+05:30
+PMAN started with pid=17, OS id=9475 
+Starting background process DIA0
+2024-12-06T19:58:48.092812+05:30
+DIA0 started with pid=18, OS id=9477 
+Starting background process DBW0
+2024-12-06T19:58:48.145609+05:30
+DBW0 started with pid=19, OS id=9479 
+Starting background process LGWR
+2024-12-06T19:58:48.189781+05:30
+LGWR started with pid=20, OS id=9481 
+Starting background process CKPT
+2024-12-06T19:58:48.201459+05:30
+CKPT started with pid=7, OS id=9483 
+Starting background process SMON
+2024-12-06T19:58:48.211210+05:30
+SMON started with pid=21, OS id=9485 
+2024-12-06T19:58:48.211781+05:30
+Starting background process SMCO
+2024-12-06T19:58:48.234477+05:30
+SMCO started with pid=22, OS id=9487 
+Starting background process RECO
+2024-12-06T19:58:48.267485+05:30
+RECO started with pid=24, OS id=9491 
+Starting background process LREG
+2024-12-06T19:58:48.300482+05:30
+LREG started with pid=26, OS id=9495 
+Starting background process PXMN
+2024-12-06T19:58:48.326210+05:30
+PXMN started with pid=27, OS id=9497 
+Starting background process FENC
+2024-12-06T19:58:48.336162+05:30
+FENC started with pid=28, OS id=9499 
+Starting background process MMON
+2024-12-06T19:58:48.366542+05:30
+MMON started with pid=29, OS id=9501 
+Starting background process MMNL
+2024-12-06T19:58:48.388688+05:30
+MMNL started with pid=28, OS id=9503 
+2024-12-06T19:58:48.389434+05:30
+starting up 1 dispatcher(s) for network address '(ADDRESS=(PARTIAL=YES)(PROTOCOL=TCP))'...
+starting up 1 shared server(s) ...
+Starting background process TMON
+2024-12-06T19:58:48.446397+05:30
+TMON started with pid=32, OS id=9509 
+Setting CPU count to 1
+ORACLE_BASE from environment = /u01/app/oracle
+2024-12-06T19:58:50.919440+05:30
+PGA_AGGREGATE_LIMIT specified is high
+2024-12-06T19:58:50.919517+05:30
+WARNING: pga_aggregate_limit value is too high for the
+amount of physical memory on the system
+  PGA_AGGREGATE_LIMIT is 2048 MB
+  PGA_AGGREGATE_TARGET is 767 MB.
+  physical memory size is 3647 MB
+  limit based on physical memory and SGA usage is 2018 MB
+  SGA_TARGET is 1200 MB
+Using default pga_aggregate_limit of 2048 MB
+
+
+restore controlfile from '/u01/rman_bkp/c-896617639-20241206-02
+
+2024-12-06T20:01:23.595035+05:30
+No controlfile conversion
+No controlfile conversion
+
+
+
+
+alter database mount;
+
+2024-12-06T20:01:42.685350+05:30
+alter database mount
+2024-12-06T20:01:46.755063+05:30
+.... (PID:9549): RT: Role transition work is not done
+.... (PID:9549): Redo network throttle feature is disabled at mount time
+2024-12-06T20:01:46.811989+05:30
+Successful mount of redo thread 1, with mount id 927063590
+2024-12-06T20:01:46.812330+05:30
+Database mounted in Exclusive Mode
+Lost write protection disabled
+.... (PID:9549): Using STANDBY_ARCHIVE_DEST parameter default value as USE_DB_RECOVERY_FILE_DEST [krsd.c:18157]
+Completed: alter database mount
+2024-12-06T20:01:52.473011+05:30
+TMON (PID:9509): STARTING ARCH PROCESSES
+Starting background process ARC0
+2024-12-06T20:01:52.481596+05:30
+ARC0 started with pid=36, OS id=9785 
+Starting background process ARC1
+2024-12-06T20:01:52.495285+05:30
+ARC1 started with pid=37, OS id=9787 
+Starting background process ARC2
+2024-12-06T20:01:52.519357+05:30
+ARC2 started with pid=38, OS id=9789 
+Starting background process ARC3
+2024-12-06T20:01:52.529663+05:30
+ARC3 started with pid=39, OS id=9791 
+TMON (PID:9509): ARC0: Archival started
+TMON (PID:9509): ARC1: Archival started
+TMON (PID:9509): ARC2: Archival started
+TMON (PID:9509): ARC3: Archival started
+TMON (PID:9509): STARTING ARCH PROCESSES COMPLETE
+2024-12-06T20:01:52.530763+05:30
+ARC0 (PID:9785): Becoming a 'no FAL' ARCH
+ARC0 (PID:9785): Becoming the 'no SRL' ARCH
+2024-12-06T20:01:52.554648+05:30
+TT00 (PID:9793): Gap Manager starting
+
+
+
+restore database;
+
+
+
+
+2024-12-06T20:02:22.044943+05:30
+Errors in file /u01/app/oracle/diag/rdbms/proddb/proddb/trace/proddb_mz00_9822.trc:
+ORA-01110: data file 1: '/u01/app/oracle/oradata/PRODDB/datafile/o1_mf_system_lrn5hvv7_.dbf'
+ORA-01565: error in identifying file '/u01/app/oracle/oradata/PRODDB/datafile/o1_mf_system_lrn5hvv7_.dbf'
+ORA-27037: unable to obtain file status
+Linux-x86_64 Error: 2: No such file or directory
+Additional information: 7
+2024-12-06T20:02:22.283115+05:30
+Errors in file /u01/app/oracle/diag/rdbms/proddb/proddb/trace/proddb_mz00_9822.trc:
+ORA-01110: data file 3: '/u01/app/oracle/oradata/PRODDB/datafile/o1_mf_sysaux_lrn5jnxt_.dbf'
+ORA-01565: error in identifying file '/u01/app/oracle/oradata/PRODDB/datafile/o1_mf_sysaux_lrn5jnxt_.dbf'
+ORA-27037: unable to obtain file status
+Linux-x86_64 Error: 2: No such file or directory
+Additional information: 7
+2024-12-06T20:02:22.595847+05:30
+Full restore complete of datafile 7 /u01/app/oracle/oradata/PRODDB/datafile/o1_mf_users_mo62qph2_.dbf.  Elapsed time: 0:00:00
+  checkpoint is 4023602
+  last deallocation scn is 3
+2024-12-06T20:02:22.625240+05:30
+Errors in file /u01/app/oracle/diag/rdbms/proddb/proddb/trace/proddb_mz00_9822.trc:
+ORA-01110: data file 4: '/u01/app/oracle/oradata/PRODDB/datafile/o1_mf_undotbs1_lrn5k49l_.dbf'
+ORA-01565: error in identifying file '/u01/app/oracle/oradata/PRODDB/datafile/o1_mf_undotbs1_lrn5k49l_.dbf'
+ORA-27037: unable to obtain file status
+Linux-x86_64 Error: 2: No such file or directory
+Additional information: 7
+2024-12-06T20:02:23.261848+05:30
+Errors in file /u01/app/oracle/diag/rdbms/proddb/proddb/trace/proddb_mz00_9822.trc:
+ORA-01110: data file 5: '/u01/app/oracle/oradata/PRODDB/datafile/o1_mf_soetbs_lrn6blkm_.dbf'
+ORA-01565: error in identifying file '/u01/app/oracle/oradata/PRODDB/datafile/o1_mf_soetbs_lrn6blkm_.dbf'
+ORA-27037: unable to obtain file status
+Linux-x86_64 Error: 2: No such file or directory
+Additional information: 7
+2024-12-06T20:02:23.922314+05:30
+Full restore complete of datafile 4 /u01/app/oracle/oradata/PRODDB/datafile/o1_mf_undotbs1_mo62qpgx_.dbf.  Elapsed time: 0:00:01
+  checkpoint is 4023603
+  last deallocation scn is 3278644
+  Undo Optimization current scn is 4021328
+2024-12-06T20:02:23.931984+05:30
+Errors in file /u01/app/oracle/diag/rdbms/proddb/proddb/trace/proddb_mz00_9822.trc:
+ORA-01110: data file 7: '/u01/app/oracle/oradata/PRODDB/datafile/o1_mf_users_mo62qph2_.dbf'
+2024-12-06T20:02:24.786847+05:30
+Checker run found 6 new persistent data failures
+2024-12-06T20:02:27.760718+05:30
+Full restore complete of datafile 1 /u01/app/oracle/oradata/PRODDB/datafile/o1_mf_system_mo62qpgf_.dbf.  Elapsed time: 0:00:05
+  checkpoint is 4023603
+  last deallocation scn is 2151084
+  Undo Optimization current scn is 4021328
+2024-12-06T20:02:27.850619+05:30
+Full restore complete of datafile 3 /u01/app/oracle/oradata/PRODDB/datafile/o1_mf_sysaux_mo62qpgw_.dbf.  Elapsed time: 0:00:05
+  checkpoint is 4023602
+  last deallocation scn is 4020026
+2024-12-06T20:02:29.333016+05:30
+Full restore complete of datafile 5 /u01/app/oracle/oradata/PRODDB/datafile/o1_mf_soetbs_mo62qpgd_.dbf.  Elapsed time: 0:00:07
+  checkpoint is 4023602
+  last deallocation scn is 3385894
+
+
+recover database;
+
+
+2024-12-06T20:03:16.746801+05:30
+alter database recover datafile list clear
+Completed: alter database recover datafile list clear
+alter database recover datafile list
+ 1 , 3 , 4 , 5 , 7
+Completed: alter database recover datafile list
+ 1 , 3 , 4 , 5 , 7
+alter database recover
+ if needed start until cancel using backup controlfile
+2024-12-06T20:03:16.747950+05:30
+Media Recovery Start
+2024-12-06T20:03:16.751297+05:30
+Serial Media Recovery started
+ORA-279 signalled during: alter database recover
+ if needed start until cancel using backup controlfile
+...
+alter database recover logfile '/u01/app/oracle/fast_recovery_area/PRODDB/archivelog/2024_12_06/o1_mf_1_23_mo61w7mb_.arc'
+2024-12-06T20:03:16.969088+05:30
+Media Recovery Log /u01/app/oracle/fast_recovery_area/PRODDB/archivelog/2024_12_06/o1_mf_1_23_mo61w7mb_.arc
+ORA-279 signalled during: alter database recover logfile '/u01/app/oracle/fast_recovery_area/PRODDB/archivelog/2024_12_06/o1_mf_1_23_mo61w7mb_.arc'...
+alter database recover cancel
+2024-12-06T20:03:17.215283+05:30
+Media Recovery Canceled
+Completed: alter database recover cancel
+
+
+2024-12-06T20:07:26.630269+05:30
+alter database recover datafile list clear
+Completed: alter database recover datafile list clear
+alter database recover datafile list
+ 1 , 3 , 4 , 5 , 7
+Completed: alter database recover datafile list
+ 1 , 3 , 4 , 5 , 7
+alter database recover
+ if needed start until cancel using backup controlfile
+2024-12-06T20:07:26.632116+05:30
+Media Recovery Start
+2024-12-06T20:07:26.632214+05:30
+Serial Media Recovery started
+ORA-279 signalled during: alter database recover
+ if needed start until cancel using backup controlfile
+...
+alter database recover cancel
+2024-12-06T20:07:26.827965+05:30
+Media Recovery Canceled
+Completed: alter database recover cancel
+2024-12-06T20:12:24.868361+05:30
+alter database recover datafile list clear
+Completed: alter database recover datafile list clear
+alter database recover datafile list
+ 1 , 3 , 4 , 5 , 7
+Completed: alter database recover datafile list
+ 1 , 3 , 4 , 5 , 7
+alter database recover
+ if needed start until cancel using backup controlfile
+2024-12-06T20:12:24.869326+05:30
+Media Recovery Start
+2024-12-06T20:12:24.869407+05:30
+Serial Media Recovery started
+ORA-279 signalled during: alter database recover
+ if needed start until cancel using backup controlfile
+...
+alter database recover cancel
+2024-12-06T20:12:25.072894+05:30
+Media Recovery Canceled
+Completed: alter database recover cancel
+
+alter database open resetlogs;
+
+
+2024-12-06T20:12:50.546466+05:30
+alter database open resetlogs
+2024-12-06T20:12:50.607197+05:30
+RESETLOGS after incomplete recovery UNTIL CHANGE 4023659 time 12/06/2024 19:47:43
+2024-12-06T20:12:50.607669+05:30
+Errors in file /u01/app/oracle/diag/rdbms/proddb/proddb/trace/proddb_ora_9769.trc:
+ORA-00313: open failed for members of log group 1 of thread 1
+ORA-00312: online log 1 thread 1: '/u01/app/oracle/fast_recovery_area/PRODDB/onlinelog/o1_mf_1_lrn5ll51_.log'
+ORA-27037: unable to obtain file status
+Linux-x86_64 Error: 2: No such file or directory
+Additional information: 7
+ORA-00312: online log 1 thread 1: '/u01/app/oracle/oradata/PRODDB/onlinelog/o1_mf_1_lrn5lkw2_.log'
+ORA-27037: unable to obtain file status
+Linux-x86_64 Error: 2: No such file or directory
+Additional information: 7
+2024-12-06T20:12:50.607741+05:30
+Errors in file /u01/app/oracle/diag/rdbms/proddb/proddb/trace/proddb_ora_9769.trc:
+ORA-00313: open failed for members of log group 1 of thread 1
+ORA-00312: online log 1 thread 1: '/u01/app/oracle/fast_recovery_area/PRODDB/onlinelog/o1_mf_1_lrn5ll51_.log'
+ORA-27037: unable to obtain file status
+Linux-x86_64 Error: 2: No such file or directory
+Additional information: 7
+ORA-00312: online log 1 thread 1: '/u01/app/oracle/oradata/PRODDB/onlinelog/o1_mf_1_lrn5lkw2_.log'
+ORA-27037: unable to obtain file status
+Linux-x86_64 Error: 2: No such file or directory
+Additional information: 7
+2024-12-06T20:12:50.607911+05:30
+Errors in file /u01/app/oracle/diag/rdbms/proddb/proddb/trace/proddb_ora_9769.trc:
+ORA-00313: open failed for members of log group 2 of thread 1
+ORA-00312: online log 2 thread 1: '/u01/app/oracle/fast_recovery_area/PRODDB/onlinelog/o1_mf_2_lrn5ll7j_.log'
+ORA-27037: unable to obtain file status
+Linux-x86_64 Error: 2: No such file or directory
+Additional information: 7
+ORA-00312: online log 2 thread 1: '/u01/app/oracle/oradata/PRODDB/onlinelog/o1_mf_2_lrn5lkwd_.log'
+ORA-27037: unable to obtain file status
+Linux-x86_64 Error: 2: No such file or directory
+Additional information: 7
+2024-12-06T20:12:50.607967+05:30
+Errors in file /u01/app/oracle/diag/rdbms/proddb/proddb/trace/proddb_ora_9769.trc:
+ORA-00313: open failed for members of log group 2 of thread 1
+ORA-00312: online log 2 thread 1: '/u01/app/oracle/fast_recovery_area/PRODDB/onlinelog/o1_mf_2_lrn5ll7j_.log'
+ORA-27037: unable to obtain file status
+Linux-x86_64 Error: 2: No such file or directory
+Additional information: 7
+ORA-00312: online log 2 thread 1: '/u01/app/oracle/oradata/PRODDB/onlinelog/o1_mf_2_lrn5lkwd_.log'
+ORA-27037: unable to obtain file status
+Linux-x86_64 Error: 2: No such file or directory
+Additional information: 7
+2024-12-06T20:12:50.608111+05:30
+Errors in file /u01/app/oracle/diag/rdbms/proddb/proddb/trace/proddb_ora_9769.trc:
+ORA-00313: open failed for members of log group 3 of thread 1
+ORA-00312: online log 3 thread 1: '/u01/app/oracle/fast_recovery_area/PRODDB/onlinelog/o1_mf_3_lrn5ll37_.log'
+ORA-27037: unable to obtain file status
+Linux-x86_64 Error: 2: No such file or directory
+Additional information: 7
+ORA-00312: online log 3 thread 1: '/u01/app/oracle/oradata/PRODDB/onlinelog/o1_mf_3_lrn5lkwn_.log'
+ORA-27037: unable to obtain file status
+Linux-x86_64 Error: 2: No such file or directory
+Additional information: 7
+2024-12-06T20:12:50.608166+05:30
+Errors in file /u01/app/oracle/diag/rdbms/proddb/proddb/trace/proddb_ora_9769.trc:
+ORA-00313: open failed for members of log group 3 of thread 1
+ORA-00312: online log 3 thread 1: '/u01/app/oracle/fast_recovery_area/PRODDB/onlinelog/o1_mf_3_lrn5ll37_.log'
+ORA-27037: unable to obtain file status
+Linux-x86_64 Error: 2: No such file or directory
+Additional information: 7
+ORA-00312: online log 3 thread 1: '/u01/app/oracle/oradata/PRODDB/onlinelog/o1_mf_3_lrn5lkwn_.log'
+ORA-27037: unable to obtain file status
+Linux-x86_64 Error: 2: No such file or directory
+Additional information: 7
+2024-12-06T20:12:50.646727+05:30
+Errors in file /u01/app/oracle/diag/rdbms/proddb/proddb/trace/proddb_ora_9769.trc:
+ORA-00313: open failed for members of log group 1 of thread 1
+ORA-00312: online log 1 thread 1: '/u01/app/oracle/fast_recovery_area/PRODDB/onlinelog/o1_mf_1_lrn5ll51_.log'
+ORA-27037: unable to obtain file status
+Linux-x86_64 Error: 2: No such file or directory
+Additional information: 7
+ORA-00312: online log 1 thread 1: '/u01/app/oracle/oradata/PRODDB/onlinelog/o1_mf_1_lrn5lkw2_.log'
+ORA-27037: unable to obtain file status
+Linux-x86_64 Error: 2: No such file or directory
+Additional information: 7
+2024-12-06T20:12:50.646823+05:30
+Errors in file /u01/app/oracle/diag/rdbms/proddb/proddb/trace/proddb_ora_9769.trc:
+ORA-00313: open failed for members of log group 1 of thread 1
+ORA-00312: online log 1 thread 1: '/u01/app/oracle/fast_recovery_area/PRODDB/onlinelog/o1_mf_1_lrn5ll51_.log'
+ORA-27037: unable to obtain file status
+Linux-x86_64 Error: 2: No such file or directory
+Additional information: 7
+ORA-00312: online log 1 thread 1: '/u01/app/oracle/oradata/PRODDB/onlinelog/o1_mf_1_lrn5lkw2_.log'
+ORA-27037: unable to obtain file status
+Linux-x86_64 Error: 2: No such file or directory
+Additional information: 7
+.... (PID:9769): Clearing online redo logfile 1 /u01/app/oracle/oradata/PRODDB/onlinelog/o1_mf_1_lrn5lkw2_.log
+2024-12-06T20:12:50.647128+05:30
+Errors in file /u01/app/oracle/diag/rdbms/proddb/proddb/trace/proddb_ora_9769.trc:
+ORA-00313: open failed for members of log group 2 of thread 1
+ORA-00312: online log 2 thread 1: '/u01/app/oracle/fast_recovery_area/PRODDB/onlinelog/o1_mf_2_lrn5ll7j_.log'
+ORA-27037: unable to obtain file status
+Linux-x86_64 Error: 2: No such file or directory
+Additional information: 7
+ORA-00312: online log 2 thread 1: '/u01/app/oracle/oradata/PRODDB/onlinelog/o1_mf_2_lrn5lkwd_.log'
+ORA-27037: unable to obtain file status
+Linux-x86_64 Error: 2: No such file or directory
+Additional information: 7
+2024-12-06T20:12:50.647183+05:30
+Errors in file /u01/app/oracle/diag/rdbms/proddb/proddb/trace/proddb_ora_9769.trc:
+ORA-00313: open failed for members of log group 2 of thread 1
+ORA-00312: online log 2 thread 1: '/u01/app/oracle/fast_recovery_area/PRODDB/onlinelog/o1_mf_2_lrn5ll7j_.log'
+ORA-27037: unable to obtain file status
+Linux-x86_64 Error: 2: No such file or directory
+Additional information: 7
+ORA-00312: online log 2 thread 1: '/u01/app/oracle/oradata/PRODDB/onlinelog/o1_mf_2_lrn5lkwd_.log'
+ORA-27037: unable to obtain file status
+Linux-x86_64 Error: 2: No such file or directory
+Additional information: 7
+.... (PID:9769): Clearing online redo logfile 2 /u01/app/oracle/oradata/PRODDB/onlinelog/o1_mf_2_lrn5lkwd_.log
+2024-12-06T20:12:50.647424+05:30
+Errors in file /u01/app/oracle/diag/rdbms/proddb/proddb/trace/proddb_ora_9769.trc:
+ORA-00313: open failed for members of log group 3 of thread 1
+ORA-00312: online log 3 thread 1: '/u01/app/oracle/fast_recovery_area/PRODDB/onlinelog/o1_mf_3_lrn5ll37_.log'
+ORA-27037: unable to obtain file status
+Linux-x86_64 Error: 2: No such file or directory
+Additional information: 7
+ORA-00312: online log 3 thread 1: '/u01/app/oracle/oradata/PRODDB/onlinelog/o1_mf_3_lrn5lkwn_.log'
+ORA-27037: unable to obtain file status
+Linux-x86_64 Error: 2: No such file or directory
+Additional information: 7
+2024-12-06T20:12:50.647477+05:30
+Errors in file /u01/app/oracle/diag/rdbms/proddb/proddb/trace/proddb_ora_9769.trc:
+ORA-00313: open failed for members of log group 3 of thread 1
+ORA-00312: online log 3 thread 1: '/u01/app/oracle/fast_recovery_area/PRODDB/onlinelog/o1_mf_3_lrn5ll37_.log'
+ORA-27037: unable to obtain file status
+Linux-x86_64 Error: 2: No such file or directory
+Additional information: 7
+ORA-00312: online log 3 thread 1: '/u01/app/oracle/oradata/PRODDB/onlinelog/o1_mf_3_lrn5lkwn_.log'
+ORA-27037: unable to obtain file status
+Linux-x86_64 Error: 2: No such file or directory
+Additional information: 7
+.... (PID:9769): Clearing online redo logfile 3 /u01/app/oracle/oradata/PRODDB/onlinelog/o1_mf_3_lrn5lkwn_.log
+Clearing online log 1 of thread 1 sequence number 22
+2024-12-06T20:12:50.647687+05:30
+Errors in file /u01/app/oracle/diag/rdbms/proddb/proddb/trace/proddb_ora_9769.trc:
+ORA-00313: open failed for members of log group 1 of thread 1
+ORA-00312: online log 1 thread 1: '/u01/app/oracle/fast_recovery_area/PRODDB/onlinelog/o1_mf_1_lrn5ll51_.log'
+ORA-27037: unable to obtain file status
+Linux-x86_64 Error: 2: No such file or directory
+Additional information: 7
+ORA-00312: online log 1 thread 1: '/u01/app/oracle/oradata/PRODDB/onlinelog/o1_mf_1_lrn5lkw2_.log'
+ORA-27037: unable to obtain file status
+Linux-x86_64 Error: 2: No such file or directory
+Additional information: 7
+2024-12-06T20:12:50.647740+05:30
+Errors in file /u01/app/oracle/diag/rdbms/proddb/proddb/trace/proddb_ora_9769.trc:
+ORA-00313: open failed for members of log group 1 of thread 1
+ORA-00312: online log 1 thread 1: '/u01/app/oracle/fast_recovery_area/PRODDB/onlinelog/o1_mf_1_lrn5ll51_.log'
+ORA-27037: unable to obtain file status
+Linux-x86_64 Error: 2: No such file or directory
+Additional information: 7
+ORA-00312: online log 1 thread 1: '/u01/app/oracle/oradata/PRODDB/onlinelog/o1_mf_1_lrn5lkw2_.log'
+ORA-27037: unable to obtain file status
+Linux-x86_64 Error: 2: No such file or directory
+Additional information: 7
+Deleted Oracle managed file /u01/app/oracle/oradata/PRODDB/onlinelog/o1_mf_1_lrn5lkw2_.log
+Deleted Oracle managed file /u01/app/oracle/fast_recovery_area/PRODDB/onlinelog/o1_mf_1_lrn5ll51_.log
+Clearing online log 2 of thread 1 sequence number 23
+2024-12-06T20:12:50.648093+05:30
+Errors in file /u01/app/oracle/diag/rdbms/proddb/proddb/trace/proddb_ora_9769.trc:
+ORA-00313: open failed for members of log group 2 of thread 1
+ORA-00312: online log 2 thread 1: '/u01/app/oracle/fast_recovery_area/PRODDB/onlinelog/o1_mf_2_lrn5ll7j_.log'
+ORA-27037: unable to obtain file status
+Linux-x86_64 Error: 2: No such file or directory
+Additional information: 7
+ORA-00312: online log 2 thread 1: '/u01/app/oracle/oradata/PRODDB/onlinelog/o1_mf_2_lrn5lkwd_.log'
+ORA-27037: unable to obtain file status
+Linux-x86_64 Error: 2: No such file or directory
+Additional information: 7
+2024-12-06T20:12:50.648152+05:30
+Errors in file /u01/app/oracle/diag/rdbms/proddb/proddb/trace/proddb_ora_9769.trc:
+ORA-00313: open failed for members of log group 2 of thread 1
+ORA-00312: online log 2 thread 1: '/u01/app/oracle/fast_recovery_area/PRODDB/onlinelog/o1_mf_2_lrn5ll7j_.log'
+ORA-27037: unable to obtain file status
+Linux-x86_64 Error: 2: No such file or directory
+Additional information: 7
+ORA-00312: online log 2 thread 1: '/u01/app/oracle/oradata/PRODDB/onlinelog/o1_mf_2_lrn5lkwd_.log'
+ORA-27037: unable to obtain file status
+Linux-x86_64 Error: 2: No such file or directory
+Additional information: 7
+Deleted Oracle managed file /u01/app/oracle/oradata/PRODDB/onlinelog/o1_mf_2_lrn5lkwd_.log
+Deleted Oracle managed file /u01/app/oracle/fast_recovery_area/PRODDB/onlinelog/o1_mf_2_lrn5ll7j_.log
+Clearing online log 3 of thread 1 sequence number 21
+2024-12-06T20:12:50.648360+05:30
+Errors in file /u01/app/oracle/diag/rdbms/proddb/proddb/trace/proddb_ora_9769.trc:
+ORA-00313: open failed for members of log group 3 of thread 1
+ORA-00312: online log 3 thread 1: '/u01/app/oracle/fast_recovery_area/PRODDB/onlinelog/o1_mf_3_lrn5ll37_.log'
+ORA-27037: unable to obtain file status
+Linux-x86_64 Error: 2: No such file or directory
+Additional information: 7
+ORA-00312: online log 3 thread 1: '/u01/app/oracle/oradata/PRODDB/onlinelog/o1_mf_3_lrn5lkwn_.log'
+ORA-27037: unable to obtain file status
+Linux-x86_64 Error: 2: No such file or directory
+Additional information: 7
+2024-12-06T20:12:50.648412+05:30
+Errors in file /u01/app/oracle/diag/rdbms/proddb/proddb/trace/proddb_ora_9769.trc:
+ORA-00313: open failed for members of log group 3 of thread 1
+ORA-00312: online log 3 thread 1: '/u01/app/oracle/fast_recovery_area/PRODDB/onlinelog/o1_mf_3_lrn5ll37_.log'
+ORA-27037: unable to obtain file status
+Linux-x86_64 Error: 2: No such file or directory
+Additional information: 7
+ORA-00312: online log 3 thread 1: '/u01/app/oracle/oradata/PRODDB/onlinelog/o1_mf_3_lrn5lkwn_.log'
+ORA-27037: unable to obtain file status
+Linux-x86_64 Error: 2: No such file or directory
+Additional information: 7
+Deleted Oracle managed file /u01/app/oracle/oradata/PRODDB/onlinelog/o1_mf_3_lrn5lkwn_.log
+Deleted Oracle managed file /u01/app/oracle/fast_recovery_area/PRODDB/onlinelog/o1_mf_3_lrn5ll37_.log
+2024-12-06T20:12:55.836948+05:30
+.... (PID:9769): Clearing online redo logfile 1 complete
+.... (PID:9769): Clearing online redo logfile 2 complete
+.... (PID:9769): Clearing online redo logfile 3 complete
+Resetting resetlogs activation ID 896580007 (0x3570b9a7)
+Online log /u01/app/oracle/oradata/PRODDB/onlinelog/o1_mf_1_mo63cbpv_.log: Thread 1 Group 1 was previously cleared
+Online log /u01/app/oracle/fast_recovery_area/PRODDB/onlinelog/o1_mf_1_mo63cccy_.log: Thread 1 Group 1 was previously cleared
+Online log /u01/app/oracle/oradata/PRODDB/onlinelog/o1_mf_2_mo63cbr5_.log: Thread 1 Group 2 was previously cleared
+Online log /u01/app/oracle/fast_recovery_area/PRODDB/onlinelog/o1_mf_2_mo63cc9x_.log: Thread 1 Group 2 was previously cleared
+Online log /u01/app/oracle/oradata/PRODDB/onlinelog/o1_mf_3_mo63cdj5_.log: Thread 1 Group 3 was previously cleared
+Online log /u01/app/oracle/fast_recovery_area/PRODDB/onlinelog/o1_mf_3_mo63cdtn_.log: Thread 1 Group 3 was previously cleared
+2024-12-06T20:12:55.915585+05:30
+Setting recovery target incarnation to 3
+2024-12-06T20:12:55.930933+05:30
+Ping without log force is disabled:
+  instance mounted in exclusive mode.
+Endian type of dictionary set to little
+2024-12-06T20:12:55.975728+05:30
+Assigning activation ID 927063590 (0x3741de26)
+Redo log for group 1, sequence 1 is not located on DAX storage
+Thread 1 opened at log sequence 1
+  Current log# 1 seq# 1 mem# 0: /u01/app/oracle/oradata/PRODDB/onlinelog/o1_mf_1_mo63cbpv_.log
+  Current log# 1 seq# 1 mem# 1: /u01/app/oracle/fast_recovery_area/PRODDB/onlinelog/o1_mf_1_mo63cccy_.log
+Successful open of redo thread 1
+2024-12-06T20:12:56.042675+05:30
+MTTR advisory is disabled because FAST_START_MTTR_TARGET is not set
+stopping change tracking
+2024-12-06T20:12:56.157919+05:30
+TT03 (PID:10453): Sleep 5 seconds and then try to clear SRLs in 2 time(s)
+2024-12-06T20:12:56.269147+05:30
+Undo initialization recovery: err:0 start: 3379027 end: 3379065 diff: 38 ms (0.0 seconds)
+[9769] Successfully onlined Undo Tablespace 2.
+Undo initialization online undo segments: err:0 start: 3379066 end: 3379140 diff: 74 ms (0.1 seconds)
+Undo initialization finished serial:0 start:3379027 end:3379145 diff:118 ms (0.1 seconds)
+Dictionary check beginning
+Dictionary check complete
+Verifying minimum file header compatibility for tablespace encryption..
+Verifying file header compatibility for tablespace encryption completed for pdb 0
+Database Characterset is AL32UTF8
+No Resource Manager plan active
+2024-12-06T20:12:56.846758+05:30
+joxcsys_required_dirobj_exists: directory object exists with required path /u01/app/oracle/product/19.0.0.0/dbhome_1/javavm/admin/, pid 9769 cid 0
+replication_dependency_tracking turned off (no async multimaster replication found)
+LOGSTDBY: Validating controlfile with logical metadata
+LOGSTDBY: Validation complete
+Starting background process AQPC
+2024-12-06T20:12:57.276024+05:30
+AQPC started with pid=47, OS id=10457 
+Starting background process CJQ0
+2024-12-06T20:12:57.824799+05:30
+CJQ0 started with pid=51, OS id=10466 
+2024-12-06T20:12:58.769355+05:30
+Sequence 3 autobackup already exist, will retry with next sequence (retry: 1)
+
+Control autobackup written to DISK device
+
+handle '/u01/rman_bkp/c-896617639-20241206-04'
+
+Completed: alter database open resetlogs
+2024-12-06T20:12:59.395759+05:30
+QPI: opatch file present, opatch
+QPI: qopiprep.bat file present
+2024-12-06T20:13:07.627775+05:30
+===========================================================
+Dumping current patch information
+===========================================================
+Patch Id: 29517242
+Patch Description: Database Release Update : 19.3.0.0.190416 (29517242)
+Patch Apply Time: 2019-04-18T12:51:17+05:30
+Bugs Fixed: 14735102,19697993,20313356,21965541,25806201,25883179,25986062,
+26476244,26611353,26872233,27369515,27423500,27666312,27710072,27846298,
+27957203,28064977,28072567,28129791,28181021,28210681,28279456,28313275,
+28350595,28371123,28379065,28431445,28463226,28489419,28502773,28513333,
+28534475,28561704,28569897,28572533,28572544,28587723,28593682,28594086,
+28597221,28601957,28605066,28606598,28625862,28627033,28636532,28643718,
+28644549,28645570,28646200,28646939,28649388,28655209,28663782,28673945,
+28692275,28694872,28696373,28705231,28710385,28710734,28714461,28718469,
+28730079,28740708,28760206,28772390,28774416,28777214,28789531,28791852,
+28795551,28802734,28804517,28810381,28811560,28815123,28815355,28819640,
+28824482,28833912,28835937,28862532,28863432,28873575,28876253,28876639,
+28884931,28888327,28892794,28897512,28899663,28901126,28905457,28907196,
+28912691,28915561,28917080,28918429,28919145,28922227,28922532,28922608,
+28925634,28925880,28933158,28936114,28937717,28938698,28940179,28940281,
+28941901,28942455,28945421,28945994,28951533,28952168,28954762,28955606,
+28957292,28957723,28962775,28965231,28966444,28974083,28977322,28983095,
+28983486,28986326,28986481,28988482,28989306,28993295,28994307,28996376,
+29000000,29001888,29002927,29003738,29006318,29006621,29007321,29007775,
+29008035,29011936,29013475,29014076,29015118,29017265,29018655,29019121,
+29021063,29021352,29024552,29026582,29026606,29027456,29027694,29027940,
+29031575,29031600,29032234,29032457,29032607,29033052,29033145,29033200,
+29033280,29034587,29037290,29038528,29039089,29039510,29043554,29043651,
+29043725,29044763,29044954,29047850,29048289,29048498,29048605,29050560,
+29050765,29051702,29052726,29053783,29056024,29056270,29056560,29059011,
+29061959,29062692,29062848,29062860,29062868,29110526,29110783,29110790,
+29110797,29110802,29110805,29111598,29113282,29113305,29117526,29117642,
+29119077,29120223,29122224,29122254,29123297,29123432,29123482,29124368,
+29125380,29126345,29127957,29128935,29129450,29129497,29129712,29130219,
+29131539,29132938,29134447,29136111,29138641,29141316,29141341,29141685,
+29142667,29144995,29145214,29145730,29149829,29150338,29151520,29152357,
+29155099,29157389,29158680,29158899,29159909,29159936,29160174,29162095,
+29163415,29163437,29163524,29163567,29167111,29167342,29167374,29167940,
+29168219,29168433,29169073,29169215,29171942,29172618,29172826,29173140,
+29173373,29173817,29174004,29176318,29177466,29177543,29177886,29178385,
+29180313,29180455,29180559,29180893,29181153,29181231,29181620,29181743,
+29181923,29182019,29183912,29184297,29184666,29185193,29186456,29189302,
+29189307,29189889,29190235,29190474,29190740,29191541,29192419,29192468,
+29192685,29193207,29194205,29194367,29194493,29194827,29195279,29195337,
+29195758,29196725,29199635,29199733,29200316,29200700,29201494,29201539,
+29202104,29202850,29203122,29203166,29203425,29203443,29203604,29205281,
+29205323,29205419,29205463,29205767,29205918,29206109,29206605,29207073,
+29208260,29208732,29211457,29211724,29212012,29212433,29212611,29213351,
+29213775,29213850,29213879,29214561,29214960,29216746,29216984,29217294,
+29217472,29217828,29217848,29218570,29219205,29219273,29220079,29221248,
+29221891,29222031,29222784,29223833,29223859,29223967,29224065,29224605,
+29225076,29227602,29228869,29229164,29229754,29229844,29229955,29230252,
+29230565,29231133,29232117,29232154,29234123,29237538,29240307,29241345,
+29242017,29242884,29243958,29245137,29245160,29246163,29247415,29247712,
+29247906,29248552,29248835,29248858,29249991,29250059,29251259,29253184,
+29253871,29254031,29254930,29255178,29255273,29255431,29255435,29256426,
+29259119,29259320,29261906,29262512,29262887,29265448,29266248,29266899,
+29267292,29268412,29269171,29270585,29273539,29273735,29273847,29274428,
+29274564,29274627,29275461,29278218,29279658,29279751,29279854,29282898,
+29285503,29285788,29285956,29286037,29287130,29287705,29292837,29293072,
+29297863,29297915,29298220,29299049,29299082,29299844,29301566,29302963,
+29303918,29304781,29311588,29312310,29312734,29312753,29313347,29313417,
+29313525,29314539,29318410,29319441,29321489,29323946,29324568,29325087,
+29325105,29325257,29325993,29327044,29329087,29331209,29331380,29331493,
+29332771,29333500,29337310,29338315,29338453,29338780,29338913,29339155,
+29341209,29343086,29346943,29347620,29348176,29350052,29351386,29351716,
+29351749,29352867,29353271,29355654,29356547,29356752,29358828,29360672,
+29361801,29363151,29364171,29364177,29367019,29367561,29368253,29373418,
+29373588,29374179,29377986,29378029,29379978,29382784,29385652,29386502,
+29386635,29386660,29387274,29388094,29388524,29388830,29389889,29390435,
+29394140,29394749,29397954,29398863,29399100,29399121,29405012,29405651,
+29412066,29412269,29417884,29423826,29429264,29429566,29431485,29435652,
+29438736,29439522,29450421,29451386,29452576,29452953,29457807,29460252,
+29462957,29486181,29507616,29515240,29521748,29530812,29531654,29557336,
+29558975,29601461
+
+Patch Id: 29585399
+Patch Description: OCW RELEASE UPDATE 19.3.0.0.0 (29585399)
+Patch Apply Time: 2019-04-18T12:51:33+05:30
+Bugs Fixed: 3,27222128,27572040,27604329,27760043,27877830,28302580,28470673,
+28621543,28642469,28699321,28710663,28755846,28772816,28785321,28800508,
+28808652,28815557,28847541,28847572,28870496,28871040,28874416,28877252,
+28881191,28881848,28888083,28911140,28925250,28925460,28935956,28940472,
+28942694,28951332,28963036,28968779,28980448,28995287,29003207,29003617,
+29016294,29018680,29024876,29026154,29027933,29047127,29052850,29058476,
+29111631,29112455,29117337,29123444,29125708,29125786,29129476,29131772,
+29132456,29139727,29146157,29147849,29149170,29152603,29152752,29154631,
+29154636,29154829,29159216,29159661,29160462,29161923,29169540,29169739,
+29170717,29173618,29181568,29182920,29183298,29186091,29191827,29201143,
+29201695,29209545,29210577,29210610,29210624,29210683,29213641,29219627,
+29224294,29225861,29229839,29235934,29242906,29243749,29244495,29244766,
+29244968,29248723,29249583,29251564,29255616,29260224,29261695,29271019,
+29273360,29282090,29282666,29285453,29285621,29290235,29292232,29293806,
+29294753,29299830,29307090,29307109,29311336,29329675,29330791,29339299,
+29357821,29360467,29360775,29367971,29368725,29379299,29379381,29380527,
+29381000,29382296,29391301,29393649,29402110,29411931,29413360,29457319,
+29465047
+===========================================================
+2024-12-06T20:13:07.823706+05:30
+db_recovery_file_dest_size of 8256 MB is 7.92% used. This is a
+user-specified limit on the amount of space that will be used by this
+database for recovery-related files, and does not reflect the amount of
+space available in the underlying filesystem or ASM diskgroup.
+
+
+
+
+
+
+

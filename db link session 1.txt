@@ -1,0 +1,172 @@
+*********** DBlink ***************************
+Creating user in sysdba
+
+SQL> create user hdfc_user identified by hdfc_user;
+
+User created.
+
+SQL> grant connect, resource to hdfc_user;
+
+Grant succeeded.
+
+
+SQL> alter user hdfc_user quota unlimited on users;
+
+User altered.
+
+
+SQL> create table hdfc_user.hdfc_account (acc_no number,acc_name varchar2(10),bal number(7,2));
+
+Table created.
+
+SQL> show user
+USER is "SYS"
+SQL> select user from dual;
+
+USER
+--------------------------------------------------------------------------------
+SYS
+
+SQL> insert into hdfc_user.hdfc_account values (123,'RAJU',10000);
+commit
+1 row created.
+
+SQL> ;
+
+Commit complete.
+
+
+SQL> exit
+
+
+
+[oracle@vamshi admin]$ sqlplus hdfc_user/hdfc_user
+
+
+
+SQL> create database link to_icici_user connect to icici_user identified by icici_user using 'to_suridb';
+     create database link database link connect to username identified by password using 'tnsname';
+Database link created.
+
+SQL> select * from tab@to_icici_user;
+     select * from tab@database link:
+TNAME
+--------------------------------------------------------------------------------
+TABTYPE        CLUSTERID
+------------- ----------
+ICICI_ACCOUNT
+TABLE
+
+
+SQL> select * from icici_account@to_icici_user;
+     select * from tablename@database link;
+    ACC_NO ACT_NAME      BALANCE
+---------- ---------- ----------
+       789 SAMPATH         50000
+
+SQL> /
+
+    ACC_NO ACT_NAME      BALANCE
+---------- ---------- ----------
+       789 SAMPATH         50000
+
+
+
+
+
+SQL> select * from icici_account@to_icici_user;
+select * from icici_account@to_icici_user
+                            *
+ERROR at line 1:
+ORA-12541: TNS:no listener
+
+
+SQL>
+SQL>
+SQL>
+SQL> /
+
+    ACC_NO ACT_NAME      BALANCE
+---------- ---------- ----------
+       789 SAMPATH         50000
+
+SQL> create table icici_account as select * from icici_account@to_icici_user;
+	creating table of remote user with same tablename   select * from tablename@database link;
+Table created.
+
+SQL> select * from icici_account;
+
+    ACC_NO ACT_NAME      BALANCE
+---------- ---------- ----------
+       789 SAMPATH         50000
+
+SQL> /
+
+    ACC_NO ACT_NAME      BALANCE
+---------- ---------- ----------
+       789 SAMPATH         50000
+
+SQL> select * from icici_account@to_icici_user;
+
+    ACC_NO ACT_NAME      BALANCE
+---------- ---------- ----------
+       789 SAMPATH         50000
+       790 VAMSHI           2000
+
+SQL> show user
+USER is "HDFC_USER"
+SQL> conn / as sysdba
+Connected.
+SQL> grant create materialized view to hdfc_user;
+
+Grant succeeded.
+
+SQL> conn hdfc_user/hdfc_user
+Connected.
+SQL>
+SQL>
+
+
+
+SQL> ed
+Wrote file afiedt.buf
+
+  1* create materialized view icici_account_mv as  select * from icici_account@to_icici_user
+SQL> /
+
+Materialized view created.
+
+SQL> select * from icici_account_mv ;
+
+    ACC_NO ACT_NAME      BALANCE
+---------- ---------- ----------
+       789 SAMPATH         50000
+       790 VAMSHI           2000
+
+SQL> /
+
+    ACC_NO ACT_NAME      BALANCE
+---------- ---------- ----------
+       789 SAMPATH         50000
+       790 VAMSHI           2000
+
+SQL> exit
+
+
+[oracle@vamshi admin]$ sqlplus / as sysdba
+
+t
+
+SQL> exec dbms_mview.refresh('hdfc_user.icici_account_mv');
+
+PL/SQL procedure successfully completed.
+
+SQL> select * from hdfc_user.icici_account_mv;
+
+    ACC_NO ACT_NAME      BALANCE
+---------- ---------- ----------
+       789 SAMPATH         50000
+       790 VAMSHI           2000
+       791 ADITI          200000
+
+SQL>

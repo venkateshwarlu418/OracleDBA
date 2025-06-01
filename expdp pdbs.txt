@@ -1,0 +1,392 @@
+
+										Database-01
+
+[oracle@venky ~]$ hostname
+venky.com
+[oracle@venky ~]$ . oraenv
+ORACLE_SID = [oracle] ? vendb
+The Oracle base has been set to /u01/app/oracle
+[oracle@venky ~]$ sqlplus / as sysdba
+
+Connected to an idle instance.
+
+SQL> startup;
+
+SQL> show pdbs
+
+    CON_ID CON_NAME			  OPEN MODE  RESTRICTED
+---------- ------------------------------ ---------- ----------
+	 2 PDB$SEED			  READ ONLY  NO
+	 3 SBI				  MOUNTED
+SQL> alter session set container=sbi;
+
+Session altered.
+
+SQL> show con_name
+
+CON_NAME
+------------------------------
+SBI
+
+
+SQL> create user venky identified by venky;
+
+User created.
+
+SQL> grant create session, connect, resource to venky;
+
+Grant succeeded.
+
+SQL> alter user venky quota unlimited on users;
+
+User altered.
+
+--- create listener and tnsnames for pdb and start the listener of that pdb
+
+SQL> connect venky/venky@to_sb;
+Connected.
+SQL> create table vtbl (slno number, name varchar2(20));
+
+Table created.
+
+SQL> insert into vtbl values(10, 'VEN');
+1 row created.
+
+SQL> commit;
+
+Commit complete.
+
+SQL> select * from vtbl;
+
+      SLNO NAME
+---------- --------------------
+	10 VEN
+
+SQL> exit  
+Disconnected from Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.3.0.0.0
+[oracle@venky ~]$ mkdir -p /u01/datapump
+[oracle@venky ~]$ sqlplus / as sysdba
+
+
+SQL> alter session set container=sbi;
+
+Session altered.
+
+SQL> show con_name
+
+CON_NAME
+------------------------------
+SBI
+
+
+SQL> grant exp_full_database to venky;
+
+Grant succeeded.
+
+SQL> grant imp_full_database to venky;
+
+Grant succeeded.
+
+SQL> show con_name
+
+CON_NAME
+------------------------------
+SBI
+
+SQL> create directory backups_dir as '/u01/datapump';
+
+Directory created.
+
+SQL> grant read, write on directory BACKUPS_DIR to venky;
+
+Grant succeeded.
+
+SQL> set pages 500
+col owner for a20
+col directory_name for a20
+col directory_path for a50
+
+select owner, DIRECTORY_NAME,DIRECTORY_PATH from dba_directories;SQL> SQL> SQL> SQL> SQL> 
+
+OWNER		     DIRECTORY_NAME			DIRECTORY_PATH
+------------    --------------------  --------------------
+SYS		     	  BACKUPS_DIR			/u01/datapump
+
+
+SQL> show user
+USER is "SYS"
+SQL> show pdbs
+
+    CON_ID CON_NAME			  OPEN MODE  RESTRICTED
+---------- ------------------------------ ---------- ----------
+	 3 SBI				  READ WRITE NO
+SQL> connect venky/venky@to_sb
+Connected.
+SQL> select * from vtbl;
+
+      SLNO NAME
+---------- --------------------
+	10 VEN
+
+[oracle@venky datapump]$ expdp venky/venky@to_sb directory=backups_dir dumpfile=venky_schema_01.dmp 
+						 logfile=schema_venky.log tables=venky.vtbl
+Export: Release 19.0.0.0.0 - Production on Wed Feb 19 19:51:55 2025
+Version 19.3.0.0.0
+
+Copyright (c) 1982, 2019, Oracle and/or its affiliates.  All rights reserved.
+
+Connected to: Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Starting "VENKY"."SYS_EXPORT_TABLE_01":  venky/********@to_sb directory=backups_dir dumpfile=venky_schema_01.dmp logfile=schema_venky.log tables=venky.vtbl 
+Processing object type TABLE_EXPORT/TABLE/TABLE_DATA
+Processing object type TABLE_EXPORT/TABLE/STATISTICS/TABLE_STATISTICS
+Processing object type TABLE_EXPORT/TABLE/STATISTICS/MARKER
+Processing object type TABLE_EXPORT/TABLE/TABLE
+. . exported "VENKY"."VTBL"                              5.562 KB       9 rows
+Master table "VENKY"."SYS_EXPORT_TABLE_01" successfully loaded/unloaded
+******************************************************************************
+Dump file set for VENKY.SYS_EXPORT_TABLE_01 is:
+  /u01/datapump/venky_schema_01.dmp
+Job "VENKY"."SYS_EXPORT_TABLE_01" successfully completed at Wed Feb 19 19:52:05 2025 elapsed 0 00:00:09
+
+[oracle@venky datapump]$ scp venky_schema_01.dmp oracle@192.168.138.22:/u01/imports
+oracle@192.168.138.22's password: 
+venky_schema_01.dmp                                                     100%  172KB   2.9MB/s   00:00    
+						 
+
+
+
+
+=====================================================================================================================
+												Database-02:
+
+--- create listener and tnsnames for pdb and start the listener of that pdb
+[oracle@venky admin]$ mkdir -p /u01/imports
+[oracle@venky ~]$ sqlplus / as sysdba
+
+SQL> startup;
+SQL> show pdbs
+
+    CON_ID CON_NAME			  OPEN MODE  RESTRICTED
+---------- ------------------------------ ---------- ----------
+	 2 PDB$SEED			  READ ONLY  NO
+	 3 SBI				  MOUNTED
+SQL> alter pluggable database sbi open;
+
+Pluggable database altered.
+
+SQL> show pdbs
+
+    CON_ID CON_NAME			  OPEN MODE  RESTRICTED
+---------- ------------------------------ ---------- ----------
+	 2 PDB$SEED			  READ ONLY  NO
+	 3 SBI				  READ WRITE NO
+
+SQL> alter session set container=sbi;
+
+Session altered.
+
+SQL> create user ven identified by ven;
+
+User created.
+SQL> grant connect, resource, create session to ven;
+
+Grant succeeded.
+
+SQL> alter user ven quota unlimited on users;
+
+User altered.
+SQL> show con_name
+
+CON_NAME
+------------------------------
+SBI
+SQL> grant exp_full_database to ven;
+
+Grant succeeded.
+
+SQL> grant imp_full_database to ven;
+
+Grant succeeded.
+SQL> create directory imports_dir as '/u01/imports';
+
+Directory created.
+
+SQL> grant read, write on directory imports_dir to ven;
+
+Grant succeeded.
+
+SQL> show pdbs
+
+    CON_ID CON_NAME			  OPEN MODE  RESTRICTED
+---------- ------------------------------ ---------- ----------
+	 3 SBI				  READ WRITE NO
+SQL> show con_id
+
+CON_ID
+------------------------------
+3
+SQL> show con_name
+
+CON_NAME
+------------------------------
+SBI
+SQL> show pdbs
+
+    CON_ID CON_NAME			  OPEN MODE  RESTRICTED
+---------- ------------------------------ ---------- ----------
+	 3 SBI				  READ WRITE NO
+SQL> connect ven/ven@sbi; 
+Connected.
+[oracle@venky admin]$ impdp ven/ven@sbi directory=imports_dir dumpfile=schema_v.dmp logfile=upload_vtbl.log remap_schema=venky:ven
+
+Import: Release 19.0.0.0.0 - Production on Wed Feb 19 19:48:43 2025
+Version 19.3.0.0.0
+
+Copyright (c) 1982, 2019, Oracle and/or its affiliates.  All rights reserved.
+
+Connected to: Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Master table "VEN"."SYS_IMPORT_FULL_01" successfully loaded/unloaded
+Starting "VEN"."SYS_IMPORT_FULL_01":  ven/********@sbi directory=imports_dir dumpfile=schema_v.dmp logfile=upload_vtbl.log remap_schema=venky:ven 
+Processing object type TABLE_EXPORT/TABLE/TABLE
+Processing object type TABLE_EXPORT/TABLE/TABLE_DATA
+. . imported "VEN"."VTBL"                                5.476 KB       1 rows
+Processing object type TABLE_EXPORT/TABLE/STATISTICS/TABLE_STATISTICS
+Processing object type TABLE_EXPORT/TABLE/STATISTICS/MARKER
+Job "VEN"."SYS_IMPORT_FULL_01" successfully completed at Wed Feb 19 19:49:09 2025 elapsed 0 00:00:25
+
+
+
+
+====================================================================================================================
+														Database-01
+
+
+
+
+SQL> insert into vtbl values (11,'VEN');
+
+1 row created.
+
+SQL> /     
+
+1 row created.
+
+SQL> /
+
+1 row created.
+
+SQL> /
+
+1 row created.
+
+SQL> /
+
+1 row created.
+
+SQL> /
+
+1 row created.
+
+SQL> /
+
+1 row created.
+
+SQL> /
+
+1 row created.
+
+SQL> commit;
+
+Commit complete.
+
+SQL> select * from vtbl;
+
+      SLNO NAME
+---------- --------------------
+	11 VEN
+	11 VEN
+	11 VEN
+	11 VEN
+	11 VEN
+	11 VEN
+	11 VEN
+	11 VEN
+	10 VEN
+
+9 rows selected.
+
+SQL> show con_name
+
+CON_NAME
+------------------------------
+SBI
+SQL> 
+[oracle@venky datapump]$ expdp venky/venky@to_sb directory=backups_dir dumpfile=venky_schema_01.dmp logfile=schema_venky.log tables=venky.vtbl
+
+Export: Release 19.0.0.0.0 - Production on Wed Feb 19 19:51:55 2025
+Version 19.3.0.0.0
+
+Copyright (c) 1982, 2019, Oracle and/or its affiliates.  All rights reserved.
+
+Connected to: Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Starting "VENKY"."SYS_EXPORT_TABLE_01":  venky/********@to_sb directory=backups_dir dumpfile=venky_schema_01.dmp logfile=schema_venky.log tables=venky.vtbl 
+Processing object type TABLE_EXPORT/TABLE/TABLE_DATA
+Processing object type TABLE_EXPORT/TABLE/STATISTICS/TABLE_STATISTICS
+Processing object type TABLE_EXPORT/TABLE/STATISTICS/MARKER
+Processing object type TABLE_EXPORT/TABLE/TABLE
+. . exported "VENKY"."VTBL"                              5.562 KB       9 rows
+Master table "VENKY"."SYS_EXPORT_TABLE_01" successfully loaded/unloaded
+******************************************************************************
+Dump file set for VENKY.SYS_EXPORT_TABLE_01 is:
+  /u01/datapump/venky_schema_01.dmp
+Job "VENKY"."SYS_EXPORT_TABLE_01" successfully completed at Wed Feb 19 19:52:05 2025 elapsed 0 00:00:09
+
+[oracle@venky datapump]$ ll
+total 352
+-rw-r-----. 1 oracle oinstall 176128 Feb 19 19:31 schema_v.dmp
+-rw-r--r--. 1 oracle oinstall   1067 Feb 19 19:52 schema_venky.log
+-rw-r--r--. 1 oracle oinstall   1052 Feb 19 19:31 schemavenky.log
+-rw-r-----. 1 oracle oinstall 176128 Feb 19 19:52 venky_schema_01.dmp
+[oracle@venky datapump]$ scp venky_schema_01.dmp oracle@192.168.138.22:/u01/imports
+oracle@192.168.138.22's password: 
+venky_schema_01.dmp                                                     100%  172KB   2.9MB/s   00:00    
+[oracle@venky datapump]$
+
+
+======================================================================================================================
+
+												Database-02
+
+[oracle@venky admin]$ impdp ven/ven@sbi directory=imports_dir dumpfile=venky_schema_01.dmp 
+					  logfile=ven.log remap_schema=venky:ven table_exists_action=replace
+
+Import: Release 19.0.0.0.0 - Production on Wed Feb 19 19:55:01 2025
+Version 19.3.0.0.0
+
+Copyright (c) 1982, 2019, Oracle and/or its affiliates.  All rights reserved.
+
+Connected to: Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Master table "VEN"."SYS_IMPORT_FULL_01" successfully loaded/unloaded
+Starting "VEN"."SYS_IMPORT_FULL_01":  ven/********@sbi directory=imports_dir dumpfile=venky_schema_01.dmp logfile=ven.log remap_schema=venky:ven table_exists_action=replace 
+Processing object type TABLE_EXPORT/TABLE/TABLE
+Processing object type TABLE_EXPORT/TABLE/TABLE_DATA
+. . imported "VEN"."VTBL"                                5.562 KB       9 rows
+Processing object type TABLE_EXPORT/TABLE/STATISTICS/TABLE_STATISTICS
+Processing object type TABLE_EXPORT/TABLE/STATISTICS/MARKER
+Job "VEN"."SYS_IMPORT_FULL_01" successfully completed at Wed Feb 19 19:55:12 2025 elapsed 0 00:00:10
+SQL> select * from vtbl;
+     SLNO NAME
+---------- --------------------
+	11 VEN
+	11 VEN
+	11 VEN
+	11 VEN
+	11 VEN
+	11 VEN
+	11 VEN
+	11 VEN
+	10 VEN
+
+9 rows selected.
+

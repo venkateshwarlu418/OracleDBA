@@ -1,0 +1,159 @@
+-----############UNDO:
+KNOW YOUR DEFAULT UNDO TABLE SPACE;
+SHOW PARAMETER UNDO_TABLESPACE;
+select VALUE from v$parameter where NAME='undo_tablespace';
+
+SET UNDO_RETENTION value at any time using:
+SQL> ALTER SYSTEM SET UNDO_RETENTION = 2400;
+
+CREATING UNDO TS:
+create undo tablespace <undotablespacename> datafile '<datafilepath>' size 2m reuse autoextend on retention noguarantee;
+CREATE UNDO TABLESPACE undotbs_02 DATAFILE '/u01/undo02.dbf' SIZE 2M REUSE AUTOEXTEND ON RETENTION NOGUARANTEE;
+
+CHANGE UNDO TABLESPACE
+ALTER SYSTEM SET UNDO_TABLESPACE = undotbs_02;
+
+KNOW UNDO RETENTION
+show parameter undo;
+
+Enabling and disabling undo retention guarantee
+SQL> ALTER TABLESPACE undotbs_02 RETENTION GUARANTEE;
+SQL> ALTER TABLESPACE undotbs_02 RETENTION NOGUARANTEE;
+
+CHECK IF YOUR UNDO HAS GUATENTEED RETENTION
+select tablespace_name ,retention from dba_tablespaces where contents = 'UNDO';
+
+
+
+
+
+
+													***********   UNDO Practice ****************
+
+										
+
+sql> SHOW PARAMETER UNDO_TABLESPACE;
+
+NAME				     				TYPE	 VALUE
+------------------------------------ ----------- ------------------------------
+undo_tablespace 		    			string	 UNDOTBS1
+
+
+
+sql> select VALUE from v$parameter where NAME='undo_tablespace';
+
+VALUE
+--------------------------------------------------------------------------------
+UNDOTBS1
+
+--- SET UNDO_RETENTION value at any time using:
+sql> ALTER SYSTEM SET UNDO_RETENTION = 2400;
+
+system altered
+
+--- KNOW YOUR RETENTION
+
+sql> set lines 200 pages 200
+set col sep |
+show parameter undo;
+
+NAME				     				TYPE	 		VALUE
+------------------------------------ ----------- ------------------------------
+		temp_undo_enabled		     	boolean	 FALSE
+		undo_management 		     	string	 AUTO
+		undo_retention			     	integer	 2400
+		undo_tablespace 		     	string	 UNDOTBS1
+
+CREATING UNDO TS:
+sql> CREATE UNDO TABLESPACE undotbs_02 DATAFILE '/u01/undo02.dbf' SIZE 2M REUSE AUTOEXTEND ON RETENTION NOGUARANTEE;
+
+Tablespace created.
+
+
+CHANGE UNDO TABLESPACE
+sql> ALTER SYSTEM SET UNDO_TABLESPACE = undotbs_02;
+
+System altered.
+
+know your retention
+sql> show parameter undo;
+NAME				     				TYPE	 		VALUE
+------------------------------------ ----------- ------------------------------
+temp_undo_enabled		    			 boolean	 	FALSE
+undo_management 		   			     string	 		AUTO
+undo_retention			 			     integer	 	3600
+undo_tablespace 		     			 string	 		UNDOTBS_02
+
+
+Enabling and disabling undo retention guarantee
+sql> alter tablespace undotbs1 retention guarantee;
+
+Tablespace altered.
+
+sql> select tablespace_name ,retention from dba_tablespaces where contents = 'UNDO';
+
+TABLESPACE_NAME 	       RETENTION
+------------------------------ -----------
+UNDOTBS1		       GUARANTEE
+
+
+
+sql> alter tablespace undotbs1 retention noguarantee;
+
+Tablespace altered.
+
+sql> select tablespace_name ,retention from dba_tablespaces where contents = 'UNDO';
+
+TABLESPACE_NAME 	       RETENTION
+------------------------------ -----------
+UNDOTBS1		       NOGUARANTEE
+
+
+CHECK IF YOUR UNDO HAS GUATENTEED RETENTION
+sql> select tablespace_name ,retention from dba_tablespaces where contents = 'UNDO';
+
+TABLESPACE_NAME     |RETENTION
+--------------------|-----------
+UNDOTBS1	    |NOGUARANTEE
+UNDOTBS_02	    |NOGUARANTEE
+
+
+
+to check the tablespaces having retention guarantee or not
+sql> set lines 200 pages 200
+set col sep |
+SELECT tablespace_name, retention FROM dba_tablespaces;
+
+TABLESPACE_NAME 	       RETENTION
+------------------------------ -----------
+SYSTEM			       NOT APPLY
+SYSAUX			       NOT APPLY
+UNDOTBS1		       NOGUARANTEE
+TEMP			       NOT APPLY
+USERS			       NOT APPLY
+HRMS_TS 		       NOT APPLY
+UNDOTBS_02		       NOGUARANTEE
+TEMP_NEW		       NOT APPLY
+TEMP_NEW_01		       NOT APPLY
+
+
+
+
+
+
+
+
+
+
+
+
+
+View Undo storage.
+Use the following queries to view undo tablespaces and rollback segments: 
+
+sql> SELECT * FROM DBA_TABLESPACES WHERE CONTENTS = 'UNDO'; 
+sql> SELECT * FROM V$PARAMETER WHERE NAME = 'undo_tablespace';
+
+Use the following queries to view undo statistics: 
+sql> SELECT * FROM V$ROLLSTAT; 
+sql> SELECT * FROM V$UNDOSTAT;

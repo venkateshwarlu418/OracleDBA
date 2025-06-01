@@ -1,0 +1,800 @@
+
+												Table space Management
+List of Views:
+1. General Tablespace Information
+View Name									Description
+SQL> desc DBA_TABLESPACES				Shows information about all tablespaces in the database.
+SQL> desc USER_TABLESPACES			Shows information about the tablespaces accessible to the current user.
+SQL> desc V$TABLESPACE				Maps tablespace numbers to names (internal use).
+
+SQL> select TS#,NAME,INCLUDED_IN_DATABASE_BACKUP,BIGFILE,FLASHBACK_ON,ENCRYPT_IN_BACKUP,CON_ID from v$tablespace;
+
+    TS# 			NAME 			  	  INC BIG FLA ENC   CON_ID
+---------- ------------------------------ --- --- --- --- ----------
+	 0 				SYSTEM			  		YES NO  YES		   3
+	 1 				SYSAUX			  		YES NO  YES		   3
+	 2 				UNDOTBS1			    YES NO  YES		   3
+	 3 				TEMP 			 	    NO  NO  YES		   3
+	 5 				USERS			        YES NO  YES		   3
+
+
+
+2. Datafiles and Tempfiles
+View Name											Description
+SQL> desc DBA_DATA_FILES						Lists datafiles associated with tablespaces.
+
+SQL> col file_name for a110
+col maxbytes for 9999999999999
+select file_name,file_id,tablespace_name,bytes,blocks,relative_fno,autoextensible,maxbytes,maxblocks,
+increment_by,user_bytes,user_blocks,online_status,lost_write_protect from DBA_DATA_FILES;
+FILE_NAME													  													FILE_ID TABLESPACE_NAME		      			BYTES	BLOCKS 		RELATIVE_FNO AUT      MAXBYTES	MAXBLOCKS INCREMENT_BY USER_BYTES USER_BLOCKS ONLINE_ LOST_WR
+-------------------------------------------------------------------------------------------------------------- ---------- ------------------------------ ---------- ---------- ------------ --- -------------- ---------- ------------ ---------- ----------- ------- -------
+/u01/app/oracle/oradata/PADMA/348C9AEA0E4C1D28E063AF0853A0A754/datafile/o1_mf_system_n1pqlgp2_.dbf					9 		SYSTEM			  			  283115520	 34560			  1		 YES    34359721984	  4194302	  1280		282066944	34432 		SYSTEM  OFF
+/u01/app/oracle/oradata/PADMA/348C9AEA0E4C1D28E063AF0853A0A754/datafile/o1_mf_sysaux_n1pqlgtd_.dbf		       		10 		SYSAUX					      346030080	 42240			  4		 YES    34359721984	  4194302	  1280		344981504	42112 		ONLINE  OFF
+/u01/app/oracle/oradata/PADMA/348C9AEA0E4C1D28E063AF0853A0A754/datafile/o1_mf_undotbs1_n1pqlgtg_.dbf		        11 		UNDOTBS1		  			  104857600	 12800			  9		 YES    34359721984	  4194302	   640		103809024	12672 		ONLINE  OFF
+/u01/app/oracle/oradata/PADMA/348C9AEA0E4C1D28E063AF0853A0A754/datafile/o1_mf_users_n1pqnxln_.dbf		      		12 		USERS 						    5242880	   640			 12		 YES    34359721984	  4194302	   160		  4194304	  512 		ONLINE  OFF
+/u01/app/oracle/oradata/PADMA/datafile/fino001.dbf								       								13 		FINOTS						  104857600	 12800			 13		 YES    34359721984	  4194302	     1		103809024	12672 		ONLINE  OFF
+
+
+
+SQL> desc DBA_TEMP_FILES						Lists tempfiles for temporary tablespaces.
+SQL> select FILE_NAME,FILE_ID,TABLESPACE_NAME,BYTES,BLOCKS,STATUS,RELATIVE_FNO,AUTOEXTENSIBLE,MAXBYTES,MAXBLOCKS,INCREMENT_BY,USER_BYTES,USER_BLOCKS,SHARED,INST_ID from DBA_TEMP_FILES;
+
+FILE_NAME																										  FILE_ID 		TABLESPACE_NAME		      BYTES			BLOCKS STATUS  RELATIVE_FNO AUT       MAXBYTES	MAXBLOCKS INCREMENT_BY USER_BYTES USER_BLOCKS SHARED	       INST_ID
+-------------------------------------------------------------------------------------------------------------- ---------- ------------------------------ ---------- ---------- ------- ------------ --- -------------- ---------- ------------ ---------- ----------- ------------- ----------
+/u01/app/oracle/oradata/PADMA/348C9AEA0E4C1D28E063AF0853A0A754/datafile/o1_mf_temp_n1pqlgtj_.dbf					3 				TEMP				   37748736	  	  4608 ONLINE		  1 	YES    34359721984	  4194302	    80		 36700160	 4480 		SHARED
+
+SQL> desc V$DATAFILE							Runtime information about each datafile.
+SQL> set lines 500 pages 200
+select file#,creation_change#,creation_time,ts#,NAME,rfile#,status,enabled,CHECKPOINT_CHANGE#,CHECKPOINT_TIME,OFFLINE_CHANGE#,ONLINE_CHANGE#,ONLINE_TIME,BYTES,BLOCKS from V$DATAFILE;
+     FILE# CREATION_CHANGE# CREATION_	     TS# NAME																										    RFILE#		 STATUS  ENABLED  CHECKPOINT_CHANGE# CHECKPOIN OFFLINE_CHANGE# ONLINE_CHANGE# ONLINE_TI	 BYTES	   BLOCKS
+---------- ---------------- --------- ---------- -------------------------------------------------------------------------------------------------------------- ---------- ------- ---------- ------------------ --------- --------------- -------------- --------- ---------- ----------
+	 9	   		 2141404	 07-MAY-25	       0 /u01/app/oracle/oradata/PADMA/348C9AEA0E4C1D28E063AF0853A0A754/datafile/o1_mf_system_n1pqlgp2_.dbf				 1			 SYSTEM  READ WRITE		 3088732	 10-MAY-25	   2610778	  2611322		  08-MAY-25  283115520	  34560
+	10	   		 2141408	 07-MAY-25	       1 /u01/app/oracle/oradata/PADMA/348C9AEA0E4C1D28E063AF0853A0A754/datafile/o1_mf_sysaux_n1pqlgtd_.dbf				 4			 ONLINE  READ WRITE		 3088732	 10-MAY-25	   2610778	  2611322		  08-MAY-25  346030080	  42240
+	11	   		 2141411	 07-MAY-25	       2 /u01/app/oracle/oradata/PADMA/348C9AEA0E4C1D28E063AF0853A0A754/datafile/o1_mf_undotbs1_n1pqlgtg_.dbf			 9			 ONLINE  READ WRITE		 3088732	 10-MAY-25	   2610778	  2611322		  08-MAY-25  104857600	  12800
+	12	   		 2142160	 07-MAY-25	       5 /u01/app/oracle/oradata/PADMA/348C9AEA0E4C1D28E063AF0853A0A754/datafile/o1_mf_users_n1pqnxln_.dbf				12			 ONLINE  READ WRITE		 3088732	 10-MAY-25	   2610778	  2611322		  08-MAY-25    5242880	    640
+	13	   		 3101711	 10-MAY-25	       6 /u01/app/oracle/oradata/PADMA/datafile/fino001.dbf																13			 ONLINE  READ WRITE		 3101712	 10-MAY-25		 	 0			0		 	     	 104857600	  12800
+		
+
+
+SQL> desc V$TEMPFILE							Runtime info about tempfiles.
+SQL> col name for a100
+select file#,ts#,name,con_id,status,enabled,creation_time,creation_change#,rfile#,bytes,blocks,create_bytes,block_size from v$tempfile;
+
+     FILE#	  TS# NAME												       CON_ID STATUS  ENABLED	 CREATION_ CREATION_CHANGE#	RFILE#	    BYTES     BLOCKS CREATE_BYTES BLOCK_SIZE
+---------- ---------- ---------------------------------------------------------------------------------------------------- ---------- ------- ---------- --------- ---------------- ---------- ---------- ---------- ------------ ----------
+	 3	    3 /u01/app/oracle/oradata/PADMA/348C9AEA0E4C1D28E063AF0853A0A754/datafile/o1_mf_temp_n1pqlgtj_.dbf		    3 ONLINE  READ WRITE 07-MAY-25	    2141405	     1	 37748736	4608	 37748736	8192
+
+
+3. Space Usage and Free Space
+View Name										Description
+SQL> desc DBA_FREE_SPACE							Shows free extents in tablespaces.
+SQL> select tablespace_name,file_id,block_id,bytes,blocks,relative_fno from dba_free_space;
+
+TABLESPACE_NAME 		    	  FILE_ID   BLOCK_ID	  BYTES     BLOCKS RELATIVE_FNO
+------------------------------ ---------- ---------- ---------- ---------- ------------
+SYSTEM									9      33704	7012352        856	      1
+SYSAUX				 			       10		4976	  65536		 	 8	      4
+SYSAUX				 			       10		5160	  65536		 	 8	      4
+SYSAUX				 			       10		5208	  65536 		 8	      4
+SYSAUX				 			       10      13928	  65536 		 8	      4
+SYSAUX				 			       10      29872	  65536 		 8	      4
+SYSAUX				 			       10      39072   25952256       3168	      4
+UNDOTBS1			 			       11		 432	  65536 		 8	      9
+UNDOTBS1			 			       11		1280	 131072 		16	      9
+UNDOTBS1			 			       11		1304	  65536 		 8	      9
+UNDOTBS1			 			       11		1328	  65536 		 8	      9
+UNDOTBS1			 			       11		1344	 524288 		64	      9
+UNDOTBS1			 			       11		1664	1048576        128	      9
+UNDOTBS1			 			       11		3112	  65536 		 8	      9
+UNDOTBS1			 			       11		4080	  65536 		 8	      9
+UNDOTBS1			 			       11		4392	  65536 		 8	      9
+UNDOTBS1			 			       11		4408	  65536 		 8	      9
+UNDOTBS1			 			       11		4440	  65536 		 8	      9
+UNDOTBS1			 			       11		4464	 131072 		16	      9
+UNDOTBS1			 			       11		5120	1048576 	   128	      9
+UNDOTBS1			 			       11		6656	1048576        128	      9
+UNDOTBS1			 			       11		9344   28311552       3456	      9
+USERS				 			       12		 128	4194304        512	     12
+FINOTS				 			       13		 128  103809024      12672	     13
+
+SQL> desc DBA_SEGMENTS							Shows segment size and allocation info.
+SQL> col owner for a10
+col segment_name for a25
+col segment_type for a15
+col segment_subtype for a15
+col partition_name for a15
+col tablespace_name for a15
+select owner,segment_name,segment_type,segment_subtype,partition_name,tablespace_name from dba_segments where tablespace_name='UNDOTBS1';
+OWNER	   SEGMENT_NAME 	     SEGMENT_TYPE    SEGMENT_SUBTYPE PARTITION_NAME  TABLESPACE_NAME
+---------- ------------------------- --------------- --------------- --------------- ---------------
+SYS	   _SYSSMU1_3588498444$      TYPE2 UNDO 				     UNDOTBS1
+SYS	   _SYSSMU2_2971032042$      TYPE2 UNDO 				     UNDOTBS1
+SYS	   _SYSSMU3_3657342154$      TYPE2 UNDO 				     UNDOTBS1
+SYS	   _SYSSMU4_811969446$	     TYPE2 UNDO 				     UNDOTBS1
+SYS	   _SYSSMU5_3018429039$      TYPE2 UNDO 				     UNDOTBS1
+SYS	   _SYSSMU6_442110264$	     TYPE2 UNDO 				     UNDOTBS1
+SYS	   _SYSSMU7_2728255665$      TYPE2 UNDO 				     UNDOTBS1
+SYS	   _SYSSMU8_801938064$	     TYPE2 UNDO 				     UNDOTBS1
+SYS	   _SYSSMU9_647420285$	     TYPE2 UNDO 				     UNDOTBS1
+SYS	   _SYSSMU10_2262159254$     TYPE2 UNDO 				     UNDOTBS1
+
+
+SQL> desc DBA_EXTENTS								Lists all extents in the database.
+elect owner,segment_name,segment_type,partition_name,tablespace_name,extent_id,file_id,block_id,bytes,blocks,relative_fno from DBA_EXTENTS where tablespace_name='UNDOTBS1';
+
+OWNER	   SEGMENT_NAME 	     SEGMENT_TYPE    PARTITION_NAME  TABLESPACE_NAME  EXTENT_ID    FILE_ID   BLOCK_ID	   BYTES     BLOCKS RELATIVE_FNO
+---------- ------------------------- --------------- --------------- --------------- ---------- ---------- ---------- ---------- ---------- ------------
+SYS	   _SYSSMU1_3588498444$      TYPE2 UNDO 		     UNDOTBS1		      0 	11	  128	   65536	  8	       9
+SYS	   _SYSSMU1_3588498444$      TYPE2 UNDO 		     UNDOTBS1		      1 	11	  136	   65536	  8	       9
+
+SQL> desc DBA_HIST_TBSPC_SPACE_USAGE				Historical space usage for tablespaces (requires AWR).
+SQL> select snap_id,dbid,tablespace_id,tablespace_size,tablespace_maxsize,tablespace_usedsize,rtime,con_dbid,con_id from DBA_HIST_TBSPC_SPACE_USAGE order by snap_id;
+
+   SNAP_ID	 DBID TABLESPACE_ID TABLESPACE_SIZE TABLESPACE_MAXSIZE TABLESPACE_USEDSIZE RTIME		       CON_DBID     CON_ID
+---------- ---------- ------------- --------------- ------------------ ------------------- ------------------------- ---------- ----------
+	 3 3207504262		  0	      34560	       4194302		     33600 05/07/2025 20:30:21	     3403427813 	 3
+	 3 3207504262		  5		640	       4194302		       128 05/07/2025 20:30:21	     3403427813 	 3
+	 3 3207504262		  2	      12800	       4194302		      9280 05/07/2025 20:30:21	     3403427813 	 3
+	 3 3207504262		  1	      42240	       4194302		     39008 05/07/2025 20:30:21	     3403427813 	 3
+	 4 3207504262		  5		640	       4194302		       128 05/07/2025 21:30:44	     3403427813 	 3
+	 4 3207504262		  0	      34560	       4194302		     33600 05/07/2025 21:30:44	     3403427813 	 3
+	 4 3207504262		  3	       4608	       4194302			 0 05/07/2025 21:30:44	     3403427813 	 3
+	 4 3207504262		  1	      42240	       4194302		     39016 05/07/2025 21:30:44	     3403427813 	 3
+	 4 3207504262		  2	      12800	       4194302		      9280 05/07/2025 21:30:44	     3403427813 	 3
+	 5 3207504262		  0	      34560	       4194302		     33600 05/08/2025 15:14:06	     3403427813 	 3
+	 5 3207504262		  5		640	       4194302		       128 05/08/2025 15:14:06	     3403427813 	 3
+	 5 3207504262		  2	      12800	       4194302		      9280 05/08/2025 15:14:06	     3403427813 	 3
+	 5 3207504262		  3	       4608	       4194302			 0 05/08/2025 15:14:06	     3403427813 	 3
+	 5 3207504262		  1	      42240	       4194302		     39016 05/08/2025 15:14:06	     3403427813 	 3
+	 6 3207504262		  5		640	       4194302		       128 05/08/2025 16:30:32	     3403427813 	 3
+	 6 3207504262		  0	      34560	       4194302		     33600 05/08/2025 16:30:32	     3403427813 	 3
+	 6 3207504262		  3	       4608	       4194302			 0 05/08/2025 16:30:32	     3403427813 	 3
+	 6 3207504262		  1	      42240	       4194302		     39016 05/08/2025 16:30:32	     3403427813 	 3
+	 6 3207504262		  2	      12800	       4194302		      9280 05/08/2025 16:30:32	     3403427813 	 3
+	 7 3207504262		  5		640	       4194302		       128 05/08/2025 17:30:56	     3403427813 	 3
+	 7 3207504262		  0	      34560	       4194302		     33600 05/08/2025 17:30:56	     3403427813 	 3
+	 7 3207504262		  3	       4608	       4194302			 0 05/08/2025 17:30:56	     3403427813 	 3
+	 7 3207504262		  2	      12800	       4194302		      9280 05/08/2025 17:30:56	     3403427813 	 3
+	 7 3207504262		  1	      42240	       4194302		     39016 05/08/2025 17:30:56	     3403427813 	 3
+	 8 3207504262		  5		640	       4194302		       128 05/08/2025 19:05:36	     3403427813 	 3
+	 8 3207504262		  0	      34560	       4194302		     33696 05/08/2025 19:05:36	     3403427813 	 3
+	 8 3207504262		  3	       4608	       4194302			 0 05/08/2025 19:05:36	     3403427813 	 3
+	 8 3207504262		  1	      42240	       4194302		     39024 05/08/2025 19:05:36	     3403427813 	 3
+	 8 3207504262		  2	      12800	       4194302		      9280 05/08/2025 19:05:36	     3403427813 	 3
+	 9 3207504262		  0	      34560	       4194302		     33696 05/08/2025 19:30:55	     3403427813 	 3
+	 9 3207504262		  5		640	       4194302		       128 05/08/2025 19:30:55	     3403427813 	 3
+	 9 3207504262		  3	       4608	       4194302			 0 05/08/2025 19:30:55	     3403427813 	 3
+	 9 3207504262		  2	      12800	       4194302		      9280 05/08/2025 19:30:55	     3403427813 	 3
+	 9 3207504262		  1	      42240	       4194302		     39024 05/08/2025 19:30:55	     3403427813 	 3
+	10 3207504262		  3	       4608	       4194302			 0 05/08/2025 21:26:13	     3403427813 	 3
+	10 3207504262		  2	      12800	       4194302		      9280 05/08/2025 21:26:13	     3403427813 	 3
+	10 3207504262		  1	      42240	       4194302		     39024 05/08/2025 21:26:13	     3403427813 	 3
+	10 3207504262		  0	      34560	       4194302		     33696 05/08/2025 21:26:13	     3403427813 	 3
+	10 3207504262		  5		640	       4194302		       128 05/08/2025 21:26:13	     3403427813 	 3
+	11 3207504262		  0	      34560	       4194302		     33696 05/09/2025 07:52:19	     3403427813 	 3
+	11 3207504262		  5		640	       4194302		       128 05/09/2025 07:52:19	     3403427813 	 3
+	11 3207504262		  3	       4608	       4194302			 0 05/09/2025 07:52:19	     3403427813 	 3
+	11 3207504262		  2	      12800	       4194302		      9280 05/09/2025 07:52:19	     3403427813 	 3
+	11 3207504262		  1	      42240	       4194302		     39024 05/09/2025 07:52:19	     3403427813 	 3
+	12 3207504262		  3	       4608	       4194302			 0 05/09/2025 08:30:30	     3403427813 	 3
+	12 3207504262		  2	      12800	       4194302		      9280 05/09/2025 08:30:30	     3403427813 	 3
+	12 3207504262		  1	      42240	       4194302		     39024 05/09/2025 08:30:30	     3403427813 	 3
+	12 3207504262		  0	      34560	       4194302		     33696 05/09/2025 08:30:30	     3403427813 	 3
+	12 3207504262		  5		640	       4194302		       128 05/09/2025 08:30:30	     3403427813 	 3
+	13 3207504262		  1	      42240	       4194302		     39032 05/09/2025 09:30:49	     3403427813 	 3
+	13 3207504262		  0	      34560	       4194302		     33704 05/09/2025 09:30:49	     3403427813 	 3
+	13 3207504262		  2	      12800	       4194302		      8800 05/09/2025 09:30:49	     3403427813 	 3
+	13 3207504262		  3	       4608	       4194302			 0 05/09/2025 09:30:49	     3403427813 	 3
+	13 3207504262		  5		640	       4194302		       128 05/09/2025 09:30:49	     3403427813 	 3
+	14 3207504262		  5		640	       4194302		       128 05/09/2025 16:30:27	     3403427813 	 3
+	14 3207504262		  0	      34560	       4194302		     33704 05/09/2025 16:30:27	     3403427813 	 3
+	14 3207504262		  3	       4608	       4194302			 0 05/09/2025 16:30:27	     3403427813 	 3
+	14 3207504262		  1	      42240	       4194302		     39032 05/09/2025 16:30:27	     3403427813 	 3
+	14 3207504262		  2	      12800	       4194302		      8800 05/09/2025 16:30:27	     3403427813 	 3
+	15 3207504262		  0	      34560	       4194302		     33704 05/10/2025 07:21:18	     3403427813 	 3
+	15 3207504262		  1	      42240	       4194302		     39032 05/10/2025 07:21:18	     3403427813 	 3
+	15 3207504262		  3	       4608	       4194302			 0 05/10/2025 07:21:18	     3403427813 	 3
+	15 3207504262		  2	      12800	       4194302		      8800 05/10/2025 07:21:18	     3403427813 	 3
+	15 3207504262		  5		640	       4194302		       128 05/10/2025 07:21:18	     3403427813 	 3
+
+64 rows selected.
+
+SQL> desc V$TEMP_SPACE_HEADER						Shows usage of temp space by tempfiles.
+SQL> desc V$SORT_SEGMENT							Shows usage of temporary segments.
+SQL> desc V$SORT_USAGE							Shows real-time temp space usage per session.
+
+4. Bigfile and Encrypted Tablespaces
+
+View Name							Description
+V$TABLESPACE_ENCRYPT				Shows encryption status for tablespaces.
+DBA_TABLESPACES.BIGFILE				Indicates whether the tablespace is a bigfile tablespace.
+
+5. Autoextend and Storage Settings
+
+View Name								Description
+DBA_DATA_FILES.AUTOEXTENSIBLE	Whether datafiles can autoextend.
+DBA_TEMP_FILES.AUTOEXTENSIBLE	Whether tempfiles can autoextend.
+
+
+												
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Alter tablespace USERS add datafile '/u01/app/oracle/oradata/BANK/datafile/users2_.dbf'  size 5M autoextend on;
+alter tablespace USERS add datafile '/u01/app/oracle/oradata/BANK/datafile/users3.dbf' size 5M autoextend on;
+
+alter tablespace USERS add datafile '/u01/app/oracle/oradata/BANK/datafile/users3.dbf' size 5M autoextend on;
+
+select file#,name from v$datafile where file#=13;
+
+select FILE_NAME||','||TABLESPACE_NAME||','||FILE_ID||','||STATUS||','||bytes from dba_data_files where file_id = 13;
+
+
+alter database create datafile '/u01/app/oracle/product/19.0.0.0/dbhome_1/dbs/UNNAMED00013' as '/u01/app/oracle/oradata/BANKA/datafile/user2.dbf' size 50M;
+
+
+
+
+unnamed
+
+Primary
+[oracle@bank ~]$ . oraenv
+ORACLE_SID = [bank] ? bank
+The Oracle base remains unchanged with value /u01/app/oracle
+[oracle@bank ~]$ sqlplus / as sysdba
+
+
+
+SQL> startup;
+ORACLE instance started.
+
+
+SQL> archive log list
+
+SQL> set lines 300 pages 300;
+SELECT sequence#, first_time, next_time, applied FROM v$archived_log ORDER BY sequence#;SQL> 
+
+ SEQUENCE# FIRST_TIM NEXT_TIME APPLIED
+---------- --------- --------- ---------
+	 7 05-FEB-25 05-FEB-25 YES
+	 8 05-FEB-25 05-FEB-25 YES
+
+SQL> alter system set standby_file_management = manual scope = both;
+
+System altered.
+
+SQL> SELECT tablespace_name,
+       block_size,
+       extent_management,
+       segment_space_management,
+       status
+FROM   dba_tablespaces
+ORDER BY tablespace_name;  2    3    4    5    6    7  
+
+TABLESPACE_NAME 	       BLOCK_SIZE EXTENT_MAN SEGMEN STATUS
+------------------------------ ---------- ---------- ------ ---------
+SYSAUX				     8192 LOCAL      AUTO   ONLINE
+SYSTEM				     8192 LOCAL      MANUAL ONLINE
+TEMP				     8192 LOCAL      MANUAL ONLINE
+UNDOTBS1			     8192 LOCAL      MANUAL ONLINE
+USERS				     8192 LOCAL      AUTO   ONLINE
+
+SQL> COLUMN file_name FORMAT A70;
+SELECT tablespace_name,
+		file_id,
+       file_name,
+       ROUND(bytes/1024/1024) AS size_mb,
+       ROUND(maxbytes/1024/1024) AS max_size_mb,
+       autoextensible,
+       increment_by,
+       status
+FROM   dba_data_files
+--WHERE  tablespace_name = 'USERS'
+ORDER BY file_id;SQL>   2    3    4    5    6    7    8    9   10   11  
+
+TABLESPACE_NAME 		  FILE_ID FILE_NAME							    SIZE_MB MAX_SIZE_MB AUT INCREMENT_BY STATUS
+------------------------------ ---------- ---------------------------------------------------------------------- ---------- ----------- --- ------------ ---------
+SYSTEM					1 /u01/app/oracle/oradata/BANK/datafile/o1_mf_system_mt6gplps_.dbf		890	  32768 YES	    1280 AVAILABLE
+SYSAUX					3 /u01/app/oracle/oradata/BANK/datafile/o1_mf_sysaux_mt6gtpq6_.dbf		530	  32768 YES	    1280 AVAILABLE
+UNDOTBS1				4 /u01/app/oracle/oradata/BANK/datafile/o1_mf_undotbs1_mt6gw5rc_.dbf		280	  32768 YES	     640 AVAILABLE
+USERS					7 /u01/app/oracle/oradata/BANK/datafile/o1_mf_users_mt6gw6tx_.dbf		  5	  32768 YES	     160 AVAILABLE
+
+SQL> Alter tablespace USERS add datafile '/u01/app/oracle/oradata/BANK/datafile/users2_.dbf'  size 5M autoextend on;
+
+Tablespace altered.
+
+SQL> 
+SQL> 
+SQL> COLUMN file_name FORMAT A70;
+SELECT tablespace_name,
+		file_id,
+       file_name,
+       ROUND(bytes/1024/1024) AS size_mb,
+       ROUND(maxbytes/1024/1024) AS max_size_mb,
+       autoextensible,
+       increment_by,
+       status
+FROM   dba_data_files
+--WHERE  tablespace_name = 'USERS'
+ORDER BY file_id;SQL>   2    3    4    5    6    7    8    9   10   11  
+
+TABLESPACE_NAME 		  FILE_ID FILE_NAME								    SIZE_MB MAX_SIZE_MB AUT INCREMENT_BY STATUS
+------------------------------ ---------- ---------------------------------------------------------------------- ---------- ----------- --- ------------ ---------
+SYSTEM					1 /u01/app/oracle/oradata/BANK/datafile/o1_mf_system_mt6gplps_.dbf		890	  32768 YES	    1280 AVAILABLE
+SYSAUX					3 /u01/app/oracle/oradata/BANK/datafile/o1_mf_sysaux_mt6gtpq6_.dbf		530	  32768 YES	    1280 AVAILABLE
+UNDOTBS1				4 /u01/app/oracle/oradata/BANK/datafile/o1_mf_undotbs1_mt6gw5rc_.dbf		280	  32768 YES	     640 AVAILABLE
+USERS					7 /u01/app/oracle/oradata/BANK/datafile/o1_mf_users_mt6gw6tx_.dbf		  5	  32768 YES	     160 AVAILABLE
+USERS				       13 /u01/app/oracle/oradata/BANK/datafile/users2_.dbf				  5	  32768 YES	       1 AVAILABLE
+
+SQL> 
+SQL> show pdbs;
+
+    CON_ID CON_NAME			  OPEN MODE  RESTRICTED
+---------- ------------------------------ ---------- ----------
+	 2 PDB$SEED			  READ ONLY  NO
+	 3 HDFC 			  READ WRITE NO
+SQL> select FILE_NAME||','||TABLESPACE_NAME||','||FILE_ID||','||STATUS||','||bytes from dba_data_files where file_id = 14;
+
+no rows selected
+
+SQL> select FILE_NAME||','||TABLESPACE_NAME||','||FILE_ID||','||STATUS||','||bytes from dba_data_files where file_id = 13;
+
+FILE_NAME||','||TABLESPACE_NAME||','||FILE_ID||','||STATUS||','||BYTES
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+/u01/app/oracle/oradata/BANK/datafile/users2_.dbf,USERS,13,AVAILABLE,5242880
+
+SQL> /
+
+FILE_NAME||','||TABLESPACE_NAME||','||FILE_ID||','||STATUS||','||BYTES
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+/u01/app/oracle/oradata/BANK/datafile/users2_.dbf,USERS,13,AVAILABLE,5242880
+
+SQL> /
+
+FILE_NAME||','||TABLESPACE_NAME||','||FILE_ID||','||STATUS||','||BYTES
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+/u01/app/oracle/oradata/BANK/datafile/users2_.dbf,USERS,13,AVAILABLE,5242880
+
+SQL> alter system switch logfile;
+
+System altered.
+
+SQL> /
+
+System altered.
+
+SQL> /
+/
+/
+/
+/
+
+System altered.
+
+SQL> 
+System altered.
+
+SQL> 
+
+System altered.
+
+SQL> 
+System altered.
+
+SQL> 
+
+System altered.
+
+SQL> SQL> SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> set lines 300 pages 300;
+SELECT sequence#, first_time, next_time, applied FROM v$archived_log ORDER BY sequence#;SQL> 
+
+ SEQUENCE# FIRST_TIM NEXT_TIME APPLIED
+---------- --------- --------- ---------
+	 7 05-FEB-25 05-FEB-25 YES
+	 8 05-FEB-25 05-FEB-25 YES
+	 8 05-FEB-25 05-FEB-25 YES
+	
+156 rows selected.
+
+SQL> set lines 200
+col DESTINATION for a30
+col ERROR for a50
+select DESTINATION,TYPE,ARCHIVED_THREAD#,APPLIED_SEQ#,ARCHIVED_SEQ#,GAP_STATUS,error from v$archive_dest_status where DEST_ID=2;SQL> SQL> SQL> 
+
+DESTINATION		       TYPE		ARCHIVED_THREAD# APPLIED_SEQ# ARCHIVED_SEQ# GAP_STATUS		     ERROR
+------------------------------ ---------------- ---------------- ------------ ------------- ------------------------ --------------------------------------------------
+to_ba			       PHYSICAL 		       1	   86		 87 NO GAP
+
+SQL> 
+
+
+
+
+
+
+
+
+
+
+
+=======================================================
+Standby
+
+
+[oracle@banka ~]$ . oraenv
+ORACLE_SID = [banka] ? banka
+The Oracle base remains unchanged with value /u01/app/oracle
+[oracle@banka ~]$ sqlplus  / as sysdba
+
+SQL> startup;
+
+SQL> clear screen
+
+
+78 rows selected.
+sql> SHOW PARAMETER standby_file_management;
+SQL> alter system set standby_file_management = manual scope = both;
+
+System altered.
+
+SQL> 
+SQL> 
+SQL> COLUMN file_name FORMAT A70;
+SELECT tablespace_name,
+		file_id,
+       file_name,
+       ROUND(bytes/1024/1024) AS size_mb,
+       ROUND(maxbytes/1024/1024) AS max_size_mb,
+       autoextensible,
+       increment_by,
+       status
+FROM   dba_data_files
+--WHERE  tablespace_name = 'USERS'
+ORDER BY file_id;SQL>   2    3    4    5    6    7    8    9   10   11  
+FROM   dba_data_files
+       *
+ERROR at line 9:
+ORA-01219: database or pluggable database not open: queries allowed on fixed tables or views only
+
+
+SQL> show pdbs;
+
+    CON_ID CON_NAME			  OPEN MODE  RESTRICTED
+---------- ------------------------------ ---------- ----------
+	 2 PDB$SEED			  MOUNTED
+	 3 HDFC 			  MOUNTED
+SQL> alter session set container=HDFC;
+
+Session altered.
+
+SQL> COLUMN file_name FORMAT A70;
+SELECT tablespace_name,
+		file_id,
+       file_name,
+       ROUND(bytes/1024/1024) AS size_mb,
+       ROUND(maxbytes/1024/1024) AS max_size_mb,
+       autoextensible,
+       increment_by,
+       status
+FROM   dba_data_files
+--WHERE  tablespace_name = 'USERS'
+ORDER BY file_id;SQL>   2    3    4    5    6    7    8    9   10   11  
+FROM   dba_data_files
+       *
+ERROR at line 9:
+ORA-01219: database or pluggable database not open: queries allowed on fixed tables or views only
+
+
+SQL> Disconnected from Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.3.0.0.0
+[oracle@banka ~]$ !sq
+sqlplus  / as sysdba
+
+SQL*Plus: Release 19.0.0.0.0 - Production on Thu Feb 6 16:35:32 2025
+Version 19.3.0.0.0
+
+Copyright (c) 1982, 2019, Oracle.  All rights reserved.
+
+
+Connected to:
+Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.3.0.0.0
+
+SQL> select FILE#||','||ERROR||','||STATUS||','||RECOVER||','||FUZZY||','||NAME from v$datafile_header where ERROR='FILE MISSING';
+
+FILE#||','||ERROR||','||STATUS||','||RECOVER||','||FUZZY||','||NAME
+--------------------------------------------------------------------------------
+13,FILE MISSING,ONLINE,,,
+
+SQL> select file#,name from v$datafile where file#=13;
+
+     FILE#
+----------
+NAME
+--------------------------------------------------------------------------------
+	13
+/u01/app/oracle/product/19.0.0.0/dbhome_1/dbs/UNNAMED00013
+
+
+SQL> alter database create datafile '/u01/app/oracle/product/19.0.0.0/dbhome_1/dbs/UNNAMED00013' as '/u01/app/oracle/oradata/BANKA/datafile/user2.dbf' size 50M;
+
+Database altered.
+alter database create datafile '/u01/app/oracle/product/19.0.0.0/dbhome_1/dbs/UNNAMED00016' as '/u01/app/oracle/oradata/BANKA/datafile/user2.dbf' size 50M;
+SQL> alter system set standby_file_management=AUTO sid='*';
+
+System altered.
+
+SQL> alter database recover managed standby database disconnect from session;
+
+Database altered.
+
+SQL> select FILE#||','||ERROR||','||STATUS||','||RECOVER||','||FUZZY||','||NAME from v$datafile_header where ERROR='FILE MISSING';
+
+no rows selected
+
+SQL> set lines 300 pages 300;
+SELECT sequence#, first_time, next_time, applied FROM v$archived_log ORDER BY sequence#;SQL> 
+
+ SEQUENCE# FIRST_TIM NEXT_TIME APPLIED
+---------- --------- --------- ---------
+	 8 05-FEB-25 05-FEB-25 YES
+	 9 05-FEB-25 05-FEB-25 YES
+	10 05-FEB-25 05-FEB-25 YES
+	11 05-FEB-25 05-FEB-25 YES
+	12 05-FEB-25 05-FEB-25 YES
+	86 06-FEB-25 06-FEB-25 NO
+	87 06-FEB-25 06-FEB-25 IN-MEMORY
+
+85 rows selected.
+
+SQL> /
+
+ SEQUENCE# FIRST_TIM NEXT_TIME APPLIED
+---------- --------- --------- ---------
+	 8 05-FEB-25 05-FEB-25 YES
+	 9 05-FEB-25 05-FEB-25 YES
+	
+85 rows selected.
+
+SQL> /
+
+ SEQUENCE# FIRST_TIM NEXT_TIME APPLIED
+---------- --------- --------- ---------
+	 8 05-FEB-25 05-FEB-25 YES
+	 9 05-FEB-25 05-FEB-25 YES
+	10 05-FEB-25 05-FEB-25 YES
+85 rows selected.
+
+SQL> 
+[oracle@banka ~]$ lsnrctl start
+
+LSNRCTL for Linux: Version 19.0.0.0.0 - Production on 06-FEB-2025 16:18:31
+
+Copyright (c) 1991, 2019, Oracle.  All rights reserved.
+
+Starting /u01/app/oracle/product/19.0.0.0/dbhome_1/bin/tnslsnr: please wait...
+
+TNSLSNR for Linux: Version 19.0.0.0.0 - Production
+System parameter file is /u01/app/oracle/product/19.0.0.0/dbhome_1/network/admin/listener.ora
+Log messages written to /u01/app/oracle/diag/tnslsnr/banka/listener/alert/log.xml
+Listening on: (DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=192.168.0.197)(PORT=1521)))
+
+Connecting to (DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=192.168.0.197)(PORT=1521)))
+STATUS of the LISTENER
+------------------------
+Alias                     LISTENER
+Version                   TNSLSNR for Linux: Version 19.0.0.0.0 - Production
+Start Date                06-FEB-2025 16:18:37
+Uptime                    0 days 0 hr. 0 min. 6 sec
+Trace Level               off
+Security                  ON: Local OS Authentication
+SNMP                      OFF
+Listener Parameter File   /u01/app/oracle/product/19.0.0.0/dbhome_1/network/admin/listener.ora
+Listener Log File         /u01/app/oracle/diag/tnslsnr/banka/listener/alert/log.xml
+Listening Endpoints Summary...
+  (DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=192.168.0.197)(PORT=1521)))
+Services Summary...
+Service "banka_DGMGRL" has 1 instance(s).
+  Instance "banka", status UNKNOWN, has 1 handler(s) for this service...
+The command completed successfully
+[oracle@banka ~]$ cd
+[oracle@banka ~]$ cd /u01/app/oracle/fast_recovery_area/BANKA/archivelog/
+[oracle@banka archivelog]$ ll
+total 8
+drwxr-x---. 2 oracle oinstall 4096 Feb  5 21:56 2025_02_05
+drwxr-x---. 2 oracle oinstall 4096 Feb  6 16:21 2025_02_06
+[oracle@banka archivelog]$ cd 2025_02_06
+[oracle@banka 2025_02_06]$ ls -lrtah
+total 2.7M
+drwxr-x---. 4 oracle oinstall   42 Feb  6 16:13 ..
+-rw-r-----. 1 oracle oinstall 1.5K Feb  6 16:19 o1_mf_1_69_mt94ycv2_.arc
+-rw-r-----. 1 oracle oinstall  98K Feb  6 16:19 o1_mf_1_67_mt94yd58_.arc
+
+[oracle@banka 2025_02_06]$ pwd
+/u01/app/oracle/fast_recovery_area/BANKA/archivelog/2025_02_06
+[oracle@banka 2025_02_06]$ ^C
+[oracle@banka 2025_02_06]$ cd /u01/app/oracle/oradata/BANKA
+[oracle@banka BANKA]$ ll
+total 8
+drwxr-x---. 3 oracle oinstall   22 Feb  5 17:13 2D639B0C40361521E0632342031FE634
+drwxr-x---. 3 oracle oinstall   22 Feb  5 17:13 2D63CA49FB3A1D9CE0632342031F38B7
+drwxr-x---. 2 oracle oinstall 4096 Feb  5 17:48 datafile
+drwxr-x---. 2 oracle oinstall 4096 Feb  5 17:15 onlinelog
+[oracle@banka BANKA]$ cd datafile
+[oracle@banka datafile]$ ll
+total 1746976
+-rw-r-----. 1 oracle oinstall 555753472 Feb  6 16:30 o1_mf_sysaux_mt6mqo2y_.dbf
+-rw-r-----. 1 oracle oinstall 933240832 Feb  6 16:30 o1_mf_system_mt6mp7ow_.dbf
+-rw-r-----. 1 oracle oinstall  33562624 Feb  5 17:48 o1_mf_temp_mt6orkxv_.tmp
+-rw-r-----. 1 oracle oinstall 293609472 Feb  6 16:30 o1_mf_undotbs1_mt6mqwcs_.dbf
+-rw-r-----. 1 oracle oinstall   5251072 Feb  6 16:30 o1_mf_users_mt6mrgty_.dbf
+[oracle@banka datafile]$ cd ..
+[oracle@banka BANKA]$ cd 2D63CA49FB3A1D9CE0632342031F38B7
+[oracle@banka 2D63CA49FB3A1D9CE0632342031F38B7]$ ll
+total 4
+drwxr-x---. 2 oracle oinstall 4096 Feb  5 17:48 datafile
+[oracle@banka 2D63CA49FB3A1D9CE0632342031F38B7]$ cd datafile/
+[oracle@banka datafile]$ ll
+total 722976
+-rw-r-----. 1 oracle oinstall 346038272 Feb  6 16:30 o1_mf_sysaux_mt6ms7c5_.dbf
+-rw-r-----. 1 oracle oinstall 283123712 Feb  6 16:30 o1_mf_system_mt6mrr76_.dbf
+-rw-r-----. 1 oracle oinstall  37756928 Feb  5 17:48 o1_mf_temp_mt6oryhm_.tmp
+-rw-r-----. 1 oracle oinstall 104865792 Feb  6 16:30 o1_mf_undotbs1_mt6msgk0_.dbf
+-rw-r-----. 1 oracle oinstall   5251072 Feb  6 16:30 o1_mf_users_mt6msksq_.dbf
+[oracle@banka datafile]$ pwd
+/u01/app/oracle/oradata/BANKA/2D63CA49FB3A1D9CE0632342031F38B7/datafile
+[oracle@banka datafile]$ alter database create datafile '/u01/app/oracle/product/19.0.0.0/dbhome_1/dbs/UNNAMED00013' as '/u01/app/oracle/oradata/BANKA/datafile/user2.dbf' size 50M;
+bash: alter: command not found...
+[oracle@banka datafile]$ /u01/app/oracle/fast_recovery_area/BANKA/archivelog/2025_02_06
+bash: /u01/app/oracle/fast_recovery_area/BANKA/archivelog/2025_02_06: Is a directory
+[oracle@banka datafile]$ ll
+total 722976
+-rw-r-----. 1 oracle oinstall 346038272 Feb  6 16:52 o1_mf_sysaux_mt6ms7c5_.dbf
+-rw-r-----. 1 oracle oinstall 283123712 Feb  6 16:58 o1_mf_system_mt6mrr76_.dbf
+-rw-r-----. 1 oracle oinstall  37756928 Feb  5 17:48 o1_mf_temp_mt6oryhm_.tmp
+-rw-r-----. 1 oracle oinstall 104865792 Feb  6 16:58 o1_mf_undotbs1_mt6msgk0_.dbf
+-rw-r-----. 1 oracle oinstall   5251072 Feb  6 16:52 o1_mf_users_mt6msksq_.dbf
+[oracle@banka datafile]$ 
+
+
+
